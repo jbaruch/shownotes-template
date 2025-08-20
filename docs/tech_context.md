@@ -3,7 +3,7 @@
 ## Technology Stack
 
 ### Core Platform
-- **Static Site Generator**: Jekyll, Next.js, or Nuxt.js (to be determined)
+- **Static Site Generator**: Jekyll (GitHub Pages native)
 - **Template Engine**: Liquid, React, or Vue.js components
 - **Build System**: GitHub Actions CI/CD
 - **Hosting**: GitHub Pages

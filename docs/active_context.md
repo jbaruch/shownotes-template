@@ -88,19 +88,55 @@ Provide a mobile-optimized platform accessible via QR codes during talks, offeri
 - No protected file violations occurred
 - User approval required before proceeding
 
-## Outstanding Questions
+## Three-Phase Development Roadmap
 
-### For User Clarification
-1. Preferred email service provider for notifications
-2. Analytics preference (privacy-focused vs full-featured)
-3. Conference branding requirements specificity
-4. Multi-language support requirements
+### Phase 1: MVP - Simple Shownotes Page
+**Goal**: Demonstrate feasibility of the approach
+- Single talk page template
+- Basic resource display (slides, links)
+- Mobile-responsive design
+- QR code accessibility
+- Minimal viable functionality to prove concept
 
-### Technical Validation Needed
-1. GitHub Pages custom domain setup complexity
-2. Serverless function provider selection
-3. Email template design requirements
-4. QR code generation approach (client vs server)
+### Phase 2: Migration - Notist Archive Migration
+**Goal**: Migrate existing shownotes archive from noti.st (speaking.jbaru.ch)
+- Import existing talk data and resources
+- Maintain URL structure for SEO/bookmarks
+- Batch content migration tools
+- Validate all content transfers correctly
+
+### Phase 3: Full Featured Platform  
+**Goal**: Complete conference platform with management features
+- Email notification system
+- Feedback collection forms
+- Talk creation and editing interface
+- Template system for reusing talk structures
+- Multi-conference support
+- Analytics and reporting
+
+## Decisions Made from User Input
+
+### ✅ Technology Stack Confirmed
+- **Static Site Generator**: Jekyll (GitHub Pages native)
+- **Email Service**: Standard recommendation (SendGrid/Mailgun) for Phase 3
+- **Analytics**: Privacy-focused approach (Plausible/Fathom)
+
+### ✅ Development Approach
+- **Phase 1 Focus**: Single page proof of concept
+- **Migration Priority**: Preserve existing content and URLs
+- **Feature Rollout**: Incremental complexity addition
+
+### Phase 1 Scope Refinement
+**Current Phase Focus**: MVP - Single shownotes page
+- Simplified from original multi-conference vision
+- Proof of concept for Jekyll + GitHub Pages approach
+- Foundation for Phase 2 migration work
+
+### Technical Validation Needed (Future Phases)
+1. Notist data export format and migration approach (Phase 2)
+2. URL structure preservation strategy (Phase 2)
+3. Serverless function provider selection (Phase 3)
+4. Email template design requirements (Phase 3)
 
 ## Risk Register
 
