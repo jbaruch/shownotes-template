@@ -161,3 +161,182 @@ Feature: MVP Shownotes Page
     And I should see any code repositories or demos
     And I should find relevant links mentioned during the talk
     And resources should be organized in a logical, scannable order
+
+  # Maps to TS-045 through TS-048: WCAG Compliance
+  Scenario: Talk page meets accessibility standards
+    Given a talk page with complete content
+    When evaluated with accessibility testing tools
+    Then WCAG 2.1 AA automated tests should pass
+    And screen readers should navigate all content sections
+    And all interactive elements should be reachable via keyboard only
+    And color contrast ratios should measure at least 4.5:1 for normal text
+
+  # Maps to TS-049 through TS-052: Semantic Structure
+  Scenario: Talk page uses proper semantic HTML structure
+    Given a rendered talk page
+    When analyzing the HTML markup
+    Then semantic HTML elements should be used (article, section, nav)
+    And headings should follow logical hierarchy (h1 → h2 → h3)
+    And all images should have descriptive alt attributes
+    And skip navigation links should enable content jumping
+
+  # Maps to TS-053 through TS-055: Notification Placeholders
+  Scenario: Talk page includes future feature placeholders
+    Given a talk page design
+    When reviewing the layout sections
+    Then placeholder for email notifications should be visible
+    And future feature areas should be designed into layout
+    And design patterns should remain consistent across sections
+
+  # Maps to TS-056 through TS-059: GitHub Pages Deployment
+  Scenario: Site deploys automatically via GitHub Pages
+    Given a GitHub repository with Jekyll site
+    When code is pushed to main branch
+    Then GitHub Actions workflow should run successfully
+    And site should deploy to GitHub Pages automatically
+    And custom domain should serve content correctly
+    And all connections should redirect to HTTPS
+
+  # Maps to TS-060 through TS-063: File Structure
+  Scenario: Jekyll site maintains proper file organization
+    Given a Jekyll site file structure
+    When examining the organization
+    Then talks should be stored in _talks/ directory
+    And URLs should follow hierarchical structure
+    And file naming should follow consistent conventions
+    And assets should be organized logically by type
+
+  # Maps to TS-064 through TS-067: Build Performance
+  Scenario: Jekyll build process performs efficiently
+    Given Jekyll build process
+    When site builds are triggered
+    Then full builds should complete within 5 minutes
+    And incremental builds should be faster than full builds
+    And build failures should not break the deployment
+    And error messages should clearly indicate problems
+
+  # Maps to TS-068 through TS-071: Progressive Enhancement
+  Scenario: Talk page provides progressive enhancement
+    Given various browser capabilities
+    When JavaScript is disabled or CSS fails to load
+    Then core functionality should work (reading content, following links)
+    And JavaScript-enhanced features should degrade gracefully
+    And older browsers should receive usable experience
+    And missing CSS should not break content accessibility
+
+  # Maps to TS-072 through TS-075: Transport Security
+  Scenario: Talk page enforces proper security measures
+    Given HTTP requests to the site
+    When analyzing security headers and responses
+    Then all HTTP requests should redirect to HTTPS
+    And HSTS headers should prevent downgrade attacks
+    And CSP headers should prevent code injection
+    And X-Frame-Options should prevent clickjacking
+
+  # Maps to TS-076 through TS-081: Required Fields
+  Scenario Outline: Talk frontmatter validates required fields correctly
+    Given talk frontmatter data with <field> as <value>
+    When validating required fields
+    Then <field> should <validation_result>
+
+    Examples:
+      | field      | value                    | validation_result                    |
+      | slug       | "unique-talk-identifier" | be unique across all talks          |
+      | title      | "Valid Title"            | be present and ≤ 200 characters     |
+      | speaker    | "Jane Developer"         | be present and ≤ 100 characters     |
+      | conference | "JSConf 2024"           | be present and ≤ 100 characters     |
+      | date       | "2024-03-15"            | follow ISO 8601 format              |
+      | status     | "completed"             | be one of: upcoming|completed|in-progress |
+
+  # Maps to TS-082 through TS-085: Optional Fields
+  Scenario: Talk frontmatter handles optional fields correctly
+    Given talk frontmatter with various optional fields
+    When processing the content
+    Then location should validate as ≤ 200 characters when present
+    And description should validate as ≤ 500 characters when present
+    And abstract should validate as ≤ 2000 characters when present
+    And level should validate as beginner|intermediate|advanced when present
+    And missing optional fields should not cause errors
+
+  # Maps to TS-086 through TS-089: Resource Structure
+  Scenario: Resources validate proper structure
+    Given resource data in frontmatter
+    When validating resource structure
+    Then type should be one of: slides|code|link|video
+    And title should be present and ≤ 100 characters
+    And URL should follow valid URL format
+    And description should be optional but ≤ 200 characters when present
+
+  # Maps to TS-090 through TS-093: Resource Validation
+  Scenario: Resource URLs are properly validated and handled
+    Given various resource URL formats
+    When processing resources
+    Then valid URLs should pass validation
+    And invalid URLs should show clear error messages
+    And broken links should not break page rendering
+    And resources should group correctly by type
+    And multiple resources of same type should be supported
+
+  # Maps to TS-094 through TS-097: Social Information
+  Scenario: Speaker social information validates and renders correctly
+    Given speaker social information in frontmatter
+    When rendering speaker section
+    Then Twitter handles should validate @username format
+    And GitHub usernames should validate platform rules
+    And website URLs should validate as proper URLs
+    And LinkedIn profiles should validate URL format
+    And missing social fields should not show broken sections
+
+  # Maps to TS-098 through TS-101: Page Navigation
+  Scenario: Site navigation functions properly across pages
+    Given site navigation structure
+    When navigating between pages
+    Then page hierarchy should be visually clear
+    And breadcrumbs should show current location
+    And browser back/forward buttons should function correctly
+    And keyboard focus should be maintained during navigation
+
+  # Maps to TS-102 through TS-105: Content Discovery
+  Scenario: Content discovery features work as expected
+    Given multiple talks in the system
+    When accessing content discovery features
+    Then talk listing page should show all talks
+    And talks should be organized by date/conference
+    And content organization should follow logical patterns
+    And future search/recommendation features should have placeholders
+
+  # Maps to TS-106 through TS-109: Design Consistency
+  Scenario: Visual design remains consistent across all pages
+    Given multiple pages of the site
+    When comparing visual design elements
+    Then heading styles should be consistent across pages
+    And color scheme should follow defined palette
+    And font choices and sizing should be consistent
+    And interactive states should provide clear visual feedback
+
+  # Maps to TS-110 through TS-113: Brand Customization
+  Scenario: Site supports basic theming and customization
+    Given customization requirements
+    When applying theme changes
+    Then CSS variables should allow color customization
+    And logo replacement should work correctly
+    And theme changes should maintain design consistency
+    And design system principles should be preserved
+
+  # Maps to TS-114 through TS-117: User-Facing Errors
+  Scenario: Error conditions are handled gracefully with helpful messages
+    Given various error conditions
+    When users encounter errors
+    Then 404 pages should provide helpful information
+    And broken resource links should show appropriate messages
+    And error messages should be user-friendly
+    And recovery options should be suggested
+
+  # Maps to TS-118 through TS-121: Graceful Degradation
+  Scenario: Site handles incomplete or malformed content gracefully
+    Given incomplete or malformed content
+    When pages are rendered
+    Then missing fields should not break layout
+    And partial data should still show useful information
+    And fallback content should appear where appropriate
+    And core functionality should remain available

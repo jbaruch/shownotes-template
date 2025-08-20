@@ -223,6 +223,353 @@ AND external links include rel="noopener" for security
 AND no script injection vulnerabilities exist
 ```
 
+### From REQ-1.4.1: WCAG Compliance
+
+**Test Scenarios:**
+- **TS-045**: Site meets WCAG 2.1 AA standards
+- **TS-046**: Screen reader navigation functions correctly
+- **TS-047**: Keyboard navigation covers all interactive elements
+- **TS-048**: Color contrast ratios meet 4.5:1 minimum requirement
+
+**Testable Assertions:**
+```
+GIVEN accessibility testing tools and screen readers
+WHEN evaluating the talk page
+THEN WCAG 2.1 AA automated tests pass
+AND screen readers can navigate all content sections
+AND all interactive elements are reachable via keyboard only
+AND color contrast ratios measure at least 4.5:1 for normal text
+```
+
+### From REQ-1.4.2: Semantic Structure
+
+**Test Scenarios:**
+- **TS-049**: HTML uses proper semantic elements
+- **TS-050**: Heading hierarchy follows logical structure
+- **TS-051**: Images have appropriate alt text
+- **TS-052**: Skip navigation links are present
+
+**Testable Assertions:**
+```
+GIVEN HTML markup of talk pages
+WHEN analyzing document structure
+THEN semantic HTML elements are used (article, section, nav, etc.)
+AND headings follow logical hierarchy (h1 → h2 → h3)
+AND all images have descriptive alt attributes
+AND skip navigation links enable content jumping
+```
+
+### From REQ-1.5.1: Notification Placeholders
+
+**Test Scenarios:**
+- **TS-053**: Email notification placeholder is present
+- **TS-054**: Layout accommodates future features
+- **TS-055**: Design patterns remain consistent
+
+**Testable Assertions:**
+```
+GIVEN a talk page design
+WHEN reviewing layout sections
+THEN placeholder for email notifications is visible
+AND future feature areas are designed into layout
+AND design patterns are consistent across sections
+```
+
+### From REQ-2.1.2: GitHub Pages Deployment
+
+**Test Scenarios:**
+- **TS-056**: Site deploys automatically via GitHub Actions
+- **TS-057**: Content serves via GitHub Pages CDN
+- **TS-058**: Custom domain configuration works
+- **TS-059**: HTTPS connections are enforced
+
+**Testable Assertions:**
+```
+GIVEN GitHub repository with Jekyll site
+WHEN code is pushed to main branch
+THEN GitHub Actions workflow runs successfully
+AND site deploys to GitHub Pages automatically
+AND custom domain serves content correctly
+AND all connections redirect to HTTPS
+```
+
+### From REQ-2.2.2: File Structure
+
+**Test Scenarios:**
+- **TS-060**: Talks organize in _talks/ collection
+- **TS-061**: URL structure follows hierarchy
+- **TS-062**: Naming conventions are consistent
+- **TS-063**: Asset organization is logical
+
+**Testable Assertions:**
+```
+GIVEN Jekyll site file structure
+WHEN examining organization
+THEN talks are stored in _talks/ directory
+AND URLs follow hierarchical structure
+AND file naming follows consistent conventions
+AND assets are organized logically by type
+```
+
+### From REQ-2.3.2: Build Performance
+
+**Test Scenarios:**
+- **TS-064**: Builds complete within 5 minutes
+- **TS-065**: Incremental builds work when possible
+- **TS-066**: Build failures are handled gracefully
+- **TS-067**: Error messaging is clear
+
+**Testable Assertions:**
+```
+GIVEN Jekyll build process
+WHEN site builds are triggered
+THEN full builds complete within 5 minutes
+AND incremental builds are faster than full builds
+AND build failures don't break the deployment
+AND error messages clearly indicate problems
+```
+
+### From REQ-2.4.2: Progressive Enhancement
+
+**Test Scenarios:**
+- **TS-068**: Core functionality works without JavaScript
+- **TS-069**: JavaScript enhances but doesn't break experience
+- **TS-070**: Graceful degradation for older browsers
+- **TS-071**: CSS loading failures are handled
+
+**Testable Assertions:**
+```
+GIVEN various browser capabilities
+WHEN JavaScript is disabled or CSS fails to load
+THEN core functionality (reading content, following links) works
+AND JavaScript-enhanced features degrade gracefully
+AND older browsers receive usable experience
+AND missing CSS doesn't break content accessibility
+```
+
+### From REQ-2.5.2: Transport Security
+
+**Test Scenarios:**
+- **TS-072**: HTTPS is enforced for all connections
+- **TS-073**: Security headers are present (HSTS, CSP)
+- **TS-074**: External links are handled securely
+- **TS-075**: Clickjacking protection is active
+
+**Testable Assertions:**
+```
+GIVEN HTTP requests to the site
+WHEN analyzing security headers and responses
+THEN all HTTP requests redirect to HTTPS
+AND HSTS headers prevent downgrade attacks
+AND CSP headers prevent code injection
+AND X-Frame-Options prevents clickjacking
+```
+
+### From REQ-3.1.1: Required Fields
+
+**Test Scenarios:**
+- **TS-076**: Talk has unique identifier (slug)
+- **TS-077**: Title is present and within 200 characters
+- **TS-078**: Speaker name is present and within 100 characters
+- **TS-079**: Conference name is present and within 100 characters
+- **TS-080**: Date follows ISO 8601 format
+- **TS-081**: Status is valid enum value
+
+**Testable Assertions:**
+```
+GIVEN talk frontmatter data
+WHEN validating required fields
+THEN slug is unique across all talks
+AND title is present and ≤ 200 characters
+AND speaker name is present and ≤ 100 characters
+AND conference name is present and ≤ 100 characters
+AND date follows ISO 8601 format (YYYY-MM-DD)
+AND status is one of: upcoming|completed|in-progress
+```
+
+### From REQ-3.1.2: Optional Fields
+
+**Test Scenarios:**
+- **TS-082**: Optional fields validate when present
+- **TS-083**: Missing optional fields don't break rendering
+- **TS-084**: Field length limits are enforced
+- **TS-085**: Enum values are validated
+
+**Testable Assertions:**
+```
+GIVEN talk frontmatter with various optional fields
+WHEN processing the content
+THEN location validates as ≤ 200 characters when present
+AND description validates as ≤ 500 characters when present
+AND abstract validates as ≤ 2000 characters when present
+AND level validates as beginner|intermediate|advanced when present
+AND missing optional fields don't cause errors
+```
+
+### From REQ-3.2.1: Resource Structure
+
+**Test Scenarios:**
+- **TS-086**: Resources have valid type enum values
+- **TS-087**: Resource titles are within character limits
+- **TS-088**: Resource URLs follow valid format
+- **TS-089**: Resource descriptions are optional but limited
+
+**Testable Assertions:**
+```
+GIVEN resource data in frontmatter
+WHEN validating resource structure
+THEN type is one of: slides|code|link|video
+AND title is present and ≤ 100 characters
+AND URL follows valid URL format
+AND description is optional but ≤ 200 characters when present
+```
+
+### From REQ-3.2.2: Resource Validation
+
+**Test Scenarios:**
+- **TS-090**: URL formats are validated
+- **TS-091**: Broken/unavailable resources are handled
+- **TS-092**: Resources are categorized by type
+- **TS-093**: Multiple resources per category are supported
+
+**Testable Assertions:**
+```
+GIVEN various resource URL formats
+WHEN processing resources
+THEN valid URLs pass validation
+AND invalid URLs show clear error messages
+AND broken links don't break page rendering
+AND resources group correctly by type
+AND multiple resources of same type are supported
+```
+
+### From REQ-3.3.1: Social Information
+
+**Test Scenarios:**
+- **TS-094**: Speaker social links validate correctly
+- **TS-095**: Social handles follow platform conventions
+- **TS-096**: Social links render appropriately
+- **TS-097**: Missing social information doesn't break display
+
+**Testable Assertions:**
+```
+GIVEN speaker social information in frontmatter
+WHEN rendering speaker section
+THEN Twitter handles validate @username format
+AND GitHub usernames validate platform rules
+AND website URLs validate as proper URLs
+AND LinkedIn profiles validate URL format
+AND missing social fields don't show broken sections
+```
+
+### From REQ-4.1.1: Page Navigation
+
+**Test Scenarios:**
+- **TS-098**: Page hierarchy is clear and logical
+- **TS-099**: Breadcrumb navigation is present
+- **TS-100**: Browser back/forward buttons work
+- **TS-101**: Focus management is maintained
+
+**Testable Assertions:**
+```
+GIVEN site navigation structure
+WHEN navigating between pages
+THEN page hierarchy is visually clear
+AND breadcrumbs show current location
+AND browser back/forward buttons function correctly
+AND keyboard focus is maintained during navigation
+```
+
+### From REQ-4.1.2: Content Discovery
+
+**Test Scenarios:**
+- **TS-102**: Talk listing page exists and functions
+- **TS-103**: Content is organized logically
+- **TS-104**: Basic search functionality works (future)
+- **TS-105**: Related content suggestions work (future)
+
+**Testable Assertions:**
+```
+GIVEN multiple talks in the system
+WHEN accessing content discovery features
+THEN talk listing page shows all talks
+AND talks are organized by date/conference
+AND content organization follows logical patterns
+AND future search/recommendation features have placeholders
+```
+
+### From REQ-4.2.1: Design Consistency
+
+**Test Scenarios:**
+- **TS-106**: Visual hierarchy is consistent across pages
+- **TS-107**: Color scheme is consistent
+- **TS-108**: Typography is consistent
+- **TS-109**: Visual feedback is clear
+
+**Testable Assertions:**
+```
+GIVEN multiple pages of the site
+WHEN comparing visual design elements
+THEN heading styles are consistent across pages
+AND color scheme follows defined palette
+AND font choices and sizing are consistent
+AND interactive states provide clear visual feedback
+```
+
+### From REQ-4.2.2: Brand Customization
+
+**Test Scenarios:**
+- **TS-110**: Basic theming is supported
+- **TS-111**: Logo customization works
+- **TS-112**: Color scheme modification is possible
+- **TS-113**: Design system principles are maintained
+
+**Testable Assertions:**
+```
+GIVEN customization requirements
+WHEN applying theme changes
+THEN CSS variables allow color customization
+AND logo replacement works correctly
+AND theme changes maintain design consistency
+AND design system principles are preserved
+```
+
+### From REQ-4.3.1: User-Facing Errors
+
+**Test Scenarios:**
+- **TS-114**: 404 error pages are helpful
+- **TS-115**: Broken resource links are handled gracefully
+- **TS-116**: Error messages are clear
+- **TS-117**: Recovery suggestions are provided
+
+**Testable Assertions:**
+```
+GIVEN various error conditions
+WHEN users encounter errors
+THEN 404 pages provide helpful information
+AND broken resource links show appropriate messages
+AND error messages are user-friendly
+AND recovery options are suggested
+```
+
+### From REQ-4.3.2: Graceful Degradation
+
+**Test Scenarios:**
+- **TS-118**: Missing content fields are handled
+- **TS-119**: Partial data doesn't break functionality
+- **TS-120**: Fallback content is provided
+- **TS-121**: Functionality is maintained with errors
+
+**Testable Assertions:**
+```
+GIVEN incomplete or malformed content
+WHEN pages are rendered
+THEN missing fields don't break layout
+AND partial data still shows useful information
+AND fallback content appears where appropriate
+AND core functionality remains available
+```
+
 ---
 
 ## Test Implementation Requirements
@@ -253,9 +600,46 @@ Each test scenario MUST:
 
 ## Test-First Development Workflow
 
-1. **Test Scenarios** (this document) define WHAT to test
+1. **Test Scenarios** (this document) define WHAT to test - **121 scenarios covering all 31 requirements**
 2. **Gherkin Features** will define HOW to test (user-readable specifications)
 3. **Test Implementation** will create failing tests that specify exact behavior
 4. **Code Implementation** will make those tests pass
 
 This ensures that every line of code serves a tested requirement and that specifications drive implementation rather than the reverse.
+
+## Complete Requirements Coverage
+
+### ✅ All 31 Requirements Now Covered:
+- **REQ-1.1.1** → TS-001 through TS-005 (Talk Information Display)
+- **REQ-1.1.2** → TS-006 through TS-010 (Resource Management)
+- **REQ-1.1.3** → TS-011 through TS-014 (Content Rendering)
+- **REQ-1.2.1** → TS-015 through TS-018 (Responsive Design)
+- **REQ-1.2.2** → TS-019 through TS-021 (Mobile Performance)
+- **REQ-1.3.1** → TS-022 through TS-024 (URL Structure)
+- **REQ-1.3.2** → TS-025 through TS-027 (Social Sharing)
+- **REQ-1.4.1** → TS-045 through TS-048 (WCAG Compliance)
+- **REQ-1.4.2** → TS-049 through TS-052 (Semantic Structure)
+- **REQ-1.5.1** → TS-053 through TS-055 (Notification Placeholders)
+- **REQ-2.1.1** → TS-028 through TS-031 (Jekyll Implementation)
+- **REQ-2.1.2** → TS-056 through TS-059 (GitHub Pages Deployment)
+- **REQ-2.2.1** → TS-032 through TS-034 (Markdown Support)
+- **REQ-2.2.2** → TS-060 through TS-063 (File Structure)
+- **REQ-2.3.1** → TS-035 through TS-038 (Page Load Performance)
+- **REQ-2.3.2** → TS-064 through TS-067 (Build Performance)
+- **REQ-2.4.1** → TS-039 through TS-041 (Supported Browsers)
+- **REQ-2.4.2** → TS-068 through TS-071 (Progressive Enhancement)
+- **REQ-2.5.1** → TS-042 through TS-044 (Content Security)
+- **REQ-2.5.2** → TS-072 through TS-075 (Transport Security)
+- **REQ-3.1.1** → TS-076 through TS-081 (Required Fields)
+- **REQ-3.1.2** → TS-082 through TS-085 (Optional Fields)
+- **REQ-3.2.1** → TS-086 through TS-089 (Resource Structure)
+- **REQ-3.2.2** → TS-090 through TS-093 (Resource Validation)
+- **REQ-3.3.1** → TS-094 through TS-097 (Social Information)
+- **REQ-4.1.1** → TS-098 through TS-101 (Page Navigation)
+- **REQ-4.1.2** → TS-102 through TS-105 (Content Discovery)
+- **REQ-4.2.1** → TS-106 through TS-109 (Design Consistency)
+- **REQ-4.2.2** → TS-110 through TS-113 (Brand Customization)
+- **REQ-4.3.1** → TS-114 through TS-117 (User-Facing Errors)
+- **REQ-4.3.2** → TS-118 through TS-121 (Graceful Degradation)
+
+**Total Coverage**: 31 Requirements → 121 Test Scenarios (100% coverage)
