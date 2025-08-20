@@ -1,288 +1,261 @@
-# Test Scenarios - MVP Shownotes Platform
+# Test Scenarios - MVP Shownotes Platform (Test-First Approach)
 
 ## Overview
 
-This document outlines the comprehensive test scenarios for the MVP shownotes platform, mapping directly to the Gherkin feature specifications and ensuring complete coverage of user workflows and technical requirements.
+This document defines test scenarios derived directly from requirements, following test-first development methodology. Each test scenario maps to specific requirements and defines testable behaviors that must be implemented.
 
-## User Journey Test Scenarios
+---
 
-### 1. QR Code Verification During Talk
+## Test-Driven Requirements Mapping
 
-**Primary Flow:**
-- Speaker displays QR code during presentation
-- Attendee scans QR code with mobile device
-- Page loads within reasonable timeframe
-- User verifies content and bookmarks for later
+### From REQ-1.1.1: Talk Information Display
 
-**Test Cases:**
-- **T1.1**: QR code scan on iOS Safari
-- **T1.2**: QR code scan on Android Chrome  
-- **T1.3**: Manual URL entry on mobile
-- **T1.4**: Page load time under conference Wi-Fi conditions
-- **T1.5**: Bookmark functionality across browsers
+**Test Scenarios:**
+- **TS-001**: Talk title displays as H1 element
+- **TS-002**: Speaker name displays prominently in page header
+- **TS-003**: Conference name and date render in metadata section
+- **TS-004**: Talk status shows with appropriate visual styling
+- **TS-005**: Talk description renders from YAML frontmatter
 
-**Success Criteria:**
-- Page loads within 5 seconds on 3G connection
-- QR code resolves to correct shownotes page
-- Mobile browsers display content properly
-- URL is bookmarkable and shareable
+**Testable Assertions:**
+```
+GIVEN a talk page with frontmatter data
+WHEN the page renders
+THEN the talk title appears as the main H1 heading
+AND the speaker name displays prominently near the title
+AND conference name and date appear in the metadata section
+AND talk status shows with status-specific CSS class
+AND description text renders from the frontmatter description field
+```
 
-### 2. Mobile Responsiveness
+### From REQ-1.1.2: Resource Management
 
-**Primary Flow:**
-- User accesses page on various mobile devices
-- Content displays optimally across screen sizes
-- Interactive elements are touch-friendly
-- Text remains readable without zooming
+**Test Scenarios:**
+- **TS-006**: Slides resource displays with clear labeling
+- **TS-007**: Code repository links render when present in frontmatter
+- **TS-008**: Additional reference links show with descriptions
+- **TS-009**: Missing resources don't break page layout
+- **TS-010**: External links open in new tabs/windows
 
-**Test Cases:**
-- **T2.1**: iPhone 12 Pro (375x812) display
-- **T2.2**: Samsung Galaxy S21 (360x800) display
-- **T2.3**: iPad (768x1024) display
-- **T2.4**: Touch target accessibility (min 44px)
-- **T2.5**: Text readability without zoom
-- **T2.6**: Horizontal scroll absence
+**Testable Assertions:**
+```
+GIVEN a talk with resources defined in frontmatter
+WHEN the page renders
+THEN slides link appears with "Slides" label
+AND code repository link displays with "Code" label
+AND additional links render with their specified titles and descriptions
+AND missing resource sections are hidden or show placeholder
+AND all external resource links have target="_blank" and rel="noopener"
+```
 
-**Success Criteria:**
-- All content fits within viewport
-- Touch targets meet accessibility guidelines
-- Text contrast ratios exceed WCAG AA standards
-- Navigation remains functional on all devices
+### From REQ-1.1.3: Content Rendering
 
-### 3. Talk Metadata Display
+**Test Scenarios:**
+- **TS-011**: Markdown content processes into HTML correctly
+- **TS-012**: YAML frontmatter parses into page variables
+- **TS-013**: Special characters render safely (no XSS)
+- **TS-014**: Code blocks render with syntax highlighting
 
-**Primary Flow:**
-- User visits shownotes page
-- Essential talk information displays clearly
-- Metadata provides context and credibility
+**Testable Assertions:**
+```
+GIVEN a talk file with Markdown content and YAML frontmatter
+WHEN Jekyll processes the file
+THEN Markdown converts to proper HTML structure
+AND YAML frontmatter values populate template variables
+AND special characters are HTML-escaped
+AND code blocks render with appropriate syntax highlighting
+```
 
-**Test Cases:**
-- **T3.1**: Talk title prominence and hierarchy
-- **T3.2**: Speaker name display and formatting
-- **T3.3**: Conference name and branding
-- **T3.4**: Date formatting and localization
-- **T3.5**: Talk status indication (completed/upcoming)
-- **T3.6**: Description rendering and length
+### From REQ-1.2.1: Responsive Design
 
-**Success Criteria:**
-- H1 heading contains talk title
-- Speaker name is prominent and clickable
-- Conference context is clear
-- Date format is user-friendly
-- Status is visually distinct
+**Test Scenarios:**
+- **TS-015**: Page layout adapts to mobile screens (320px width)
+- **TS-016**: Touch targets meet minimum 44px accessibility standard
+- **TS-017**: No horizontal scrolling occurs on mobile devices
+- **TS-018**: Text remains readable without zooming on mobile
 
-### 4. Resource Access and Organization
+**Testable Assertions:**
+```
+GIVEN a talk page rendered on mobile device
+WHEN the viewport width is 320px or greater
+THEN page content fits within viewport without horizontal scroll
+AND all interactive elements (links, buttons) are minimum 44px touch targets
+AND text has sufficient size and contrast to read without zooming
+AND layout stacks vertically for mobile consumption
+```
 
-**Primary Flow:**
-- User explores available talk resources
-- Resources are categorized and accessible
-- External links function correctly
-- Resource descriptions provide context
+### From REQ-1.2.2: Mobile Performance
 
-**Test Cases:**
-- **T4.1**: Slides link accessibility and labeling
-- **T4.2**: Code repository link functionality
-- **T4.3**: Additional resource organization
-- **T4.4**: External link handling (new tab)
-- **T4.5**: Resource description clarity
-- **T4.6**: Broken link detection and handling
+**Test Scenarios:**
+- **TS-019**: Page loads within 5 seconds on 3G connection
+- **TS-020**: Core functionality works without JavaScript enabled
+- **TS-021**: Page handles intermittent connectivity gracefully
 
-**Success Criteria:**
-- All resource links are functional
-- External links open in new tabs
-- Resource types are clearly distinguished
-- Descriptions provide adequate context
+**Testable Assertions:**
+```
+GIVEN a 3G network connection simulation
+WHEN a user loads a talk page
+THEN the page reaches First Contentful Paint within 5 seconds
+AND all core content (title, speaker, resources) is accessible
+AND page functions completely with JavaScript disabled
+AND intermittent connection issues don't break the experience
+```
 
-### 5. Post-Talk Return Experience
+### From REQ-1.3.1: URL Structure
 
-**Primary Flow:**
-- User returns to bookmarked page days/weeks later
-- Content remains accessible and relevant
-- Updated resources are visible
-- Page experience is consistent
+**Test Scenarios:**
+- **TS-022**: URLs follow the specified clean pattern
+- **TS-023**: URLs remain stable over time
+- **TS-024**: URLs are shareable across platforms
 
-**Test Cases:**
-- **T5.1**: Bookmark persistence across browser sessions
-- **T5.2**: Content consistency after site updates
-- **T5.3**: Resource availability over time
-- **T5.4**: Performance consistency on return visits
-- **T5.5**: Updated content visibility
+**Testable Assertions:**
+```
+GIVEN a talk with specific conference and title metadata
+WHEN Jekyll generates the site
+THEN talk URLs follow pattern /talks/[conference-slug]/[talk-slug]/
+AND URLs contain only lowercase letters, numbers, and hyphens
+AND URLs don't change when content is updated
+AND URLs work when shared on social media, email, messaging apps
+```
 
-**Success Criteria:**
-- Bookmarked URLs remain valid
-- Content loads reliably after extended periods
-- Site updates don't break existing links
-- Performance remains consistent
+### From REQ-1.3.2: Social Sharing
 
-### 6. Page Sharing Capabilities
+**Test Scenarios:**
+- **TS-025**: Open Graph meta tags populate correctly
+- **TS-026**: Social media previews display appropriate content
+- **TS-027**: Page titles format correctly for sharing
 
-**Primary Flow:**
-- User shares shownotes page with colleagues
-- Shared links display appropriate previews
-- Recipients can access content without barriers
+**Testable Assertions:**
+```
+GIVEN a talk page with complete metadata
+WHEN the HTML is generated
+THEN Open Graph meta tags include og:title, og:description, og:type
+AND social media platforms show proper preview cards
+AND page title formats as "[Talk Title] - [Speaker] - [Conference]"
+AND meta descriptions truncate appropriately for different platforms
+```
 
-**Test Cases:**
-- **T6.1**: URL copying and sharing functionality
-- **T6.2**: Social media preview generation
-- **T6.3**: Email sharing with preview cards
-- **T6.4**: Slack/Teams sharing integration
-- **T6.5**: WhatsApp/messaging app sharing
-- **T6.6**: Open Graph meta tag validation
+### From REQ-2.1.1: Jekyll Implementation
 
-**Success Criteria:**
-- URLs are clean and meaningful
-- Social previews show talk title and description
-- Shared links work across platforms
-- No authentication required for access
+**Test Scenarios:**
+- **TS-028**: Site builds successfully with Jekyll
+- **TS-029**: Liquid templating processes talk data correctly
+- **TS-030**: Collections organize talks properly
+- **TS-031**: Site deploys to GitHub Pages without errors
 
-### 7. Accessibility and Performance
+**Testable Assertions:**
+```
+GIVEN a Jekyll site configuration and talk collection
+WHEN the build process runs
+THEN Jekyll processes all files without errors
+AND Liquid templates access frontmatter variables correctly
+AND talk collection generates individual pages with proper URLs
+AND site deploys successfully to GitHub Pages
+```
 
-**Primary Flow:**
-- Users with different abilities access content
-- Page performs well across various conditions
-- Content is discoverable and navigable
+### From REQ-2.2.1: Markdown Support
 
-**Test Cases:**
-- **T7.1**: Screen reader compatibility testing
-- **T7.2**: Keyboard navigation functionality
-- **T7.3**: Color contrast ratio validation
-- **T7.4**: Focus indicator visibility
-- **T7.5**: Semantic HTML structure validation
-- **T7.6**: Performance on slow connections
+**Test Scenarios:**
+- **TS-032**: YAML frontmatter validates and parses correctly
+- **TS-033**: Malformed frontmatter is handled gracefully
+- **TS-034**: Markdown processes all standard syntax
 
-**Success Criteria:**
-- WCAG 2.1 AA compliance achieved
-- Screen readers announce content properly
-- Keyboard navigation covers all interactive elements
-- Performance budgets are met
+**Testable Assertions:**
+```
+GIVEN various talk files with different content formats
+WHEN Jekyll processes the files
+THEN valid YAML frontmatter populates template variables
+AND invalid YAML shows clear error messages without breaking site
+AND standard Markdown syntax (headers, lists, links, bold, italic) renders correctly
+AND frontmatter validation prevents malformed content from publishing
+```
 
-## Technical Integration Test Scenarios
+### From REQ-2.3.1: Page Load Performance
 
-### 8. Jekyll Build and Deployment
+**Test Scenarios:**
+- **TS-035**: First Contentful Paint occurs within 3 seconds on 3G
+- **TS-036**: Cumulative Layout Shift remains below 0.1
+- **TS-037**: Images are optimized for web delivery
+- **TS-038**: CSS and JavaScript are minified
 
-**Primary Flow:**
-- Content updates trigger automated builds
-- Jekyll processes Markdown and frontmatter correctly
-- GitHub Pages deployment succeeds
+**Testable Assertions:**
+```
+GIVEN a performance testing environment
+WHEN a talk page loads on simulated 3G connection
+THEN First Contentful Paint occurs within 3 seconds
+AND Cumulative Layout Shift measures less than 0.1
+AND images are served in optimized formats (WebP where supported)
+AND CSS and JavaScript files are minified for production
+```
 
-**Test Cases:**
-- **T8.1**: Local Jekyll development server
-- **T8.2**: Production build completion
-- **T8.3**: GitHub Actions workflow execution
-- **T8.4**: Asset optimization and minification
-- **T8.5**: Site regeneration after content updates
-- **T8.6**: Build error handling and reporting
+### From REQ-2.4.1: Browser Compatibility
 
-**Success Criteria:**
-- Local and production builds are consistent
-- Automated deployments complete successfully
-- Build times remain under 5 minutes
-- Build errors are clearly reported
+**Test Scenarios:**
+- **TS-039**: Site functions on required mobile browsers
+- **TS-040**: Site functions on required desktop browsers
+- **TS-041**: Progressive enhancement provides fallbacks
 
-### 9. Content Management Workflow
+**Testable Assertions:**
+```
+GIVEN the list of required browsers
+WHEN testing across browser matrix
+THEN core functionality works on Mobile Safari (iOS 12+)
+AND core functionality works on Chrome Mobile (Android 8+)
+AND core functionality works on Desktop Chrome, Safari, Firefox, Edge
+AND enhanced features degrade gracefully on older browsers
+AND site provides usable experience even with limited browser support
+```
 
-**Primary Flow:**
-- New talk content is added via Markdown
-- Frontmatter validates correctly
-- Content renders as expected
+### From REQ-2.5.1: Content Security
 
-**Test Cases:**
-- **T9.1**: Markdown parsing and rendering
-- **T9.2**: YAML frontmatter validation
-- **T9.3**: Resource link processing
-- **T9.4**: Date formatting and display
-- **T9.5**: Collection organization
-- **T9.6**: URL generation consistency
+**Test Scenarios:**
+- **TS-042**: User content is sanitized to prevent XSS
+- **TS-043**: Content Security Policy headers are present
+- **TS-044**: External links are handled securely
 
-**Success Criteria:**
-- Markdown renders correctly across all sections
-- YAML validation prevents malformed content
-- Resource links are processed accurately
-- URLs follow consistent patterns
+**Testable Assertions:**
+```
+GIVEN various content inputs including potential XSS vectors
+WHEN Jekyll processes the content
+THEN all user-provided content is properly escaped
+AND Content Security Policy headers prevent inline scripts
+AND external links include rel="noopener" for security
+AND no script injection vulnerabilities exist
+```
 
-### 10. Cross-Browser Compatibility
+---
 
-**Primary Flow:**
-- Page functions correctly across required browsers
-- Progressive enhancement works as intended
-- Fallbacks handle unsupported features gracefully
+## Test Implementation Requirements
 
-**Test Cases:**
-- **T10.1**: Chrome (latest 2 versions)
-- **T10.2**: Safari (macOS and iOS)
-- **T10.3**: Firefox (latest 2 versions)
-- **T10.4**: Edge (Chromium-based)
-- **T10.5**: JavaScript disabled scenarios
-- **T10.6**: CSS loading failure handling
+### Test Coverage Requirements
+Each test scenario MUST:
+1. Map directly to a specific requirement
+2. Have clear, measurable success criteria
+3. Be implementable as automated tests where possible
+4. Include both positive and negative test cases
+5. Cover error conditions and edge cases
 
-**Success Criteria:**
-- Core functionality works without JavaScript
-- Enhanced features degrade gracefully
-- Visual consistency maintained across browsers
-- Performance remains acceptable in all scenarios
-
-## Edge Case and Error Scenarios
-
-### 11. Error Handling
-
-**Test Cases:**
-- **T11.1**: Missing resource links
-- **T11.2**: Malformed frontmatter
-- **T11.3**: Broken image references
-- **T11.4**: Network connectivity issues
-- **T11.5**: Large content handling
-- **T11.6**: Special characters in content
-
-### 12. Performance Edge Cases
-
-**Test Cases:**
-- **T12.1**: Very slow network conditions (2G)
-- **T12.2**: High traffic scenarios
-- **T12.3**: Large resource file handling
-- **T12.4**: Multiple simultaneous page loads
-- **T12.5**: Cache invalidation testing
-
-### 13. Security Scenarios
-
-**Test Cases:**
-- **T13.1**: XSS prevention in content
-- **T13.2**: Safe external link handling
-- **T13.3**: HTTPS enforcement
-- **T13.4**: Content Security Policy validation
-- **T13.5**: Safe Markdown processing
-
-## Testing Framework Requirements
-
-### Automated Testing
-- **Unit Tests**: Jekyll plugin functionality
-- **Integration Tests**: Build process validation
+### Test Categories
+- **Unit Tests**: Individual component functionality
+- **Integration Tests**: Jekyll build process and template rendering
 - **End-to-End Tests**: Complete user workflows
-- **Performance Tests**: Page load and rendering
+- **Performance Tests**: Load time and resource optimization
 - **Accessibility Tests**: WCAG compliance validation
+- **Cross-Browser Tests**: Compatibility matrix validation
 
-### Manual Testing
-- **Device Testing**: Physical device validation
-- **Browser Testing**: Cross-browser functionality
-- **Usability Testing**: Real user scenarios
-- **Content Testing**: Various content types
+### Test Data Requirements
+- **Sample Talk Content**: Various frontmatter configurations
+- **Edge Cases**: Missing fields, malformed data, special characters
+- **Performance Scenarios**: Large content, slow networks, multiple resources
+- **Browser Matrix**: All required browser/device combinations
 
-### Continuous Testing
-- **Pre-commit Hooks**: Code quality validation
-- **Pull Request Checks**: Automated test execution
-- **Deployment Validation**: Post-deploy verification
-- **Monitoring**: Ongoing performance and availability
+---
 
-## Test Data Requirements
+## Test-First Development Workflow
 
-### Sample Talk Content
-- **Completed Talk**: Full resource set, video available
-- **Upcoming Talk**: Minimal resources, future date
-- **In-Progress Talk**: Partial resources, current date
-- **Long Content**: Extended abstracts and resource lists
-- **Minimal Content**: Basic required fields only
+1. **Test Scenarios** (this document) define WHAT to test
+2. **Gherkin Features** will define HOW to test (user-readable specifications)
+3. **Test Implementation** will create failing tests that specify exact behavior
+4. **Code Implementation** will make those tests pass
 
-### Test Environments
-- **Local Development**: Full Jekyll environment
-- **Staging**: GitHub Pages preview environment
-- **Production**: Live GitHub Pages deployment
-- **Mobile Testing**: Device-specific test scenarios
+This ensures that every line of code serves a tested requirement and that specifications drive implementation rather than the reverse.
