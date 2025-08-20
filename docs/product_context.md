@@ -11,17 +11,19 @@ Conferences generate valuable content that is often lost or difficult to access 
 ## Primary User Journey
 
 1. **Discovery**: Attendee sees QR code/short URL during a talk
-2. **Access**: Scans/types URL on mobile device
-3. **Consumption**: Immediately accesses talk resources (slides, links, etc.)
-4. **Engagement**: Can subscribe for video notification when available
-5. **Feedback**: May provide feedback or participate in related offers
+2. **Quick Check**: Scans/types URL to verify it works and bookmark for later
+3. **Bookmark/Share**: Saves URL to share with colleagues after the talk
+4. **Post-Talk Return**: Comes back later to access resources and sign up for notifications
+5. **Video Release**: Returns when video is published to re-watch and share
+6. **Extended Sharing**: Shares resources with broader network over time
 
 ## Design Philosophy
 
-- **Mobile-First**: Optimized for in-talk viewing on phones
-- **Speed-Focused**: Quick loading for conference Wi-Fi scenarios
-- **Context-Aware**: Different states based on talk timing (pre/during/post)
-- **Simple Navigation**: Clear paths for "presentation listening mode"
+- **Mobile-First**: Optimized for quick mobile access and bookmarking
+- **Bookmark-Friendly**: Easy to save and return to later
+- **Post-Talk Focus**: Designed for use after the presentation ends
+- **Share-Optimized**: Clean URLs and social sharing capabilities
+- **Notification-Ready**: Easy signup for video/update notifications
 
 ## Success Metrics
 

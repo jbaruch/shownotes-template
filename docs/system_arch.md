@@ -50,18 +50,19 @@ Content Management (GitHub) → Static Site Generation → CDN Delivery + Server
 5. CDN propagates changes globally
 
 ### User Interaction Flow
-1. User scans QR code / visits short URL
-2. CDN serves static page optimally
-3. Dynamic features load via JavaScript
-4. Serverless functions handle form submissions
-5. Email notifications triggered as needed
+1. **During Talk**: User scans QR code to verify it works and bookmark
+2. **Post-Talk**: User returns to access resources and explore content
+3. **Notification Signup**: User subscribes for video/update notifications
+4. **Return Visits**: User comes back when video is published
+5. **Sharing**: User shares resources with colleagues and network
 
 ## Simplified Architecture Approach
 
-### Traffic Patterns (Low Volume)
+### Traffic Patterns (Low Volume, Non-Real-Time)
 - **Expected Load**: ~100s of visits per shownotes page total
-- **No Scaling Concerns**: GitHub Pages handles this easily
-- **Mobile-Optimized**: Responsive design for mobile access
+- **Usage Pattern**: Quick check during talk, main usage post-talk
+- **No Real-Time Pressure**: Users bookmark and return later
+- **Mobile-Optimized**: Responsive design for mobile bookmarking and sharing
 
 ### Simple Approach
 - **Static Assets**: GitHub Pages default delivery sufficient

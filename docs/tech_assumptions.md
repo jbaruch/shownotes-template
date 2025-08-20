@@ -27,14 +27,15 @@
 ## Development Workflow Assumptions
 
 ### Content Management
-**Assumption**: Non-technical users can manage content via GitHub web interface
+**Assumption**: Speaker manages own content via GitHub/Markdown
 **Rationale**:
-- GitHub provides user-friendly editing for Markdown
-- Version control built-in
-- Collaborative editing with pull requests
+- Personal speaking archive, not multi-user platform
+- Speaker has technical familiarity for content management
+- Version control useful for tracking talk evolution over time
+- Simple workflow for post-talk resource updates
 
-**Risk**: Learning curve for non-developers
-**Mitigation**: Provide comprehensive documentation and training
+**Risk**: Workflow complexity for quick updates
+**Mitigation**: Simple file structure, template-based approach
 
 ### Build Process
 **Assumption**: GitHub Actions provides sufficient CI/CD capabilities
@@ -59,14 +60,15 @@
 **Mitigation**: No special optimization needed
 
 ### Mobile Performance (Basic)
-**Assumption**: Standard responsive design sufficient
+**Assumption**: Standard responsive design sufficient for bookmark/share workflow
 **Rationale**:
-- Low traffic means no performance pressure
-- Jekyll default templates are mobile-responsive
-- Standard GitHub Pages performance adequate
+- Usage is quick check during talk, main usage post-talk
+- No real-time performance pressure during presentations
+- Jekyll default templates handle mobile bookmarking well
+- Users return later when they have better connectivity
 
-**Risk**: Minor usability issues on slow connections
-**Mitigation**: Keep pages simple, minimal JavaScript
+**Risk**: Minor usability issues during quick verification
+**Mitigation**: Keep pages simple, ensure core content loads first
 
 ## Integration Assumptions
 
