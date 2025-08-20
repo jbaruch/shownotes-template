@@ -48,25 +48,25 @@
 
 ## Performance Assumptions
 
-### Traffic Patterns
-**Assumption**: Conference traffic follows predictable spike patterns
+### Traffic Patterns (Simplified)
+**Assumption**: Very low traffic volume (~100s of visits per shownotes total)
 **Rationale**:
-- Conferences have scheduled talks
-- QR code scans concentrate during presentations
-- Traffic drops significantly post-conference
+- Personal speaking archive, not high-traffic conference platform
+- Individual talk pages with limited audience
+- GitHub Pages default performance sufficient
 
-**Risk**: Unexpected viral content or social media sharing
-**Mitigation**: CDN caching, static site inherently scalable
+**Risk**: None - traffic expectations are very conservative
+**Mitigation**: No special optimization needed
 
-### Mobile Performance
-**Assumption**: Conference Wi-Fi will be slow and unreliable
+### Mobile Performance (Basic)
+**Assumption**: Standard responsive design sufficient
 **Rationale**:
-- Conferences often have overloaded networks
-- Mobile devices are primary access method
-- Users need quick access during talks
+- Low traffic means no performance pressure
+- Jekyll default templates are mobile-responsive
+- Standard GitHub Pages performance adequate
 
-**Risk**: Complex pages may not load quickly
-**Mitigation**: Aggressive optimization, critical CSS, minimal JavaScript
+**Risk**: Minor usability issues on slow connections
+**Mitigation**: Keep pages simple, minimal JavaScript
 
 ## Integration Assumptions
 
@@ -112,27 +112,27 @@
 **Risk**: Speakers may want private/protected content
 **Mitigation**: Document assumption clearly, plan for auth if needed
 
-## Scalability Assumptions
+## Scalability Assumptions (Simplified)
 
-### Conference Size
-**Assumption**: Platform will serve conferences of 100-10,000 attendees
+### Usage Scale
+**Assumption**: Personal speaking archive with minimal traffic
 **Rationale**:
-- Covers most conference sizes
-- GitHub Pages can handle this traffic
-- CDN provides global distribution
+- ~100s of visits per shownotes page total
+- Individual speaker's talk archive, not conference platform
+- GitHub Pages free tier more than sufficient
 
-**Risk**: Larger conferences may need different architecture
-**Mitigation**: Monitor usage patterns, plan architecture evolution
+**Risk**: None - usage well within GitHub Pages limits
+**Mitigation**: No scaling considerations needed for Phase 1
 
 ### Growth Pattern
-**Assumption**: Platform will grow gradually from single to multiple conferences
+**Assumption**: Gradual evolution from simple to full-featured
 **Rationale**:
-- Allows iterative improvement
-- Validates assumptions before large-scale deployment
-- Reduces technical risk
+- Phase 1: Single page proof of concept
+- Phase 2: Migration focus, still low traffic
+- Phase 3: Advanced features when/if needed
 
-**Risk**: Multi-tenancy complexity if rapid growth occurs
-**Mitigation**: Design with multi-conference support from start
+**Risk**: Feature creep could complicate simple approach
+**Mitigation**: Maintain focus on simplicity, add complexity only when proven necessary
 
 ## Technology Lifecycle Assumptions
 

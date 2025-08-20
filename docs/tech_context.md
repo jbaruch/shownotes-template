@@ -93,19 +93,16 @@
 - **User Preferences**: Notification settings, accessibility
 - **Analytics Config**: Tracking codes, conversion goals
 
-## Performance Requirements
+## Performance Requirements (Simplified)
 
 ### Load Time Targets
-- **First Contentful Paint**: < 1.5 seconds
-- **Largest Contentful Paint**: < 2.5 seconds
-- **Time to Interactive**: < 3.5 seconds
-- **Mobile Performance**: 90+ Lighthouse score
+- **Reasonable Mobile Performance**: Standard GitHub Pages performance
+- **Basic Responsiveness**: Works well on conference Wi-Fi
 
-### Scalability Targets
-- **Concurrent Users**: 1000+ simultaneous users
-- **Page Load Capacity**: 10,000+ page views per hour
-- **Conference Peak**: Handle full conference attendance
-- **Global Distribution**: < 200ms response time worldwide
+### Traffic Expectations
+- **Low Traffic**: ~100s of visits per shownotes page total
+- **No Load Concerns**: GitHub Pages default performance sufficient
+- **Simple Architecture**: No complex optimization needed
 
 ## Browser Support
 

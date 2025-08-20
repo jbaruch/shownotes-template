@@ -68,11 +68,16 @@ Conference attendees struggle to access talk materials during and after presenta
 ### Solution Approach
 Provide a mobile-optimized platform accessible via QR codes during talks, offering immediate access to resources with optional email notifications for follow-up content.
 
-### Success Criteria
-- Quick page loads on conference Wi-Fi (< 2.5s LCP)
-- High adoption rate (QR code scans vs attendance)
-- Easy content management for non-technical users
-- Scalable to handle conference traffic spikes
+### Success Criteria (Simplified)
+- Pages load reasonably on mobile devices
+- Easy content management via GitHub/Markdown
+- Clean, accessible design for talk resources
+- Simple architecture that "just works"
+
+### Traffic Expectations
+- **Very Low Volume**: ~100s of visits per shownotes page total
+- **Personal Archive**: Individual speaker's talk collection
+- **No Scaling Concerns**: GitHub Pages default performance sufficient
 
 ## Next Phase Preparation
 
@@ -140,20 +145,20 @@ Provide a mobile-optimized platform accessible via QR codes during talks, offeri
 
 ## Risk Register
 
-### High Priority Risks
-1. **Conference Wi-Fi Performance**: Mitigation through aggressive optimization
-2. **Non-Technical User Adoption**: Mitigation through documentation and training
-3. **Build Time Scalability**: Mitigation through optimized build processes
+### Risks (Simplified)
+1. **Learning Curve**: GitHub/Markdown workflow for content management
+   - **Mitigation**: Simple documentation, start with basic editing
 
-### Medium Priority Risks
-1. **Jekyll vs Modern Framework**: Plan migration path if JavaScript ecosystem needed
-2. **GitHub Pages Limitations**: Serverless functions for dynamic features
-3. **Email Service Costs**: Start simple, evaluate alternatives
+2. **Future Feature Complexity**: Adding advanced features later
+   - **Mitigation**: Phase 3 approach allows complexity when needed
 
-### Low Priority Risks
-1. **Multi-Conference Complexity**: Design modularly from start
-2. **Security Vulnerabilities**: Static sites reduce attack surface
-3. **Browser Compatibility**: Progressive enhancement approach
+3. **Migration Complexity**: Notist data import challenges  
+   - **Mitigation**: Phase 2 focus, plan import scripts carefully
+
+### Eliminated Risks
+- **Performance/Scaling**: Not relevant for ~100s visits per page
+- **Complex Infrastructure**: Static site simplicity removes most technical risks
+- **High Availability**: GitHub Pages reliability sufficient for personal archive
 
 ## Phase Completion Status
 

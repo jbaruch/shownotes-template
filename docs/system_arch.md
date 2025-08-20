@@ -56,18 +56,17 @@ Content Management (GitHub) → Static Site Generation → CDN Delivery + Server
 4. Serverless functions handle form submissions
 5. Email notifications triggered as needed
 
-## Scalability Strategy
+## Simplified Architecture Approach
 
-### Traffic Patterns
-- **Conference Spikes**: High traffic during events
-- **Geographic Distribution**: Global conference audiences
-- **Mobile-Heavy**: Primary mobile device usage
+### Traffic Patterns (Low Volume)
+- **Expected Load**: ~100s of visits per shownotes page total
+- **No Scaling Concerns**: GitHub Pages handles this easily
+- **Mobile-Optimized**: Responsive design for mobile access
 
-### Scaling Approach
-- **Static Assets**: Unlimited scaling via CDN
-- **Dynamic Features**: Serverless auto-scaling
-- **Database**: Lightweight, event-driven storage
-- **Caching**: Aggressive caching at CDN level
+### Simple Approach
+- **Static Assets**: GitHub Pages default delivery sufficient
+- **No Complex Optimizations**: Standard Jekyll performance adequate
+- **Minimal Infrastructure**: Focus on simplicity over optimization
 
 ## Security Architecture
 
