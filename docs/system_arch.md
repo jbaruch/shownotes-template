@@ -1,0 +1,124 @@
+# System Architecture - Conference Talk Show Notes Platform
+
+## Architectural Overview
+
+The Conference Talk Show Notes Platform follows a **Static Site + Serverless** architecture pattern optimized for:
+- Zero server maintenance
+- Cost-effective scaling
+- High availability
+- Easy content management
+
+## Core Architecture Pattern
+
+```
+Content Management (GitHub) → Static Site Generation → CDN Delivery + Serverless Functions
+```
+
+## Components
+
+### 1. Content Management Layer
+- **GitHub Repository**: Single source of truth for all content
+- **Markdown + Frontmatter**: Human-readable content format
+- **Git Workflow**: Version control for content changes
+- **GitHub Issues**: Content creation workflow
+
+### 2. Static Site Generation
+- **Build Process**: Automated via GitHub Actions
+- **Template Engine**: Converts Markdown to HTML
+- **Asset Pipeline**: Optimizes images, CSS, and JavaScript
+- **SEO Optimization**: Meta tags, structured data
+
+### 3. Hosting & Delivery
+- **GitHub Pages**: Static file hosting
+- **CDN**: Global content distribution
+- **Custom Domain**: Conference-specific branding
+- **HTTPS**: Secure content delivery
+
+### 4. Dynamic Features (Serverless)
+- **Email Notifications**: Subscription management
+- **Form Processing**: Feedback collection
+- **Analytics**: Usage tracking
+- **Raffle Management**: Giveaway automation
+
+## Data Flow
+
+### Content Publishing Flow
+1. Content creator writes Markdown files
+2. Git commit triggers build process
+3. Static site generator processes content
+4. Generated site deploys to GitHub Pages
+5. CDN propagates changes globally
+
+### User Interaction Flow
+1. User scans QR code / visits short URL
+2. CDN serves static page optimally
+3. Dynamic features load via JavaScript
+4. Serverless functions handle form submissions
+5. Email notifications triggered as needed
+
+## Scalability Strategy
+
+### Traffic Patterns
+- **Conference Spikes**: High traffic during events
+- **Geographic Distribution**: Global conference audiences
+- **Mobile-Heavy**: Primary mobile device usage
+
+### Scaling Approach
+- **Static Assets**: Unlimited scaling via CDN
+- **Dynamic Features**: Serverless auto-scaling
+- **Database**: Lightweight, event-driven storage
+- **Caching**: Aggressive caching at CDN level
+
+## Security Architecture
+
+### Static Content Security
+- **HTTPS Only**: Enforced secure connections
+- **CSP Headers**: Content Security Policy
+- **No Server Attack Surface**: Static files only
+
+### Dynamic Feature Security
+- **Serverless Isolation**: Function-level security
+- **Input Validation**: Form data sanitization
+- **Rate Limiting**: Anti-abuse measures
+- **Secret Management**: Environment variables
+
+## Integration Points
+
+### External Services
+- **Email Service**: Transactional email delivery
+- **Analytics Platform**: Usage tracking
+- **Form Processing**: Data collection
+- **URL Shortening**: QR code generation
+
+### API Boundaries
+- **GitHub API**: Content management
+- **Email API**: Notification delivery
+- **Analytics API**: Data collection
+- **Conference APIs**: Event integration
+
+## Monitoring & Observability
+
+### Performance Monitoring
+- **CDN Analytics**: Traffic patterns
+- **Page Speed**: Load time metrics
+- **Mobile Performance**: Device-specific metrics
+- **Uptime Monitoring**: Availability tracking
+
+### Error Tracking
+- **Build Failures**: CI/CD monitoring
+- **JavaScript Errors**: Client-side tracking
+- **API Failures**: Serverless function monitoring
+- **User Experience**: Error reporting
+
+## Deployment Architecture
+
+### Environments
+- **Development**: Local development server
+- **Staging**: Preview deployments
+- **Production**: Live conference platform
+
+### Release Process
+- **Feature Branches**: Development workflow
+- **Pull Requests**: Code review process
+- **Automated Testing**: Quality gates
+- **Blue-Green Deployment**: Zero-downtime releases
