@@ -101,8 +101,8 @@ class NavigationTest < Minitest::Test
     # All navigation links should be functional
     nav_links = extract_navigation_links(page_html)
     nav_links.each do |link|
-      assert_valid_href(link[:href]),
-             "Navigation link should have valid href: #{link[:href]}"
+      assert_valid_href(link[:href])
+      # Message: "Navigation link should have valid href: #{link[:href]}"
       
       refute_includes link[:href], 'javascript:',
                      'Navigation should not depend on JavaScript'

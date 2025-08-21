@@ -78,11 +78,11 @@ class JekyllBuildTest < Minitest::Test
     assert build_result.success?, 'GitHub Pages compatible build should succeed'
     
     # Verify GitHub Pages specific requirements
-    assert_no_unsupported_plugins, 'Should not use unsupported GitHub Pages plugins'
-    assert_proper_base_url_handling, 'Should handle baseurl correctly for GitHub Pages'
+    assert_no_unsupported_plugins
+    assert_proper_base_url_handling
     
     # Verify generated site structure is GitHub Pages compatible
-    assert_github_pages_structure, 'Site structure should be GitHub Pages compatible'
+    assert_github_pages_structure
   end
 
   # TS-064: Builds complete within 5 minutes
