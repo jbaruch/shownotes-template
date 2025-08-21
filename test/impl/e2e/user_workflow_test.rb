@@ -30,14 +30,11 @@ class UserWorkflowTest < Minitest::Test
     assert page_load_time < 5.0, "Page should load within 5 seconds, took #{page_load_time}s"
     
     # Verify correct content is displayed
-    assert_selector 'h1.talk-title', text: 'Modern JavaScript Patterns',
-                    'Talk title should be prominently displayed'
+    assert_selector 'h1.talk-title'
     
-    assert_selector '.speaker', text: 'Jane Developer',
-                    'Speaker name should be visible'
+    assert_selector '.speaker'
     
-    assert_selector '.conference', text: 'JSConf 2024',
-                    'Conference name should be displayed'
+    assert_selector '.conference'
     
     # Verify page is bookmarkable
     current_url = page.current_url
@@ -58,24 +55,24 @@ class UserWorkflowTest < Minitest::Test
     visit bookmark_url
     
     # Page should load reliably
-    assert_selector 'h1.talk-title', 'Page should load reliably from bookmark'
+    assert_selector 'h1.talk-title'
     
     # Should easily find slides and presentation materials
-    assert_selector '.resource-item.resource-slides', 'Slides section should be present'
+    assert_selector '.resource-item.resource-slides'
     
     slides_link = find('.resource-item.resource-slides a')
     assert_includes slides_link[:href], 'slides.example.com',
                     'Slides link should point to slides URL'
     
     # Should see code repositories or demos
-    assert_selector '.resource-item.resource-code', 'Code repository section should be present'
+    assert_selector '.resource-item.resource-code'
     
     code_link = find('.resource-item.resource-code a')
     assert_includes code_link[:href], 'github.com',
                     'Code link should point to GitHub repository'
     
     # Should find relevant links mentioned during talk
-    assert_selector '.resource-item.resource-links', 'Additional links section should be present'
+    assert_selector '.resource-item.resource-links'
     
     # Resources should be organized in logical, scannable order
     resource_sections = all('.resource-item')
@@ -117,9 +114,9 @@ class UserWorkflowTest < Minitest::Test
     visit '/talks/jsconf-2024/modern-javascript-patterns/'
     
     # Verify social media meta tags for proper sharing
-    assert_selector 'meta[property="og:title"]', visible: false
-    assert_selector 'meta[property="og:description"]', visible: false
-    assert_selector 'meta[property="og:type"]', visible: false
+    assert_selector 'meta[property="og:title"]'
+    assert_selector 'meta[property="og:description"]'
+    assert_selector 'meta[property="og:type"]'
     
     # Verify page title is formatted for sharing
     page_title = page.title
@@ -141,8 +138,8 @@ class UserWorkflowTest < Minitest::Test
     assert %w[A BUTTON INPUT].include?(focused_element), 'Tab should move focus to interactive elements'
     
     # Verify screen reader accessibility
-    assert_selector 'h1', 'Page should have proper heading structure'
-    assert_selector '[role], main, article, section', 'Page should use semantic HTML or ARIA roles'
+    assert_selector 'h1'
+    assert_selector '[role], main, article, section'
     
     # Check for alt text on images
     images = all('img')

@@ -125,14 +125,16 @@ class ContentRenderingTest < Minitest::Test
 
   # Test malformed frontmatter handling
   def test_malformed_frontmatter_handled_gracefully
-    assert_raises(FrontmatterParsingError) do
-      parse_frontmatter(@malformed_frontmatter)
-    end
+    # Interface method will fail with "not implemented"
+    result = parse_frontmatter(@malformed_frontmatter)
     
-    # Or should return error information without breaking the build
-    result = safe_parse_frontmatter(@malformed_frontmatter)
+    # Test will fail on interface method call
     assert result.is_a?(Hash), 'Should return hash even with malformed frontmatter'
     assert result.key?('error'), 'Should include error information'
+    
+    # Also test safe parsing method
+    safe_result = safe_parse_frontmatter(@malformed_frontmatter)
+    assert safe_result.is_a?(Hash), 'Safe parse should return hash'
   end
 
   private
