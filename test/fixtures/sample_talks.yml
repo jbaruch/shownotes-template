@@ -1,0 +1,139 @@
+# Test fixtures for talk data
+# Used across unit, integration, and e2e tests
+
+# Complete talk with all fields
+complete_talk:
+  title: "Modern JavaScript Patterns"
+  speaker: "Jane Developer"
+  conference: "JSConf 2024"
+  date: "2024-03-15"
+  location: "San Francisco, CA"
+  status: "completed"
+  description: "Exploring modern JavaScript patterns and best practices for scalable applications"
+  abstract: |
+    This comprehensive talk explores the evolution of JavaScript patterns and introduces
+    modern approaches to building scalable, maintainable applications. We'll cover
+    functional programming concepts, async patterns, and architectural best practices.
+  duration: "45 minutes"
+  level: "intermediate"
+  topics:
+    - "javascript"
+    - "patterns"
+    - "architecture"
+  resources:
+    slides:
+      title: "Presentation Slides"
+      url: "https://slides.example.com/js-patterns"
+      description: "Complete slide deck from the presentation"
+    code:
+      title: "Demo Repository"
+      url: "https://github.com/jane/js-patterns-demo"
+      description: "Working examples of all patterns discussed"
+    links:
+      - title: "MDN JavaScript Guide"
+        url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide"
+        description: "Comprehensive JavaScript reference"
+      - title: "You Don't Know JS"
+        url: "https://github.com/getify/You-Dont-Know-JS"
+        description: "Deep dive into JavaScript core concepts"
+  social:
+    twitter: "@janedev"
+    github: "janedev"
+    website: "https://janedev.example.com"
+
+# Minimal talk with only required fields
+minimal_talk:
+  title: "Quick Lightning Talk"
+  speaker: "Bob Smith"
+  conference: "Local Meetup"
+  date: "2024-02-20"
+  status: "upcoming"
+
+# Talk with missing resources
+talk_no_resources:
+  title: "Theory-Heavy Discussion"
+  speaker: "Alice Johnson"
+  conference: "Academic Conference 2024"
+  date: "2024-04-10"
+  status: "completed"
+  description: "A discussion of theoretical concepts without practical demos"
+
+# Talk with malformed data (for error testing)
+malformed_talk:
+  title: "This title is way too long and exceeds the 200 character limit set in the requirements specification and should trigger a validation error when processed"
+  speaker: ""  # Empty speaker should fail validation
+  conference: "Test Conference"
+  date: "invalid-date-format"  # Should fail ISO 8601 validation
+  status: "invalid-status"     # Should fail enum validation
+
+# Upcoming talk with placeholders
+upcoming_talk:
+  title: "Future Innovations in Web Development"
+  speaker: "Sarah Wilson"
+  conference: "WebConf 2024"
+  date: "2024-12-15"
+  status: "upcoming"
+  description: "Coming soon - details will be updated closer to the event"
+  resources:
+    slides:
+      title: "Slides"
+      url: "https://example.com/placeholder"
+      description: "Slides will be available after the talk"
+
+# Talk with special characters (for XSS testing)
+xss_test_talk:
+  title: "Security & <script>alert('xss')</script> Best Practices"
+  speaker: "Security Expert"
+  conference: "SecConf 2024"
+  date: "2024-05-20"
+  status: "completed"
+  description: "Learn about security practices and XSS prevention <script>alert('xss')</script>"
+  
+# Performance test talks (array of similar talks for bulk testing)
+performance_talks:
+  - title: "Performance Talk 1"
+    speaker: "Perf Expert 1"
+    conference: "PerfConf 2024"
+    date: "2024-06-01"
+    status: "completed"
+    
+  - title: "Performance Talk 2"
+    speaker: "Perf Expert 2"
+    conference: "PerfConf 2024"
+    date: "2024-06-02"
+    status: "completed"
+    
+  - title: "Performance Talk 3"
+    speaker: "Perf Expert 3"
+    conference: "PerfConf 2024"
+    date: "2024-06-03"
+    status: "completed"
+
+# Different conference formats for variety testing
+conference_variety:
+  workshop:
+    title: "Hands-on React Workshop"
+    speaker: "React Expert"
+    conference: "React Workshop Series"
+    date: "2024-07-15"
+    status: "upcoming"
+    duration: "4 hours"
+    level: "beginner"
+    
+  keynote:
+    title: "The Future of Web Development"
+    speaker: "Industry Leader"
+    conference: "WebSummit 2024"
+    date: "2024-08-20"
+    status: "completed"
+    duration: "60 minutes"
+    level: "intermediate"
+    
+  lightning:
+    title: "Quick CSS Tip"
+    speaker: "CSS Guru"
+    conference: "CSS Meetup"
+    date: "2024-03-25"
+    status: "completed"
+    duration: "5 minutes"
+    level: "beginner"
