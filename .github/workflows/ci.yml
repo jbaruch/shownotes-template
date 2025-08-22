@@ -12,7 +12,7 @@ jobs:
     
     strategy:
       matrix:
-        ruby-version: ['2.6', '2.7', '3.0']
+        ruby-version: ['3.0', '3.1']
     
     steps:
     - uses: actions/checkout@v4
@@ -23,6 +23,12 @@ jobs:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true
     
+    - name: Install dependencies
+      run: |
+        bundle install
+      env:
+        BUNDLE_FORCE_RUBY_PLATFORM: true
+    
     - name: Run tests
       run: bundle exec rake test
       env:
@@ -30,7 +36,7 @@ jobs:
     
     - name: Run test summary
       run: bundle exec rake test:all
-      if: matrix.ruby-version == '3.0'
+      if: matrix.ruby-version == '3.1'
 
   security:
     runs-on: ubuntu-latest
@@ -41,8 +47,14 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.0'
+        ruby-version: '3.1'
         bundler-cache: true
+    
+    - name: Install dependencies
+      run: |
+        bundle install
+      env:
+        BUNDLE_FORCE_RUBY_PLATFORM: true
     
     - name: Run security tests
       run: bundle exec rake test:unit
@@ -63,8 +75,14 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.0'
+        ruby-version: '3.1'
         bundler-cache: true
+    
+    - name: Install dependencies
+      run: |
+        bundle install
+      env:
+        BUNDLE_FORCE_RUBY_PLATFORM: true
     
     - name: Run performance tests
       run: bundle exec rake test:performance
@@ -81,8 +99,14 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.0'
+        ruby-version: '3.1'
         bundler-cache: true
+    
+    - name: Install dependencies
+      run: |
+        bundle install
+      env:
+        BUNDLE_FORCE_RUBY_PLATFORM: true
     
     - name: Build Jekyll site
       run: |
