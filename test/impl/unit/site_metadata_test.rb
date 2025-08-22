@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'minitest/autorun'
+require 'json'
 
 # Unit tests for Site Metadata (TS-032 through TS-034, TS-039 through TS-044)
 # Maps to Gherkin: "Talk page includes proper metadata" + "Talk page includes social media metadata"
@@ -146,15 +147,20 @@ class SiteMetadataTest < Minitest::Test
     
     json_ld_scripts.each do |script|
       # Verify valid JSON
-      parsed_data = JSON.parse(script[:content])
+      parsed_data = JSON.parse(script)
       
-      # Should have @context
-      assert parsed_data['@context'], 'JSON-LD should have @context'
-      assert_includes parsed_data['@context'], 'schema.org',
-                     '@context should reference schema.org'
+      # Handle array of structured data
+      data_array = parsed_data.is_a?(Array) ? parsed_data : [parsed_data]
       
-      # Should have @type
-      assert parsed_data['@type'], 'JSON-LD should have @type'
+      data_array.each do |data|
+        # Should have @context
+        assert data['@context'], 'JSON-LD should have @context'
+        assert_includes data['@context'], 'schema.org',
+                       '@context should reference schema.org'
+        
+        # Should have @type
+        assert data['@type'], 'JSON-LD should have @type'
+      end
     end
   end
 
@@ -207,48 +213,94 @@ class SiteMetadataTest < Minitest::Test
 
   private
 
-  # Interface methods - implementations will be created later
+  # Interface methods - connected to implementation
   def generate_talk_page(talk_data)
-    fail 'generate_talk_page method not implemented yet'
+    require_relative '../../../lib/simple_talk_renderer'
+    renderer = SimpleTalkRenderer.new
+    renderer.generate_talk_page(talk_data)
   end
 
   def extract_page_title(html)
-    fail 'extract_page_title method not implemented yet'
+    match = html.match(/<title[^>]*>(.*?)<\/title>/m)
+    match ? match[1].strip : nil
   end
 
   def extract_meta_description(html)
-    fail 'extract_meta_description method not implemented yet'
+    match = html.match(/<meta[^>]*name="description"[^>]*content="([^"]+)"[^>]*>/)
+    match ? match[1] : nil
   end
 
   def extract_canonical_url(html)
-    fail 'extract_canonical_url method not implemented yet'
+    match = html.match(/<link[^>]*rel="canonical"[^>]*href="([^"]+)"[^>]*>/)
+    match ? match[1] : nil
   end
 
   def extract_open_graph_tags(html)
-    fail 'extract_open_graph_tags method not implemented yet'
+    og_tags = {}
+    html.scan(/<meta[^>]*property="(og:[^"]+)"[^>]*content="([^"]+)"[^>]*>/) do |property, content|
+      og_tags[property] = content
+    end
+    og_tags
   end
 
   def extract_twitter_card_tags(html)
-    fail 'extract_twitter_card_tags method not implemented yet'
+    twitter_tags = {}
+    html.scan(/<meta[^>]*name="(twitter:[^"]+)"[^>]*content="([^"]+)"[^>]*>/) do |name, content|
+      twitter_tags[name] = content
+    end
+    twitter_tags
   end
 
   def extract_structured_data(html)
-    fail 'extract_structured_data method not implemented yet'
+    scripts = extract_json_ld_scripts(html)
+    structured_data = []
+    
+    scripts.each do |script|
+      begin
+        data = JSON.parse(script)
+        if data.is_a?(Array)
+          structured_data.concat(data)
+        else
+          structured_data << data
+        end
+      rescue JSON::ParserError
+        # Skip invalid JSON
+      end
+    end
+    
+    structured_data
   end
 
   def extract_json_ld_scripts(html)
-    fail 'extract_json_ld_scripts method not implemented yet'
+    scripts = []
+    html.scan(/<script[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/m) do |content|
+      scripts << content[0].strip
+    end
+    scripts
   end
 
   def extract_meta_tags(html)
-    fail 'extract_meta_tags method not implemented yet'
+    meta_tags = []
+    
+    # Extract standard meta tags
+    html.scan(/<meta[^>]*name="([^"]+)"[^>]*content="([^"]+)"[^>]*>/) do |name, content|
+      meta_tags << { name: name, content: content }
+    end
+    
+    # Extract property meta tags (like Open Graph)
+    html.scan(/<meta[^>]*property="([^"]+)"[^>]*content="([^"]+)"[^>]*>/) do |property, content|
+      meta_tags << { property: property, content: content }
+    end
+    
+    meta_tags
   end
 
   def extract_viewport_meta(html)
-    fail 'extract_viewport_meta method not implemented yet'
+    match = html.match(/<meta[^>]*name="viewport"[^>]*content="([^"]+)"[^>]*>/)
+    match ? match[1] : nil
   end
 
   def find_schema_by_type(structured_data, type)
-    fail 'find_schema_by_type method not implemented yet'
+    structured_data.find { |data| data['@type'] == type }
   end
 end

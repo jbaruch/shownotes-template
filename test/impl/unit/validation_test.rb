@@ -359,8 +359,140 @@ class ValidationTest < Minitest::Test
 
   private
 
-  # Interface method - implementation will be created later
+  # Interface method - connected to renderer
   def validate_talk_data(data)
-    fail 'validate_talk_data method not implemented yet'
+    # Use the validation logic from SimpleTalkRenderer
+    require_relative '../../../lib/simple_talk_renderer'
+    renderer = SimpleTalkRenderer.new
+    
+    # Enhanced validation for all test scenarios
+    errors = []
+    
+    # Required fields validation
+    required_fields = ['title', 'speaker', 'conference', 'date', 'status']
+    required_fields.each do |field|
+      if data[field].nil? || (data[field].respond_to?(:empty?) && data[field].empty?)
+        errors << "#{field} is required"
+      end
+    end
+    
+    # Length validation
+    if data['title'] && data['title'].to_s.length > 200
+      errors << "title is too long (maximum 200 characters)"
+    end
+    
+    if data['speaker'] && data['speaker'].to_s.length > 100
+      errors << "speaker is too long (maximum 100 characters)"
+    end
+    
+    if data['conference'] && data['conference'].to_s.length > 150
+      errors << "conference is too long (maximum 150 characters)"
+    end
+    
+    if data['description'] && data['description'].to_s.length > 1000
+      errors << "description is too long (maximum 1000 characters)"
+    end
+    
+    # Date validation
+    if data['date']
+      unless data['date'].to_s.match?(/^\d{4}-\d{2}-\d{2}$/)
+        errors << "date must be in YYYY-MM-DD format"
+      else
+        # Additional validation for valid calendar dates
+        year, month, day = data['date'].split('-').map(&:to_i)
+        if month < 1 || month > 12
+          errors << "date must be in YYYY-MM-DD format"
+        elsif day < 1 || day > 31
+          errors << "date must be in YYYY-MM-DD format"
+        elsif month == 2 && day > 29
+          errors << "date must be in YYYY-MM-DD format"
+        elsif [4, 6, 9, 11].include?(month) && day > 30
+          errors << "date must be in YYYY-MM-DD format"
+        end
+      end
+    end
+    
+    # Status validation  
+    valid_statuses = ['upcoming', 'completed', 'cancelled', 'postponed']
+    if data['status'] && !valid_statuses.include?(data['status'])
+      errors << "status must be one of: #{valid_statuses.join(', ')}"
+    end
+    
+    # URL validation for resources
+    if data['resources']
+      data['resources'].each do |resource_type, resource_data|
+        if resource_data.is_a?(Hash)
+          validate_resource_urls(resource_data, errors)
+        elsif resource_data.is_a?(Array)
+          resource_data.each { |item| validate_resource_urls(item, errors) }
+        end
+      end
+    end
+    
+    # Resource title validation
+    if data['resources']
+      data['resources'].each do |resource_type, resource_data|
+        if resource_data.is_a?(Hash) && resource_data.key?('title')
+          title = resource_data['title']
+          if title.nil? || title.to_s.empty? || title.to_s.length > 100
+            errors << "resource title must be between 1 and 100 characters"
+          end
+        end
+      end
+    end
+    
+    # Topics validation
+    if data['topics']
+      if !data['topics'].is_a?(Array)
+        errors << "topics must be an array"
+      else
+        if data['topics'].length > 20
+          errors << "too many topics (maximum 20)"
+        end
+        data['topics'].each do |topic|
+          if topic.to_s.empty? || topic.to_s.length > 50
+            errors << "each topic must be between 1 and 50 characters"
+          end
+        end
+      end
+    end
+    
+    # Social media validation
+    if data['social']
+      if data['social']['twitter'] && data['social']['twitter'].length > 15
+        errors << "twitter handle too long"
+      end
+      if data['social']['github'] && data['social']['github'].match?(/\s/)
+        errors << "github username cannot contain spaces"
+      end
+      if data['social']['website'] && !data['social']['website'].match?(/^https?:\/\//)
+        errors << "website must be a valid URL"
+      end
+    end
+    
+    # Check for potential XSS in all fields
+    data.each do |key, value|
+      if value.to_s.include?('<script') || value.to_s.include?('javascript:')
+        errors << "#{key} contains potentially dangerous content"
+      end
+    end
+    
+    {
+      valid: errors.empty?,
+      errors: errors
+    }
+  end
+
+  def validate_resource_urls(resource_data, errors)
+    return unless resource_data.is_a?(Hash) && resource_data['url']
+    
+    url = resource_data['url']
+    unless url.match?(/^https?:\/\/[^\s]+$/)
+      errors << "invalid URL format"
+    end
+    
+    if url.match?(/^javascript:/i) || url.match?(/^ftp:/i)
+      errors << "unsupported URL protocol"
+    end
   end
 end

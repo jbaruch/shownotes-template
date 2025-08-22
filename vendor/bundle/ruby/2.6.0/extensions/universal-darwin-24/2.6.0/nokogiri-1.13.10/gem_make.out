@@ -1,5 +1,5 @@
 current directory: /Users/jbaruch/Projects/shownotes/vendor/bundle/ruby/2.6.0/gems/nokogiri-1.13.10/ext/nokogiri
-/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby -I /System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0 -r ./siteconf20250821-96665-1s8k8as.rb extconf.rb
+/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby -I /System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0 -r ./siteconf20250822-65667-1yrvwle.rb extconf.rb
 checking for whether -std=c99 is accepted as CFLAGS... yes
 checking for whether -Wno-declaration-after-statement is accepted as CFLAGS... yes
 checking for whether -g is accepted as CFLAGS... yes
@@ -2354,5 +2354,5 @@ rm -rf /Users/jbaruch/Projects/shownotes/vendor/bundle/ruby/2.6.0/gems/nokogiri-
 
 current directory: /Users/jbaruch/Projects/shownotes/vendor/bundle/ruby/2.6.0/gems/nokogiri-1.13.10/ext/nokogiri
 make "DESTDIR=" install
-/usr/bin/install -c -m 0755 nokogiri.bundle ./.gem.20250821-96665-rik1r4/nokogiri
+/usr/bin/install -c -m 0755 nokogiri.bundle ./.gem.20250822-65667-8f36u2/nokogiri
 installing nokogiri libraries

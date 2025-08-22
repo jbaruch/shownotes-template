@@ -1,0 +1,374 @@
+/* CSS Custom Properties for color scheme consistency */
+:root {
+    --primary-color: #007bff;
+    --primary-dark: #0056b3;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #333;
+    --border-color: #dee2e6;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Reset and base styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+    color: var(--dark-color);
+    background: #fff;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-areas: 
+        "header"
+        "main"
+        "footer";
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+    gap: 0;
+}
+
+/* Skip navigation link - accessibility */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    text-decoration: none;
+    z-index: 1000;
+}
+
+.skip-link:focus {
+    top: 6px;
+}
+
+/* Layout wrapper */
+.wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.site-header {
+    grid-area: header;
+    background: var(--light-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+}
+
+.site-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+    display: inline-block;
+    margin-right: 2rem;
+}
+
+.site-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+}
+
+.site-nav li {
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.site-nav a {
+    text-decoration: none;
+    color: #666;
+    font-weight: 500;
+}
+
+.site-nav a:hover,
+.site-nav a:focus {
+    color: #333;
+}
+
+/* Main content */
+.page-content {
+    grid-area: main;
+    padding: 2rem 0;
+}
+
+/* Talk styles */
+.talk {
+    max-width: 100%;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    margin-bottom: 2rem;
+}
+
+.breadcrumb ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.breadcrumb li:not(:last-child)::after {
+    content: " / ";
+    margin: 0 0.5rem;
+    color: #666;
+}
+
+.breadcrumb a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover,
+.breadcrumb a:focus {
+    text-decoration: underline;
+}
+
+/* Talk header */
+.talk-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 1rem;
+}
+
+.talk-title {
+    font-size: 2rem;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+}
+
+.talk-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.talk-meta > * {
+    display: inline-block;
+}
+
+.speaker {
+    font-weight: bold;
+    color: #333;
+}
+
+.status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-upcoming {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-in-progress {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Talk sections */
+.talk-description,
+.talk-abstract,
+.talk-resources,
+.talk-content {
+    margin-bottom: 2rem;
+}
+
+.talk-description h2,
+.talk-abstract h2,
+.talk-resources h2,
+.talk-content h2 {
+    font-size: 1.5rem;
+    margin: 0 0 1rem 0;
+    color: #333;
+}
+
+/* Resource groups */
+.resource-group {
+    margin-bottom: 1.5rem;
+}
+
+.resource-group h3 {
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem 0;
+    color: #555;
+}
+
+.resource-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.resource-item {
+    margin-bottom: 0.5rem;
+}
+
+.resource-link {
+    display: block;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #007bff;
+    transition: background-color 0.2s;
+}
+
+.resource-link:hover,
+.resource-link:focus {
+    background: #e9ecef;
+    text-decoration: none;
+}
+
+.resource-description {
+    display: block;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+/* Content styling */
+.content h1,
+.content h2,
+.content h3,
+.content h4,
+.content h5,
+.content h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.content p {
+    margin-bottom: 1rem;
+}
+
+.content ul,
+.content ol {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.content li {
+    margin-bottom: 0.25rem;
+}
+
+.content a {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+.content a:hover,
+.content a:focus {
+    color: #0056b3;
+}
+
+/* Code blocks */
+.content pre {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.9rem;
+}
+
+.content code {
+    background: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9rem;
+}
+
+.content pre code {
+    background: none;
+    padding: 0;
+}
+
+/* Notification placeholder */
+.notification-placeholder {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.notification-placeholder h2 {
+    margin-top: 0;
+    color: #666;
+}
+
+/* Footer */
+.site-footer {
+    grid-area: footer;
+    background: var(--light-color);
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 0;
+    text-align: center;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .wrapper {
+        padding: 0 15px;
+    }
+    
+    .talk-title {
+        font-size: 1.5rem;
+    }
+    
+    .talk-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .site-nav li {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Touch targets - minimum 44px for accessibility */
+@media (max-width: 768px) {
+    .resource-link {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .site-nav a {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+}
