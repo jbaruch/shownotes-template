@@ -1,0 +1,160 @@
+---
+layout: default
+---
+
+<article class="talk" itemscope itemtype="https://schema.org/PresentationDigitalDocument">
+    <!-- Breadcrumb navigation -->
+    <nav class="breadcrumb" role="navigation" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="{{ '/' | relative_url }}">Home</a></li>
+            <li><a href="{{ '/talks/' | relative_url }}">Talks</a></li>
+            <li aria-current="page">{{ page.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Talk header -->
+    <header class="talk-header">
+        <h1 class="talk-title" itemprop="name">{{ page.title }}</h1>
+        
+        <div class="talk-meta">
+            <span class="speaker" itemprop="author">{{ page.speaker }}</span>
+            <span class="conference" itemprop="publisher">{{ page.conference }}</span>
+            <time class="date" datetime="{{ page.date | date: '%Y-%m-%d' }}" itemprop="datePublished">
+                {{ page.date | date: "%B %d, %Y" }}
+            </time>
+            {% if page.status %}
+            <span class="status status-{{ page.status | downcase }}">{{ page.status | capitalize }}</span>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Talk description -->
+    {% if page.description %}
+    <section class="talk-description" itemprop="description">
+        <h2>About This Talk</h2>
+        <p>{{ page.description }}</p>
+    </section>
+    {% endif %}
+
+    <!-- Talk abstract -->
+    {% if page.abstract %}
+    <section class="talk-abstract" itemprop="abstract">
+        <h2>Abstract</h2>
+        <div class="abstract-content">
+            {{ page.abstract | markdownify }}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Talk resources -->
+    {% if page.resources and page.resources.size > 0 %}
+    <section class="talk-resources">
+        <h2>Resources</h2>
+        
+        {% assign slides = page.resources | where: "type", "slides" %}
+        {% if slides.size > 0 %}
+        <div class="resource-group">
+            <h3>Slides</h3>
+            <ul class="resource-list">
+                {% for resource in slides %}
+                <li class="resource-item resource-slides">
+                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
+                        {{ resource.title }}
+                        {% if resource.description %}<span class="resource-description">{{ resource.description }}</span>{% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% assign code = page.resources | where: "type", "code" %}
+        {% if code.size > 0 %}
+        <div class="resource-group">
+            <h3>Code</h3>
+            <ul class="resource-list">
+                {% for resource in code %}
+                <li class="resource-item resource-code">
+                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
+                        {{ resource.title }}
+                        {% if resource.description %}<span class="resource-description">{{ resource.description }}</span>{% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% assign video = page.resources | where: "type", "video" %}
+        {% if video.size > 0 %}
+        <div class="resource-group">
+            <h3>Video</h3>
+            <ul class="resource-list">
+                {% for resource in video %}
+                <li class="resource-item resource-video">
+                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
+                        {{ resource.title }}
+                        {% if resource.description %}<span class="resource-description">{{ resource.description }}</span>{% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% assign links = page.resources | where: "type", "link" %}
+        {% if links.size > 0 %}
+        <div class="resource-group">
+            <h3>Additional Links</h3>
+            <ul class="resource-list">
+                {% for resource in links %}
+                <li class="resource-item resource-link-item">
+                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
+                        {{ resource.title }}
+                        {% if resource.description %}<span class="resource-description">{{ resource.description }}</span>{% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    <!-- Talk content -->
+    {% if content and content != empty %}
+    <section class="talk-content" itemprop="text">
+        <h2>Notes</h2>
+        <div class="content">
+            {{ content }}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Notification placeholder for future features -->
+    <section class="notification-placeholder">
+        <h2>Stay Updated</h2>
+        <p>Interested in updates about this talk? Email notifications will be available in a future version.</p>
+    </section>
+</article>
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "PresentationDigitalDocument",
+  "name": "{{ page.title | escape }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ page.speaker | escape }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ page.conference | escape }}"
+  },
+  "datePublished": "{{ page.date | date: '%Y-%m-%d' }}",
+  {% if page.description %}"description": "{{ page.description | escape }}",{% endif %}
+  {% if page.abstract %}"abstract": "{{ page.abstract | strip_html | escape }}",{% endif %}
+  "url": "{{ page.url | absolute_url }}"
+}
+</script>

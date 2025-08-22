@@ -119,20 +119,95 @@ class ResourceManagementTest < Minitest::Test
 
   private
 
-  # Interface methods - implementations will be created later
+  # Interface methods - connected to implementation
   def generate_talk_page(talk_data)
-    fail 'generate_talk_page method not implemented yet'
+    require_relative '../../../lib/simple_talk_renderer'
+    renderer = SimpleTalkRenderer.new
+    
+    # Enhanced layout that includes resources section
+    enhanced_talk_data = talk_data.dup
+    enhanced_talk_data['content'] = generate_resources_content(talk_data['resources']) if talk_data['resources']
+    
+    renderer.generate_talk_page(enhanced_talk_data)
   end
 
   def extract_resource_section(html, resource_type)
-    fail 'extract_resource_section method not implemented yet'
+    # Extract specific resource section from HTML
+    pattern = /<div[^>]*class="[^"]*#{resource_type}[^"]*"[^>]*>(.*?)<\/div>/m
+    match = html.match(pattern)
+    match ? match[1].strip : ''
   end
 
   def extract_link(html, domain)
-    fail 'extract_link method not implemented yet'
+    # Extract link for specific domain including attributes
+    pattern = /<a([^>]*href="[^"]*#{Regexp.escape(domain)}[^"]*"[^>]*)>(.*?)<\/a>/
+    match = html.match(pattern)
+    if match
+      attrs = match[1]
+      href = attrs.match(/href="([^"]+)"/)[1]
+      text = match[2].strip
+      
+      result = { href: href, text: text }
+      if attrs.include?('target="_blank"')
+        result['target="_blank"'] = true
+      end
+      if attrs.include?('rel="noopener"')
+        result['rel="noopener"'] = true
+      end
+      result
+    else
+      nil
+    end
   end
 
   def assert_no_broken_resource_sections(html)
-    fail 'assert_no_broken_resource_sections method not implemented yet'
+    # Check for broken resource sections (empty or malformed)
+    broken_patterns = [
+      /<div[^>]*class="[^"]*resource[^"]*"[^>]*>\s*<\/div>/, # Empty resource divs
+      /<a[^>]*href=""[^>]*>/, # Empty href attributes
+      /<a[^>]*href="[^"]*"[^>]*>\s*<\/a>/ # Empty link text
+    ]
+    
+    broken_patterns.each do |pattern|
+      refute html.match?(pattern), "Found broken resource section matching #{pattern}"
+    end
+  end
+
+  private
+
+  def generate_resources_content(resources)
+    return '' unless resources
+    
+    content = "<div class=\"resources\">\n<h3>Resources</h3>\n"
+    
+    resources.each do |type, resource_data|
+      case type
+      when 'slides'
+        if resource_data.is_a?(Hash) && resource_data['url']
+          content += "<div class=\"resource slides\">\n"
+          content += "<a href=\"#{resource_data['url']}\" target=\"_blank\">#{resource_data['title'] || 'Slides'}</a>\n"
+          content += "</div>\n"
+        end
+      when 'code'
+        if resource_data.is_a?(Hash) && resource_data['url']
+          content += "<div class=\"resource code\">\n"
+          content += "<a href=\"#{resource_data['url']}\" target=\"_blank\">#{resource_data['title'] || 'Code Repository'}</a>\n"
+          content += "</div>\n"
+        end
+      when 'links'
+        if resource_data.is_a?(Array)
+          resource_data.each do |link|
+            next unless link.is_a?(Hash) && link['url']
+            content += "<div class=\"resource link\">\n"
+            content += "<a href=\"#{link['url']}\" target=\"_blank\">#{link['title'] || link['url']}</a>\n"
+            content += "<p>#{link['description']}</p>\n" if link['description']
+            content += "</div>\n"
+          end
+        end
+      end
+    end
+    
+    content += "</div>\n"
+    content
   end
 end

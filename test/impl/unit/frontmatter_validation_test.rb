@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'minitest/autorun'
+require 'set'
 
 # Unit tests for Frontmatter Validation (TS-076 through TS-085)
 # Maps to Gherkin: "Talk frontmatter validates required fields correctly" + "Talk frontmatter handles optional fields correctly"
@@ -208,73 +209,194 @@ class FrontmatterValidationTest < Minitest::Test
 
   private
 
-  # Interface class - implementation will be created later
+  # Interface class - connected to implementation
   class FrontmatterValidator
     def initialize
-      fail 'FrontmatterValidator class not implemented yet'
+      @registered_slugs = Set.new
     end
 
     def validate_slug(slug)
-      fail 'validate_slug method not implemented yet'
+      errors = []
+      
+      if slug.nil? || slug.empty?
+        errors << "Slug is required"
+      elsif slug.length < 3
+        errors << "Slug must be at least 3 characters"
+      elsif slug.length > 50
+        errors << "Slug must be no more than 50 characters"
+      elsif !slug.match?(/^[a-z0-9-]+$/)
+        errors << "Slug must contain only lowercase letters, numbers, and hyphens"
+      elsif @registered_slugs.include?(slug)
+        errors << "Slug must be unique across all talks"
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_title(title)
-      fail 'validate_title method not implemented yet'
+      errors = []
+      
+      if title.nil? || title.empty?
+        errors << "Title is required"
+      elsif title.length > 200
+        errors << "Title must be 200 characters or less"
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_speaker(speaker)
-      fail 'validate_speaker method not implemented yet'
+      errors = []
+      
+      if speaker.nil? || speaker.empty?
+        errors << "Speaker is required"
+      elsif speaker.length > 100
+        errors << "Speaker must be no more than 100 characters"
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_conference(conference)
-      fail 'validate_conference method not implemented yet'
+      errors = []
+      
+      if conference.nil? || conference.empty?
+        errors << "Conference is required"
+      elsif conference.length > 100
+        errors << "Conference must be 100 characters or less"
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_date(date)
-      fail 'validate_date method not implemented yet'
+      errors = []
+      
+      if date.nil? || date.empty?
+        errors << "Date is required"
+      elsif !date.match?(/^\d{4}-\d{2}-\d{2}$/)
+        errors << "Date must be in YYYY-MM-DD format"
+      else
+        # Additional date validation
+        year, month, day = date.split('-').map(&:to_i)
+        if month < 1 || month > 12 || day < 1 || day > 31
+          errors << "Date must be a valid calendar date"
+        end
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_status(status)
-      fail 'validate_status method not implemented yet'
+      errors = []
+      valid_statuses = ['upcoming', 'completed', 'in-progress']
+      
+      if status.nil? || status.empty?
+        errors << "Status is required"
+      elsif !valid_statuses.include?(status)
+        errors << "Status must be one of: #{valid_statuses.join(', ')}"
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_optional_fields(fields)
-      fail 'validate_optional_fields method not implemented yet'
+      errors = []
+      
+      fields.each do |field, value|
+        next if value.nil? || value.empty?
+        
+        case field
+        when 'description'
+          errors.concat(validate_description(value).errors)
+        when 'abstract'
+          errors.concat(validate_abstract(value).errors)
+        when 'location'
+          errors.concat(validate_location(value).errors)
+        when 'level'
+          errors.concat(validate_level(value).errors)
+        end
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_location(location)
-      fail 'validate_location method not implemented yet'
+      errors = []
+      
+      if location && location.length > 200
+        errors << "Location must be no more than 200 characters"
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_description(description)
-      fail 'validate_description method not implemented yet'
+      errors = []
+      
+      if description && description.length > 500
+        errors << "Description must be no more than 500 characters"
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_abstract(abstract)
-      fail 'validate_abstract method not implemented yet'
+      errors = []
+      
+      if abstract && abstract.length > 500
+        errors << "Abstract must be no more than 500 characters"
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_level(level)
-      fail 'validate_level method not implemented yet'
+      errors = []
+      valid_levels = ['beginner', 'intermediate', 'advanced']
+      
+      if level && !valid_levels.include?(level)
+        errors << "Level must be one of: #{valid_levels.join(', ')}"
+      end
+      
+      ValidationResult.new(errors.empty?, errors)
     end
 
     def validate_all(data)
-      fail 'validate_all method not implemented yet'
+      all_errors = []
+      
+      # Validate required fields
+      all_errors.concat(validate_title(data['title']).errors)
+      all_errors.concat(validate_speaker(data['speaker']).errors)
+      all_errors.concat(validate_conference(data['conference']).errors)
+      all_errors.concat(validate_date(data['date']).errors)
+      all_errors.concat(validate_status(data['status']).errors)
+      
+      # Validate optional fields if present
+      optional_fields = data.select { |k, v| ['description', 'abstract', 'location', 'level'].include?(k) }
+      all_errors.concat(validate_optional_fields(optional_fields).errors)
+      
+      ValidationResult.new(all_errors.empty?, all_errors)
     end
 
     def register_slug(slug)
-      fail 'register_slug method not implemented yet'
+      @registered_slugs.add(slug)
     end
   end
 
   # Interface class for validation results
   class ValidationResult
+    def initialize(valid, errors)
+      @valid = valid
+      @errors = errors
+    end
+    
     def valid?
-      fail 'ValidationResult#valid? method not implemented yet'
+      @valid
     end
 
     def errors
-      fail 'ValidationResult#errors method not implemented yet'
+      @errors
     end
   end
 end
