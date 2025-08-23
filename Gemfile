@@ -1,8 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '>= 2.6.0'
-
-# Use compatible versions for Ruby 2.6+
+# Use compatible versions for Ruby 3.0+
 gem 'jekyll', '~> 4.2'
 gem 'minitest', '~> 5.0'
 gem 'kramdown-parser-gfm'
@@ -12,9 +10,9 @@ gem 'jekyll-sitemap'
 # Build tools
 gem 'rake'
 
-# For testing only - compatible versions
+# For testing only - stable versions
 group :test do
   gem 'capybara', '~> 3.35'
-  gem 'nokogiri', '~> 1.11'
+  gem 'nokogiri', '~> 1.16.0'  # Newer but compatible version
   gem 'selenium-webdriver', '~> 4.0'
 end

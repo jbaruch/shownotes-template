@@ -23,12 +23,6 @@ jobs:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true
     
-    - name: Install dependencies
-      run: |
-        bundle install
-      env:
-        BUNDLE_FORCE_RUBY_PLATFORM: true
-    
     - name: Run tests
       run: bundle exec rake test
       env:
@@ -49,12 +43,6 @@ jobs:
       with:
         ruby-version: '3.1'
         bundler-cache: true
-    
-    - name: Install dependencies
-      run: |
-        bundle install
-      env:
-        BUNDLE_FORCE_RUBY_PLATFORM: true
     
     - name: Run security tests
       run: bundle exec rake test:unit
@@ -78,12 +66,6 @@ jobs:
         ruby-version: '3.1'
         bundler-cache: true
     
-    - name: Install dependencies
-      run: |
-        bundle install
-      env:
-        BUNDLE_FORCE_RUBY_PLATFORM: true
-    
     - name: Run performance tests
       run: bundle exec rake test:performance
       env:
@@ -101,12 +83,6 @@ jobs:
       with:
         ruby-version: '3.1'
         bundler-cache: true
-    
-    - name: Install dependencies
-      run: |
-        bundle install
-      env:
-        BUNDLE_FORCE_RUBY_PLATFORM: true
     
     - name: Build Jekyll site
       run: |
