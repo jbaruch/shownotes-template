@@ -13,6 +13,6 @@ gem 'rake'
 # For testing only - stable versions
 group :test do
   gem 'capybara', '~> 3.35'
-  gem 'nokogiri', '~> 1.16.0'  # Newer but compatible version
+  gem 'nokogiri', '~> 1.18.9'  # Updated for security fixes
   gem 'selenium-webdriver', '~> 4.0'
 end
