@@ -2,6 +2,7 @@
 
 require 'minitest/autorun'
 require 'json'
+require 'uri'
 
 # Unit tests for Site Metadata (TS-032 through TS-034, TS-039 through TS-044)
 # Maps to Gherkin: "Talk page includes proper metadata" + "Talk page includes social media metadata"

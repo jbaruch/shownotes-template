@@ -360,6 +360,14 @@ body {
 
 /* Touch targets - minimum 44px for accessibility */
 @media (max-width: 768px) {
+    a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+    
     .resource-link {
         min-height: 44px;
         display: flex;
