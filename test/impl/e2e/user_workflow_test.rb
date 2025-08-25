@@ -176,7 +176,7 @@ class UserWorkflowTest < Minitest::Test
     assert page.has_text?('not found'), '404 page should indicate page not found'
     
     # Should provide recovery options
-    assert_link 'Home', 'Should provide link back to home page'
+    assert page.has_link?('Home'), 'Should provide link back to home page'
   end
 
   private
