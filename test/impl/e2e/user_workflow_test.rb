@@ -170,8 +170,8 @@ class UserWorkflowTest < Minitest::Test
     # Test 404 handling
     visit '/talks/nonexistent-conference/nonexistent-talk/'
     
-    # Should show helpful 404 page
-    assert_text /404/, '404 page should be displayed for nonexistent talks'
+    # Should show helpful 404 page  
+    assert_text '404', '404 page should be displayed for nonexistent talks'
     assert_text 'not found', '404 page should indicate page not found'
     
     # Should provide recovery options
