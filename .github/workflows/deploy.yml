@@ -35,9 +35,12 @@ jobs:
     
     - name: Setup Pages
       id: pages
-      uses: actions/configure-pages@v4
+      uses: actions/configure-pages@v5
       with:
+        # Enable GitHub Pages automatically if not already configured
         enablement: true
+        # Set deployment source to GitHub Actions
+        token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Build with Jekyll
       run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
@@ -46,7 +49,7 @@ jobs:
         BUNDLE_FORCE_RUBY_PLATFORM: true
     
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
 
   deploy:
     environment:
@@ -57,4 +60,4 @@ jobs:
     steps:
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v4
+      uses: actions/deploy-pages@v5
