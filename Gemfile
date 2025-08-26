@@ -10,6 +10,9 @@ gem 'jekyll-sitemap'
 # Build tools
 gem 'rake'
 
+# Security auditing
+gem 'bundler-audit'
+
 # For testing only - stable versions
 group :test do
   gem 'capybara', '~> 3.35'
