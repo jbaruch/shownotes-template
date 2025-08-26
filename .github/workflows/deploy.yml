@@ -37,10 +37,8 @@ jobs:
       id: pages
       uses: actions/configure-pages@v5
       with:
-        # Enable GitHub Pages automatically if not already configured
-        enablement: true
-        # Set deployment source to GitHub Actions
-        token: ${{ secrets.GITHUB_TOKEN }}
+        # Don't try to auto-enable GitHub Pages - requires manual setup first
+        enablement: false
     
     - name: Build with Jekyll
       run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"

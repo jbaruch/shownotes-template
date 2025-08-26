@@ -5,31 +5,26 @@ The Deploy workflow is failing with "Resource not accessible by integration" err
 
 ## Required Manual Configuration
 
-### Step 1: Enable GitHub Pages Initially
-Since the "Pages" option is missing, you need to enable it first by creating a simple `index.html` file:
+### Step 1: Fix Workflow Permissions (CRITICAL)
+The deployment is failing because GitHub Actions doesn't have write permissions:
 
 1. Go to your repository on GitHub
-2. Click "Add file" → "Create new file" 
-3. Name it `index.html`
-4. Add simple content:
-   ```html
-   <!DOCTYPE html>
-   <html>
-   <head><title>Shownotes</title></head>
-   <body><h1>Shownotes Site</h1></body>
-   </html>
-   ```
-5. Commit directly to the main branch
-6. Wait 1-2 minutes for GitHub to detect the HTML file
+2. Click on the "Settings" tab
+3. In the left sidebar, click "Actions" → "General"
+4. Scroll down to "Workflow permissions"
+5. Select **"Read and write permissions"** (not "Read repository contents")
+6. Click "Save"
 
-### Step 2: Navigate to Repository Settings
-1. Go to your repository on GitHub
-2. Click on the "Settings" tab  
-3. In the left sidebar, look for "Pages" (should now appear)
+### Step 2: Enable GitHub Pages
+The `index.html` file should have triggered GitHub to show the Pages option:
+
+1. Still in Settings, look for "Pages" in the left sidebar
+2. If "Pages" doesn't appear, wait a few more minutes for GitHub to detect the HTML file
+3. Click on "Pages" when it appears
 
 ### Step 3: Configure Publishing Source  
 1. Under "Build and deployment", find the "Source" dropdown
-2. Select **"GitHub Actions"** instead of "Deploy from a branch"
+2. Select **"GitHub Actions"** instead of "Deploy from a branch"  
 3. Click "Save"
 
 ### Step 3: Verify Environment Creation
@@ -44,12 +39,22 @@ The deploy.yml workflow has been updated with:
 - Improved error handling and explicit token configuration
 - Better documentation
 
+## Step 4: Test the Fix
+After completing the above steps:
+
+1. Go to Actions tab in your repository
+2. Manually trigger the "Deploy to GitHub Pages" workflow by clicking "Run workflow"
+3. OR push a small change to trigger it automatically
+
 ## Expected Behavior After Setup
 Once configured, pushes to the main branch will:
 1. Run the CI tests successfully ✅
 2. Build the Jekyll site ✅  
 3. Deploy to GitHub Pages ✅
 4. Make the site available at your Pages URL
+
+## Quick Fix Summary
+The main issue is **workflow permissions**. GitHub Actions needs "Read and write permissions" to create the Pages site. The other steps are also important but the permissions fix is critical.
 
 ## Troubleshooting
 If you continue to see permission errors:
