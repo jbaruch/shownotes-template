@@ -23,7 +23,7 @@ jobs:
     - name: Update dependencies
       run: |
         bundle update
-        bundle audit --update
+        bundle exec bundle-audit --update
       env:
         BUNDLE_FORCE_RUBY_PLATFORM: true
     
@@ -58,6 +58,6 @@ jobs:
         delete-branch: true
     
     - name: Security audit
-      run: bundle audit
+      run: bundle exec bundle-audit
       env:
         BUNDLE_FORCE_RUBY_PLATFORM: true
