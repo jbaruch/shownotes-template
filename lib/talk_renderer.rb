@@ -7,7 +7,7 @@ begin
   require 'nokogiri'
   require 'yaml'
   require 'ostruct'
-rescue LoadError => e
+rescue LoadError
   # Fallback for testing without full Jekyll setup
   require 'yaml'
   require 'ostruct'
@@ -111,7 +111,7 @@ class TalkRenderer
     parts = content.split(/^---\s*$/, 3)
     return Kramdown::Document.new(content).to_html if parts.length < 3
     
-    frontmatter = parts[1].strip
+    _frontmatter = parts[1].strip
     markdown_content = parts[2].strip
     
     # Process markdown to HTML

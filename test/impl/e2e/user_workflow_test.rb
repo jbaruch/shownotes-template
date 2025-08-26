@@ -44,8 +44,8 @@ class UserWorkflowTest < Minitest::Test
                  'URL should be clean and bookmarkable'
     
     # Verify URL is shareable (clean, meaningful)
-    refute_match /[?&]/, current_url, 'URL should not contain query parameters'
-    assert_match /talks/, current_url, 'URL should clearly indicate it\'s a talk page'
+    refute_match(/[?&]/, current_url, 'URL should not contain query parameters')
+    assert_match(/talks/, current_url, 'URL should clearly indicate it\'s a talk page')
   end
 
   # Maps to Gherkin: Post-talk resource access workflow

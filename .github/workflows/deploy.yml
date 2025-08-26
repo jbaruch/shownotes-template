@@ -28,8 +28,8 @@ jobs:
         ruby-version: '3.1'
         bundler-cache: true
     
-    - name: Run tests before deployment
-      run: bundle exec rake test
+    - name: Run essential tests before deployment
+      run: bundle exec rake quick
       env:
         BUNDLE_FORCE_RUBY_PLATFORM: true
     

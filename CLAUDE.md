@@ -200,3 +200,15 @@
     - Protected file modifications
     - Fundamental design flaws
       → STOP immediately
+
+## IV. TOOL CONFIGURATIONS
+
+### Context7 Integration
+* Documentation Retrieval:
+    - Auto-trigger when user requests code examples
+    - Auto-trigger for setup or configuration steps
+    - Auto-trigger for library/API documentation
+
+[[calls]]
+match = "when the user requests code examples, setup or configuration steps, or library/API documentation"
+tool  = "context7"
