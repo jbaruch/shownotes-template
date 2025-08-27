@@ -12,17 +12,21 @@ abstract: |
   concepts, and modern tooling approaches.
 resources:
   - type: "slides"
-    title: "Slide Deck"
-    url: "https://example.com/slides"
-    description: "Complete presentation slides"
+    title: "Modern JavaScript Patterns - Slide Deck"
+    url: "https://docs.google.com/presentation/d/1vQtLbueXXLmtdrkOsEFqtDlhM-rzaoaEFacQ8fMrmn4w9qFptjZe0RlsaUcUjMwyg/edit#slide=id.p1"
+    description: "Complete presentation slides with examples"
+  - type: "video"
+    title: "Full Presentation Video"
+    url: "https://www.youtube.com/watch?v=Yh_hs4mZTiY"
+    description: "Complete video recording of the talk"
   - type: "code" 
     title: "Example Repository"
     url: "https://github.com/example/modern-js-patterns"
     description: "Code examples from the talk"
   - type: "link"
     title: "Additional Reading"
-    url: "https://example.com/resources"
-    description: "Curated list of related articles and tools"
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript"
+    description: "MDN JavaScript documentation and resources"
 ---
 
 ## Key Takeaways
