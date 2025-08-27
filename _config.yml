@@ -51,6 +51,3 @@ exclude:
 
 # Security
 safe: true
-
-# Force rebuild
-build: 2025-08-27-embed-fix

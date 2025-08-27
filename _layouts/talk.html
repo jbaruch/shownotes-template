@@ -50,19 +50,15 @@ layout: default
     {% if page.resources and page.resources.size > 0 %}
     <section class="talk-resources">
         <h2>Resources</h2>
-        <!-- DEBUG: Resource count: {{ page.resources.size }} -->
         
         {% comment %} Group resources by type {% endcomment %}
         {% assign grouped_resources = page.resources | group_by: "type" %}
-        <!-- DEBUG: Group count: {{ grouped_resources.size }} -->
         
         {% for group in grouped_resources %}
         <div class="resource-group">
             <h3>{{ group.name | capitalize }}</h3>
-            <!-- DEBUG: Items in {{ group.name }}: {{ group.items.size }} -->
             <ul class="resource-list">
                 {% for resource in group.items %}
-                <!-- DEBUG: Processing {{ resource.type }}: {{ resource.url }} -->
                 {% include embedded_resource.html resource=resource %}
                 {% endfor %}
             </ul>

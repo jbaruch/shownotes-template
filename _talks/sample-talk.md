@@ -62,5 +62,3 @@ async function fetchUserData(userId) {
 ## Questions & Discussion
 
 Feel free to reach out with questions about implementing these patterns in your projects!
-
-*Updated: Testing embed functionality*
