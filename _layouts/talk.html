@@ -48,7 +48,23 @@ layout: default
 
     <!-- Talk resources with embedded content support -->
     {% if page.resources and page.resources.size > 0 %}
-    {{ page.resources | render_embedded_resources }}
+    <section class="talk-resources">
+        <h2>Resources</h2>
+        
+        {% comment %} Group resources by type {% endcomment %}
+        {% assign grouped_resources = page.resources | group_by: "type" %}
+        
+        {% for group in grouped_resources %}
+        <div class="resource-group">
+            <h3>{{ group.name | capitalize }}</h3>
+            <ul class="resource-list">
+                {% for resource in group.items %}
+                {% include embedded_resource.html resource=resource %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </section>
     {% endif %}
 
     <!-- Talk content -->
