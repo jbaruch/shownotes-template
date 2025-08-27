@@ -12,9 +12,9 @@ abstract: |
   concepts, and modern tooling approaches.
 resources:
   - type: "slides"
-    title: "Modern JavaScript Patterns - Slide Deck"
-    url: "https://docs.google.com/presentation/d/1vQtLbueXXLmtdrkOsEFqtDlhM-rzaoaEFacQ8fMrmn4w9qFptjZe0RlsaUcUjMwyg/edit#slide=id.p1"
-    description: "Complete presentation slides with examples"
+    title: "Modern JavaScript Patterns - Slide Deck (Demo - Not Published)"
+    url: "https://docs.google.com/presentation/d/1BkEo_wlzLlooEwxCDhifi_-cDaEwL_v5WrYOB3PQKPs/edit?usp=sharing"
+    description: "Note: This demo slide deck is not publicly published. For embed to work, the presentation must be published to web or shared publicly."
   - type: "video"
     title: "Full Presentation Video"
     url: "https://www.youtube.com/watch?v=Yh_hs4mZTiY"

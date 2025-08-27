@@ -24,7 +24,8 @@ Usage: {% include embedded_resource.html resource=resource %}
   {% comment %} Extract presentation ID from Google Slides URL {% endcomment %}
   {% assign url_parts = url | split: "/d/" %}
   {% if url_parts.size > 1 %}
-    {% assign id_part = url_parts[1] | split: "/" | first %}
+    {% assign id_with_path = url_parts[1] %}
+    {% assign id_part = id_with_path | split: "/edit" | first | split: "/present" | first %}
     {% assign embed_url = "https://docs.google.com/presentation/d/e/" | append: id_part | append: "/pubembed?start=false&loop=false&delayms=3000" %}
     
     <li class="resource-item resource-{{ type }}">
