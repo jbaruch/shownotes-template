@@ -390,3 +390,78 @@ body {
         box-sizing: border-box;
     }
 }
+
+/* Embedded content styles */
+.embed-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    margin: 1rem 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.embed-container.slides-embed {
+    padding-bottom: 56.25%; /* 16:9 aspect ratio for slides */
+}
+
+.embed-container.video-embed {
+    padding-bottom: 56.25%; /* 16:9 aspect ratio for videos */
+}
+
+.embed-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 8px;
+}
+
+.responsive-iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Resource items containing embeds */
+.resource-item:has(.embed-container) {
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.resource-item .embed-container {
+    margin: 0.5rem 0 1rem 0;
+}
+
+/* Fallback for older browsers that don't support :has() */
+.resource-item.resource-slides .embed-container,
+.resource-item.resource-video .embed-container {
+    margin: 0.5rem 0 1rem 0;
+}
+
+/* Loading state for embeds */
+.embed-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1;
+}
+
+.embed-container iframe {
+    z-index: 2;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}

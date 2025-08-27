@@ -46,79 +46,9 @@ layout: default
     </section>
     {% endif %}
 
-    <!-- Talk resources -->
+    <!-- Talk resources with embedded content support -->
     {% if page.resources and page.resources.size > 0 %}
-    <section class="talk-resources">
-        <h2>Resources</h2>
-        
-        {% assign slides = page.resources | where: "type", "slides" %}
-        {% if slides.size > 0 %}
-        <div class="resource-group">
-            <h3>Slides</h3>
-            <ul class="resource-list">
-                {% for resource in slides %}
-                <li class="resource-item resource-slides">
-                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                        {{ resource.title }}
-                        {% if resource.description %}<span class="resource-description">{{ resource.description }}</span>{% endif %}
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-
-        {% assign code = page.resources | where: "type", "code" %}
-        {% if code.size > 0 %}
-        <div class="resource-group">
-            <h3>Code</h3>
-            <ul class="resource-list">
-                {% for resource in code %}
-                <li class="resource-item resource-code">
-                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                        {{ resource.title }}
-                        {% if resource.description %}<span class="resource-description">{{ resource.description }}</span>{% endif %}
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-
-        {% assign video = page.resources | where: "type", "video" %}
-        {% if video.size > 0 %}
-        <div class="resource-group">
-            <h3>Video</h3>
-            <ul class="resource-list">
-                {% for resource in video %}
-                <li class="resource-item resource-video">
-                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                        {{ resource.title }}
-                        {% if resource.description %}<span class="resource-description">{{ resource.description }}</span>{% endif %}
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-
-        {% assign links = page.resources | where: "type", "link" %}
-        {% if links.size > 0 %}
-        <div class="resource-group">
-            <h3>Additional Links</h3>
-            <ul class="resource-list">
-                {% for resource in links %}
-                <li class="resource-item resource-link-item">
-                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                        {{ resource.title }}
-                        {% if resource.description %}<span class="resource-description">{{ resource.description }}</span>{% endif %}
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-    </section>
+    {{ page.resources | render_embedded_resources }}
     {% endif %}
 
     <!-- Talk content -->

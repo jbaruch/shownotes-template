@@ -349,6 +349,87 @@ class TalkRenderer
     end
   end
 
+  # Make this public for Jekyll plugin access
+  def generate_resources_html(resources)
+    return '' if resources.nil? || resources.empty?
+    
+    html = <<~HTML
+      <section class="talk-resources">
+        <h2>Resources</h2>
+    HTML
+    
+    # Handle both array and hash formats
+    if resources.is_a?(Array)
+      # Group by type for array format
+      grouped = resources.group_by { |item| item['type'] || 'links' }
+      grouped.each do |type, items|
+        html += <<~HTML
+          <div class="resource-group">
+            <h3>#{type.capitalize}</h3>
+            <ul class="resource-list">
+        HTML
+        items.each do |item|
+          if item['url'] && item['title']
+            # Use embed functionality for supported URLs
+            if embeddable_url?(item['url'])
+              html += generate_embed_html(item, type)
+            else
+              html += generate_link_html(item, type)
+            end
+          end
+        end
+        html += "</ul></div>\n"
+      end
+    else
+      # Handle hash format
+      resources.each do |type, resource_data|
+      next if resource_data.nil?
+      
+      if resource_data.is_a?(Array)
+        # Handle array of links
+        html += <<~HTML
+          <div class="resource-group">
+            <h3>#{type.capitalize}</h3>
+            <ul class="resource-list">
+        HTML
+        resource_data.each do |item|
+          if item['url'] && item['title']
+            # Use embed functionality for supported URLs
+            if embeddable_url?(item['url'])
+              html += generate_embed_html(item, type)
+            else
+              html += generate_link_html(item, type)
+            end
+          end
+        end
+        html += "</ul></div>\n"
+      elsif resource_data.is_a?(Hash) && resource_data['url']
+        # Handle single resource
+        html += <<~HTML
+          <div class="resource-group">
+            <h3>#{type.capitalize}</h3>
+            <ul class="resource-list">
+        HTML
+        
+        # Use embed functionality for supported URLs
+        if embeddable_url?(resource_data['url'])
+          html += generate_embed_html(resource_data, type)
+        else
+          html += generate_link_html(resource_data, type)
+        end
+        
+        html += <<~HTML
+            </ul>
+          </div>
+        HTML
+      end
+      end  # end resources.each for hash format
+    end    # end if/else for array/hash handling
+    
+    html += "</section>"
+    html
+  end
+
   private
 
   def setup_jekyll_site
@@ -443,86 +524,6 @@ class TalkRenderer
     html_content.gsub!('Liquid error: internal', '#')
     
     html_content
-  end
-  
-  def generate_resources_html(resources)
-    return '' if resources.nil? || resources.empty?
-    
-    html = <<~HTML
-      <section class="talk-resources">
-        <h2>Resources</h2>
-    HTML
-    
-    # Handle both array and hash formats
-    if resources.is_a?(Array)
-      # Group by type for array format
-      grouped = resources.group_by { |item| item['type'] || 'links' }
-      grouped.each do |type, items|
-        html += <<~HTML
-          <div class="resource-group">
-            <h3>#{type.capitalize}</h3>
-            <ul class="resource-list">
-        HTML
-        items.each do |item|
-          if item['url'] && item['title']
-            # Use embed functionality for supported URLs
-            if embeddable_url?(item['url'])
-              html += generate_embed_html(item, type)
-            else
-              html += generate_link_html(item, type)
-            end
-          end
-        end
-        html += "</ul></div>\n"
-      end
-    else
-      # Handle hash format
-      resources.each do |type, resource_data|
-      next if resource_data.nil?
-      
-      if resource_data.is_a?(Array)
-        # Handle array of links
-        html += <<~HTML
-          <div class="resource-group">
-            <h3>#{type.capitalize}</h3>
-            <ul class="resource-list">
-        HTML
-        resource_data.each do |item|
-          if item['url'] && item['title']
-            # Use embed functionality for supported URLs
-            if embeddable_url?(item['url'])
-              html += generate_embed_html(item, type)
-            else
-              html += generate_link_html(item, type)
-            end
-          end
-        end
-        html += "</ul></div>\n"
-      elsif resource_data.is_a?(Hash) && resource_data['url']
-        # Handle single resource
-        html += <<~HTML
-          <div class="resource-group">
-            <h3>#{type.capitalize}</h3>
-            <ul class="resource-list">
-        HTML
-        
-        # Use embed functionality for supported URLs
-        if embeddable_url?(resource_data['url'])
-          html += generate_embed_html(resource_data, type)
-        else
-          html += generate_link_html(resource_data, type)
-        end
-        
-        html += <<~HTML
-            </ul>
-          </div>
-        HTML
-      end
-      end  # end resources.each for hash format
-    end    # end if/else for array/hash handling
-    
-    html += "</section>"
-    html
   end
 
   def default_talk_layout
