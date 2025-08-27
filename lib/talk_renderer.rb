@@ -7,10 +7,12 @@ begin
   require 'nokogiri'
   require 'yaml'
   require 'ostruct'
+  require 'date'
 rescue LoadError
   # Fallback for testing without full Jekyll setup
   require 'yaml'
   require 'ostruct'
+  require 'date'
   
   # Mock Kramdown if not available
   unless defined?(Kramdown)
@@ -89,6 +91,175 @@ class TalkRenderer
       # Render the page using Jekyll/Liquid
       render_page(page)
     end
+  end
+
+  # Detect if URL is embeddable (Google Slides or YouTube)
+  def embeddable_url?(url)
+    return false if url.nil? || url.empty?
+    google_slides_url?(url) || youtube_url?(url)
+  end
+
+  # Check if URL is Google Slides
+  def google_slides_url?(url)
+    url.match?(/docs\.google\.com\/presentation\/d\//)
+  end
+
+  # Check if URL is YouTube
+  def youtube_url?(url)
+    url.match?(/(?:youtube\.com\/watch\?v=|youtu\.be\/|m\.youtube\.com\/watch\?v=)/)
+  end
+
+  # Convert URL to embed format
+  def convert_to_embed_url(url)
+    return url unless embeddable_url?(url)
+    
+    if google_slides_url?(url)
+      convert_google_slides_to_embed(url)
+    elsif youtube_url?(url)
+      convert_youtube_to_embed(url)
+    else
+      url
+    end
+  end
+
+  # Convert Google Slides URL to embed format
+  def convert_google_slides_to_embed(url)
+    # Extract presentation ID from various Google Slides URL formats
+    match = url.match(/docs\.google\.com\/presentation\/d\/([a-zA-Z0-9_-]+)/)
+    return url unless match
+    
+    presentation_id = match[1]
+    "https://docs.google.com/presentation/d/e/#{presentation_id}/pubembed?start=false&loop=false&delayms=3000"
+  end
+
+  # Convert YouTube URL to embed format
+  def convert_youtube_to_embed(url)
+    video_id = extract_youtube_video_id(url)
+    return url unless video_id
+    
+    "https://www.youtube-nocookie.com/embed/#{video_id}"
+  end
+
+  # Extract YouTube video ID from various URL formats
+  def extract_youtube_video_id(url)
+    # Handle youtube.com/watch?v=ID format (with potential additional parameters)
+    if (match = url.match(/(?:youtube\.com|m\.youtube\.com)\/watch\?.*v=([a-zA-Z0-9_-]+)/))
+      return match[1]
+    end
+    
+    # Handle youtu.be/ID format (with potential parameters after ?)
+    if (match = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/))
+      return match[1].split('?')[0] # Remove any parameters after the ID
+    end
+    
+    nil
+  end
+
+  # Generate embed HTML for a resource item
+  def generate_embed_html(item, type, in_list = true)
+    url = item['url']
+    title = item['title'] || 'Embedded Content'
+    
+    return generate_link_html(item, type) unless embeddable_url?(url)
+    
+    embed_url = convert_to_embed_url(url)
+    
+    # Security: validate the converted URL is safe and actually converted
+    unless embed_url.start_with?('https://') && embed_url != url
+      return generate_link_html(item, type)
+    end
+    
+    # Additional security: reject malicious URLs
+    if embed_url.include?('<') || embed_url.include?('>') || embed_url.include?('"')
+      return generate_link_html(item, type)
+    end
+    
+    # HTML escape title for security, but don't escape the embed URL (it's already validated)
+    escaped_title = escape_html(title)
+    
+    embed_content = if google_slides_url?(url)
+      generate_slides_embed_html(embed_url, escaped_title)
+    elsif youtube_url?(url)
+      generate_video_embed_html(embed_url, escaped_title)
+    else
+      return generate_link_html(item, type)
+    end
+    
+    # Wrap in list item if requested
+    if in_list
+      <<~HTML
+        <li class="resource-item resource-#{type}">
+          #{embed_content}
+        </li>
+      HTML
+    else
+      embed_content
+    end
+  end
+
+  # Generate slides embed HTML (embed_url is already validated, title is escaped)
+  def generate_slides_embed_html(embed_url, title)
+    <<~HTML
+      <div class="embed-container slides-embed">
+        <iframe src="#{embed_url}" 
+                frameborder="0" 
+                allowfullscreen="true"
+                loading="lazy"
+                title="#{title}"
+                class="responsive-iframe">
+        </iframe>
+      </div>
+    HTML
+  end
+
+  # Generate video embed HTML (embed_url is already validated, title is escaped)
+  def generate_video_embed_html(embed_url, title)
+    <<~HTML
+      <div class="embed-container video-embed">
+        <iframe src="#{embed_url}" 
+                frameborder="0"
+                allowfullscreen
+                loading="lazy"
+                title="#{title}"
+                class="responsive-iframe">
+        </iframe>
+      </div>
+    HTML
+  end
+
+  # Generate fallback link HTML
+  def generate_link_html(item, type)
+    url = item['url']
+    title = item['title'] || type.capitalize
+    
+    return '' if url.nil? || url.empty?
+    
+    # Security: validate URL is safe for linking
+    unless url.match?(/^https?:\/\//)
+      return ''
+    end
+    
+    # Security: reject URLs containing malicious content
+    if url.include?('<script>') || url.include?('javascript:') || url.include?('alert(')
+      return ''
+    end
+    
+    escaped_url = escape_html(url)
+    escaped_title = escape_html(title)
+    
+    <<~HTML
+      <li class="resource-item resource-#{type}">
+        <a href="#{escaped_url}" target="_blank" rel="noopener noreferrer" class="resource-link">
+          #{escaped_title}
+        </a>
+      </li>
+    HTML
+  end
+
+  # HTML escape utility
+  def escape_html(text)
+    return '' if text.nil?
+    text.to_s.gsub('&', '&amp;').gsub('<', '&lt;').gsub('>', '&gt;').gsub('"', '&quot;').gsub("'", '&#x27;')
   end
 
   # Extract HTML section by CSS class
@@ -294,13 +465,12 @@ class TalkRenderer
         HTML
         items.each do |item|
           if item['url'] && item['title']
-            html += <<~HTML
-              <li class="resource-item resource-#{type}">
-                <a href="#{item['url']}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                  #{item['title']}
-                </a>
-              </li>
-            HTML
+            # Use embed functionality for supported URLs
+            if embeddable_url?(item['url'])
+              html += generate_embed_html(item, type)
+            else
+              html += generate_link_html(item, type)
+            end
           end
         end
         html += "</ul></div>\n"
@@ -319,13 +489,12 @@ class TalkRenderer
         HTML
         resource_data.each do |item|
           if item['url'] && item['title']
-            html += <<~HTML
-              <li class="resource-item resource-#{type}">
-                <a href="#{item['url']}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                  #{item['title']}
-                </a>
-              </li>
-            HTML
+            # Use embed functionality for supported URLs
+            if embeddable_url?(item['url'])
+              html += generate_embed_html(item, type)
+            else
+              html += generate_link_html(item, type)
+            end
           end
         end
         html += "</ul></div>\n"
@@ -335,11 +504,16 @@ class TalkRenderer
           <div class="resource-group">
             <h3>#{type.capitalize}</h3>
             <ul class="resource-list">
-              <li class="resource-item resource-#{type}">
-                <a href="#{resource_data['url']}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                  #{resource_data['title'] || type.capitalize}
-                </a>
-              </li>
+        HTML
+        
+        # Use embed functionality for supported URLs
+        if embeddable_url?(resource_data['url'])
+          html += generate_embed_html(resource_data, type)
+        else
+          html += generate_link_html(resource_data, type)
+        end
+        
+        html += <<~HTML
             </ul>
           </div>
         HTML

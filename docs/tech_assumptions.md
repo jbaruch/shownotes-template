@@ -179,3 +179,47 @@
 
 **Risk**: Complexity may compromise core functionality
 **Mitigation**: Modular design, feature flags, phased rollout
+
+## Embed Functionality Technical Assumptions (Added 2025-08-26)
+
+### URL Pattern Recognition
+**Assumption**: URL pattern matching can reliably detect embeddable content
+**Rationale**:
+- Google Slides URLs have consistent `docs.google.com/presentation` pattern
+- YouTube URLs follow predictable `youtube.com/watch` and `youtu.be/` formats
+- Pattern-based detection avoids complex API integrations
+
+**Risk**: URL formats may change, edge cases may be missed
+**Mitigation**: Comprehensive pattern testing, graceful fallback to links
+
+### Responsive Iframe Embedding  
+**Assumption**: CSS-only responsive iframes provide adequate mobile experience
+**Rationale**:
+- Aspect ratio techniques work across modern browsers
+- No JavaScript dependencies maintain simplicity
+- Lazy loading supported natively in modern browsers
+
+**Risk**: Complex responsive behavior may require JavaScript
+**Mitigation**: Test extensively on mobile devices, consider JS enhancement if needed
+
+### Security and Sanitization
+**Assumption**: Input validation and HTML escaping prevent XSS vulnerabilities
+**Rationale**:
+- URL pattern matching limits injection attack surface
+- HTML escaping prevents malicious content rendering
+- iframe sandbox attributes provide additional protection
+
+**Risk**: New attack vectors, improper escaping implementation
+**Mitigation**: Security testing, code review, CSP headers
+
+### Backward Compatibility
+**Assumption**: Existing resource formats remain fully functional with embedding enhancement
+**Rationale**:
+- Enhancement only adds functionality, doesn't remove existing behavior
+- Fallback strategy preserves link functionality for all cases
+- No changes to resource data structure or API contracts
+
+**Risk**: Subtle breaking changes in edge cases
+**Mitigation**: Comprehensive regression testing, test-driven development approach
+
+These technical assumptions guide the implementation approach and framework selection.
