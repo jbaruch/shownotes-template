@@ -32,12 +32,13 @@ Usage: {% include embedded_resource.html resource=resource %}
       <div class="embed-container slides-embed">
         <iframe src="{{ embed_url }}" 
                 frameborder="0" 
-                allowfullscreen="true"
+                allowfullscreen
                 loading="lazy"
                 title="{{ title | escape }}"
                 class="responsive-iframe"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin">
+                referrerpolicy="strict-origin-when-cross-origin"
+                sandbox="allow-scripts allow-same-origin allow-presentation">
         </iframe>
       </div>
     </li>
@@ -81,7 +82,8 @@ Usage: {% include embedded_resource.html resource=resource %}
                 title="{{ title | escape }}"
                 class="responsive-iframe"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin">
+                referrerpolicy="strict-origin-when-cross-origin"
+                sandbox="allow-scripts allow-same-origin allow-presentation">
         </iframe>
       </div>
     </li>
