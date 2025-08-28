@@ -28,7 +28,9 @@ Usage: {% include embedded_resource.html resource=resource %}
     {% assign id_part = id_with_path | split: "/edit" | first | split: "/present" | first | split: "/pub" | first | split: "?" | first %}
     {% comment %} Handle both publication IDs (2PACX-*) and document IDs {% endcomment %}
     {% if id_part contains "2PACX-" %}
-      {% assign embed_url = "https://docs.google.com/presentation/d/e/" | append: id_part | append: "/pubembed?start=false&loop=false&delayms=3000" %}
+      {% comment %} Remove leading 'e/' from publication URLs {% endcomment %}
+      {% assign clean_id = id_part | remove_first: "e/" %}
+      {% assign embed_url = "https://docs.google.com/presentation/d/e/" | append: clean_id | append: "/pubembed?start=false&loop=false&delayms=3000" %}
     {% else %}
       {% comment %} For document IDs, try direct embed format first {% endcomment %}
       {% assign embed_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/embed?start=false&loop=false&delayms=3000" %}
