@@ -17,24 +17,36 @@ layout: default
         <h1 class="talk-title" itemprop="name">{{ page.title }}</h1>
         
         <div class="talk-meta">
-            <span class="speaker" itemprop="author">{{ page.speaker }}</span>
-            <span class="conference" itemprop="publisher">{{ page.conference }}</span>
-            <time class="date" datetime="{{ page.date | date: '%Y-%m-%d' }}" itemprop="datePublished">
+            {% if page.speaker %}
+            <span class="meta-item" itemprop="author">
+                <span class="meta-icon speaker" aria-hidden="true"></span>
+                {{ page.speaker }}
+            </span>
+            {% endif %}
+            {% if page.conference %}
+            <span class="meta-item" itemprop="publisher">
+                <span class="meta-icon conference" aria-hidden="true"></span>
+                {{ page.conference }}
+            </span>
+            {% endif %}
+            {% if page.date %}
+            <time class="meta-item" datetime="{{ page.date | date: '%Y-%m-%d' }}" itemprop="datePublished">
+                <span class="meta-icon date" aria-hidden="true"></span>
                 {{ page.date | date: "%B %d, %Y" }}
             </time>
+            {% endif %}
             {% if page.status %}
-            <span class="status status-{{ page.status | downcase }}">{{ page.status | capitalize }}</span>
+            <span class="meta-item status-{{ page.status | downcase }}">
+                <span class="meta-icon status" aria-hidden="true"></span>
+                {{ page.status | capitalize }}
+            </span>
             {% endif %}
         </div>
+        
+        {% if page.description %}
+        <p class="talk-description" itemprop="description">{{ page.description }}</p>
+        {% endif %}
     </header>
-
-    <!-- Talk description -->
-    {% if page.description %}
-    <section class="talk-description" itemprop="description">
-        <h2>About This Talk</h2>
-        <p>{{ page.description }}</p>
-    </section>
-    {% endif %}
 
     <!-- Talk abstract -->
     {% if page.abstract %}
