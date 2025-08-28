@@ -525,11 +525,15 @@ a:hover {
     background: var(--surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-xl);
-    padding: var(--space-8);
+    padding: 0;
     transition: all 0.3s ease;
     box-shadow: var(--shadow-md);
     position: relative;
     overflow: hidden;
+}
+
+.featured-talk-card .talk-content {
+    padding: var(--space-8);
 }
 
 .featured-talk-card:hover {
@@ -641,13 +645,13 @@ a:hover {
 .talk-list-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     background: var(--background);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: var(--space-5) var(--space-6);
     transition: all 0.2s ease;
-    gap: var(--space-4);
+    gap: var(--space-5);
 }
 
 .talk-list-item:hover {
@@ -698,23 +702,103 @@ a:hover {
     line-height: 1.5;
 }
 
-.resources-indicator {
+/* Preview thumbnails */
+.talk-preview-large {
+    width: 100%;
+    height: 200px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    overflow: hidden;
     flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
 }
 
-.resource-count {
-    display: inline-flex;
+.talk-preview-small {
+    width: 120px;
+    height: 80px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.preview-thumbnail {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
     align-items: center;
-    gap: var(--space-1);
-    background: var(--primary-light);
-    color: var(--primary-dark);
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.preview-thumbnail:hover {
+    transform: scale(1.02);
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.preview-thumbnail:hover .play-overlay {
+    background: var(--primary-color);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.play-icon {
+    width: 24px;
+    height: 24px;
+    color: white;
+    margin-left: 2px;
+}
+
+.slides-preview-bg {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    color: white;
+}
+
+.slides-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.preview-small .slides-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.preview-label {
+    font-size: 0.875rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.preview-small .preview-label {
+    font-size: 0.75rem;
 }
 
 /* Legacy talks grid (for talks page if kept) */
