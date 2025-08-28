@@ -17,8 +17,8 @@ collections:
     permalink: /talks/:path/
 
 # Build settings
-sass:
-  style: compressed
+# sass:
+#   style: compressed
 
 # Plugins
 plugins:
