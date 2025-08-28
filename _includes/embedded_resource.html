@@ -25,7 +25,7 @@ Usage: {% include embedded_resource.html resource=resource %}
   {% assign url_parts = url | split: "/d/" %}
   {% if url_parts.size > 1 %}
     {% assign id_with_path = url_parts[1] %}
-    {% assign id_part = id_with_path | split: "/edit" | first | split: "/present" | first | split: "?" | first %}
+    {% assign id_part = id_with_path | split: "/edit" | first | split: "/present" | first | split: "/pub" | first | split: "?" | first %}
     {% comment %} Handle both publication IDs (2PACX-*) and document IDs {% endcomment %}
     {% if id_part contains "2PACX-" %}
       {% assign embed_url = "https://docs.google.com/presentation/d/e/" | append: id_part | append: "/pubembed?start=false&loop=false&delayms=3000" %}
