@@ -13,7 +13,7 @@ abstract: |
 resources:
   - type: "slides"
     title: "Modern JavaScript Patterns - Slide Deck"
-    url: "https://docs.google.com/presentation/d/1vQtLbueXXLmtdrkOsEFqtDlhM-rzaoaEFacQ8fMrmn4w9qFptjZe0RlsaUcUjMwyg/edit#slide=id.p1"
+    url: "https://docs.google.com/presentation/d/1eGDnKKNPW8lmATghSadPFroVEA32zxhv/edit?usp=sharing&ouid=104301617063075159178&rtpof=true&sd=true"
     description: "Complete presentation slides with examples"
   - type: "video"
     title: "Full Presentation Video"
