@@ -14,9 +14,9 @@ gem 'rake'
 # Security auditing
 gem 'bundler-audit'
 
-# For testing only - stable versions
+# For testing only - stable versions  
 group :test do
   gem 'capybara', '~> 3.35'
-  gem 'nokogiri', '~> 1.13.0'  # Compatible with Ruby 2.6
+  gem 'nokogiri', '>= 1.13.0'  # Allow newer versions for Ruby 3.1
   gem 'selenium-webdriver', '~> 4.0'
 end
