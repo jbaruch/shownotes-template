@@ -1,0 +1,214 @@
+---
+layout: default
+title: All Talks
+description: Browse all conference talks, presentations, and show notes
+---
+
+<div class="talks-index">
+    <header class="page-header">
+        <h1>All Talks</h1>
+        <p class="page-description">Conference talks, presentations, and show notes with embedded resources</p>
+    </header>
+
+    <div class="talks-grid">
+        {% assign talks = site.talks | sort: 'date' | reverse %}
+        {% for talk in talks %}
+            <article class="talk-card">
+                <header class="talk-header">
+                    <h2><a href="{{ talk.url | relative_url }}">{{ talk.title }}</a></h2>
+                    <div class="talk-meta">
+                        {% if talk.speaker %}
+                            <span class="speaker">{{ talk.speaker }}</span>
+                        {% endif %}
+                        {% if talk.conference %}
+                            <span class="conference">{{ talk.conference }}</span>
+                        {% endif %}
+                        {% if talk.date %}
+                            <time class="date" datetime="{{ talk.date | date_to_xmlschema }}">{{ talk.date | date: "%B %d, %Y" }}</time>
+                        {% endif %}
+                    </div>
+                </header>
+
+                {% if talk.description %}
+                    <p class="talk-description">{{ talk.description }}</p>
+                {% endif %}
+
+                {% if talk.resources %}
+                    <div class="talk-resources">
+                        <h3>Resources</h3>
+                        <ul class="resource-types">
+                            {% assign grouped_resources = talk.resources | group_by: "type" %}
+                            {% for group in grouped_resources %}
+                                <li class="resource-type">
+                                    <span class="resource-icon resource-icon-{{ group.name }}"></span>
+                                    {{ group.name | capitalize }} ({{ group.items.size }})
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <footer class="talk-footer">
+                    <a href="{{ talk.url | relative_url }}" class="read-more">View Talk →</a>
+                </footer>
+            </article>
+        {% endfor %}
+    </div>
+
+    {% if talks.size == 0 %}
+        <div class="empty-state">
+            <h2>No talks yet</h2>
+            <p>Check back soon for conference talks and presentations!</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.talks-index {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.page-description {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.talks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.talk-card {
+    background: #fff;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.talk-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.talk-header h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+}
+
+.talk-header h2 a {
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.talk-header h2 a:hover {
+    color: #3498db;
+}
+
+.talk-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: #7f8c8d;
+    margin-bottom: 1rem;
+}
+
+.talk-description {
+    margin: 1rem 0;
+    color: #555;
+    line-height: 1.6;
+}
+
+.talk-resources {
+    margin: 1rem 0;
+}
+
+.talk-resources h3 {
+    font-size: 0.875rem;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.resource-types {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.resource-type {
+    background: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.resource-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6c757d;
+}
+
+.resource-icon-slides { background: #e74c3c; }
+.resource-icon-video { background: #e67e22; }
+.resource-icon-code { background: #2ecc71; }
+.resource-icon-link { background: #3498db; }
+
+.talk-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.read-more {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #7f8c8d;
+}
+
+@media (max-width: 768px) {
+    .talks-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+    }
+}
+</style>
