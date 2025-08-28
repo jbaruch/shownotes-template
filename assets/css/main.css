@@ -786,24 +786,6 @@ a:hover {
     transform-origin: top left;
 }
 
-.preview-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    pointer-events: none;
-}
-
-.preview-thumbnail:hover .preview-overlay {
-    opacity: 1;
-}
 
 .slides-icon {
     width: 40px;
