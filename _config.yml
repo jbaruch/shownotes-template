@@ -16,6 +16,14 @@ collections:
     output: true
     permalink: /talks/:path/
 
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "talks"
+    values:
+      layout: "talk"
+
 # Build settings
 # sass:
 #   style: compressed

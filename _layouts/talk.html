@@ -7,7 +7,6 @@ layout: default
     <nav class="breadcrumb" role="navigation" aria-label="Breadcrumb">
         <ol>
             <li><a href="{{ '/' | relative_url }}">Home</a></li>
-            <li><a href="{{ '/talks/' | relative_url }}">Talks</a></li>
             <li aria-current="page">{{ page.title }}</li>
         </ol>
     </nav>
@@ -35,12 +34,6 @@ layout: default
                 {{ page.date | date: "%B %d, %Y" }}
             </time>
             {% endif %}
-            {% if page.status %}
-            <span class="meta-item status-{{ page.status | downcase }}">
-                <span class="meta-icon status" aria-hidden="true"></span>
-                {{ page.status | capitalize }}
-            </span>
-            {% endif %}
         </div>
         
         {% if page.description %}
@@ -48,52 +41,69 @@ layout: default
         {% endif %}
     </header>
 
-    <!-- Talk abstract -->
-    {% if page.abstract %}
-    <section class="talk-abstract" itemprop="abstract">
-        <h2>Abstract</h2>
-        <div class="abstract-content">
-            {{ page.abstract | markdownify }}
-        </div>
-    </section>
-    {% endif %}
 
-    <!-- Talk resources with embedded content support -->
+    <!-- Main content: slides and video side by side -->
     {% if page.resources and page.resources.size > 0 %}
-    <section class="talk-resources">
-        <h2>Resources</h2>
+    <section class="talk-main-content">
+        {% assign slides_resource = null %}
+        {% assign video_resource = null %}
+        {% assign other_resources = page.resources | where_exp: "resource", "resource.type != 'slides' and resource.type != 'video'" %}
         
-        {% comment %} Group resources by type {% endcomment %}
-        {% assign grouped_resources = page.resources | group_by: "type" %}
+        {% comment %} Find slides and video resources {% endcomment %}
+        {% for resource in page.resources %}
+            {% if resource.type == 'slides' %}
+                {% assign slides_resource = resource %}
+            {% elsif resource.type == 'video' %}
+                {% assign video_resource = resource %}
+            {% endif %}
+        {% endfor %}
         
-        {% for group in grouped_resources %}
-        <div class="resource-group">
-            <h3>{{ group.name | capitalize }}</h3>
-            <ul class="resource-list">
-                {% for resource in group.items %}
-                {% include embedded_resource.html resource=resource %}
+        <div class="media-container">
+            {% comment %} Slides section {% endcomment %}
+            {% if slides_resource %}
+            <div class="media-item slides-section">
+                <h2>Slides</h2>
+                {% include embedded_resource.html resource=slides_resource %}
+            </div>
+            {% endif %}
+            
+            {% comment %} Video section {% endcomment %}
+            <div class="media-item video-section">
+                <h2>Video</h2>
+                {% if video_resource %}
+                    {% include embedded_resource.html resource=video_resource %}
+                {% else %}
+                    <div class="video-placeholder">
+                        <div class="placeholder-content">
+                            <div class="placeholder-icon">🎥</div>
+                            <p class="placeholder-text">Stay tuned! The video will be published soon.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% comment %} Resources section {% endcomment %}
+        {% if other_resources.size > 0 %}
+        <section class="talk-resources">
+            <h2>Resources</h2>
+            <ul class="resources-list">
+                {% for resource in other_resources %}
+                <li class="resource-link-item">
+                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
+                        <span class="resource-title">{{ resource.title }}</span>
+                        {% if resource.description %}
+                        <span class="resource-description">{{ resource.description }}</span>
+                        {% endif %}
+                    </a>
+                </li>
                 {% endfor %}
             </ul>
-        </div>
-        {% endfor %}
+        </section>
+        {% endif %}
     </section>
     {% endif %}
 
-    <!-- Talk content -->
-    {% if content and content != empty %}
-    <section class="talk-content" itemprop="text">
-        <h2>Notes</h2>
-        <div class="content">
-            {{ content }}
-        </div>
-    </section>
-    {% endif %}
-
-    <!-- Notification placeholder for future features -->
-    <section class="notification-placeholder">
-        <h2>Stay Updated</h2>
-        <p>Interested in updates about this talk? Email notifications will be available in a future version.</p>
-    </section>
 </article>
 
 <!-- Structured data -->

@@ -32,52 +32,73 @@ Usage: {% include embedded_resource.html resource=resource preview_mode=true siz
     {% if id_part contains "2PACX-" %}
       {% comment %} Remove leading 'e/' from publication URLs {% endcomment %}
       {% assign clean_id = id_part | remove_first: "e/" %}
-      {% assign embed_url = "https://docs.google.com/presentation/d/e/" | append: clean_id | append: "/pubembed?start=false&loop=false&delayms=3000" %}
+      {% if preview_mode %}
+        {% assign embed_url = "https://docs.google.com/presentation/d/e/" | append: clean_id | append: "/embed?start=false&loop=false&delayms=3000&rm=minimal&chrome=false" %}
+      {% else %}
+        {% assign embed_url = "https://docs.google.com/presentation/d/e/" | append: clean_id | append: "/pubembed?start=false&loop=false&delayms=3000" %}
+      {% endif %}
       {% assign thumb_url = "https://docs.google.com/presentation/d/e/" | append: clean_id | append: "/export/png" %}
     {% else %}
       {% comment %} For document IDs, try direct embed format first {% endcomment %}
-      {% assign embed_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/embed?start=false&loop=false&delayms=3000" %}
+      {% if preview_mode %}
+        {% assign embed_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/embed?start=false&loop=false&delayms=3000&rm=minimal&chrome=false" %}
+      {% else %}
+        {% assign embed_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/embed?start=false&loop=false&delayms=3000" %}
+      {% endif %}
       {% assign thumb_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/export/png" %}
     {% endif %}
     
     {% if preview_mode %}
       <div class="preview-thumbnail preview-{{ size }}">
-        <div class="slides-visual-preview">
-          <div class="slide-mockup">
-            <div class="slide-header"></div>
-            <div class="slide-content">
-              <div class="slide-line long"></div>
-              <div class="slide-line medium"></div>
-              <div class="slide-line short"></div>
-            </div>
+        {% if include.talk_url %}
+        <a href="{{ include.talk_url }}" class="preview-link">
+          <div class="slides-embed-preview">
+            <iframe src="{{ embed_url }}" 
+                    frameborder="0" 
+                    allowfullscreen
+                    loading="lazy"
+                    title="{{ title | escape }}"
+                    class="preview-iframe slides-preview"
+                    sandbox="allow-scripts allow-same-origin allow-presentation">
+            </iframe>
           </div>
-        </div>
-      </div>
-    {% else %}
-      <li class="resource-item resource-{{ type }}">
-        <div class="embed-container slides-embed">
+        </a>
+        {% else %}
+        <div class="slides-embed-preview">
           <iframe src="{{ embed_url }}" 
                   frameborder="0" 
                   allowfullscreen
                   loading="lazy"
                   title="{{ title | escape }}"
-                  class="responsive-iframe"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerpolicy="strict-origin-when-cross-origin"
+                  class="preview-iframe slides-preview"
                   sandbox="allow-scripts allow-same-origin allow-presentation">
           </iframe>
         </div>
-      </li>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="embed-container slides-embed">
+        <iframe src="{{ embed_url }}" 
+                frameborder="0" 
+                allowfullscreen
+                loading="lazy"
+                title="{{ title | escape }}"
+                class="responsive-iframe"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                sandbox="allow-scripts allow-same-origin allow-presentation">
+        </iframe>
+      </div>
     {% endif %}
   {% else %}
     {% comment %} Fallback to link if URL parsing fails {% endcomment %}
     {% if not preview_mode %}
-      <li class="resource-item resource-{{ type }}">
+      <div class="resource-fallback">
         <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
           {{ title }}
           {% if include.resource.description %}<span class="resource-description">{{ include.resource.description }}</span>{% endif %}
         </a>
-      </li>
+      </div>
     {% endif %}
   {% endif %}
 
@@ -114,39 +135,37 @@ Usage: {% include embedded_resource.html resource=resource preview_mode=true siz
         </div>
       </div>
     {% else %}
-      <li class="resource-item resource-{{ type }}">
-        <div class="embed-container video-embed">
-          <iframe src="{{ embed_url }}" 
-                  frameborder="0"
-                  allowfullscreen
-                  loading="lazy"
-                  title="{{ title | escape }}"
-                  class="responsive-iframe"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerpolicy="strict-origin-when-cross-origin"
-                  sandbox="allow-scripts allow-same-origin allow-presentation">
-          </iframe>
-        </div>
-      </li>
+      <div class="embed-container video-embed">
+        <iframe src="{{ embed_url }}" 
+                frameborder="0"
+                allowfullscreen
+                loading="lazy"
+                title="{{ title | escape }}"
+                class="responsive-iframe"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                sandbox="allow-scripts allow-same-origin allow-presentation">
+        </iframe>
+      </div>
     {% endif %}
   {% else %}
     {% comment %} Fallback to link if video ID extraction fails {% endcomment %}
     {% if not preview_mode %}
-      <li class="resource-item resource-{{ type }}">
+      <div class="resource-fallback">
         <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
           {{ title }}
           {% if include.resource.description %}<span class="resource-description">{{ include.resource.description }}</span>{% endif %}
         </a>
-      </li>
+      </div>
     {% endif %}
   {% endif %}
 
 {% else %}
   {% comment %} Non-embeddable URL - show as regular link {% endcomment %}
-  <li class="resource-item resource-{{ type }}">
+  <div class="resource-fallback">
     <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
       {{ title }}
       {% if include.resource.description %}<span class="resource-description">{{ include.resource.description }}</span>{% endif %}
     </a>
-  </li>
+  </div>
 {% endif %}
