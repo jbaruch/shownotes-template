@@ -1,13 +1,20 @@
 ---
 layout: default
-title: "Conference Talks & Presentations"
-description: "Conference talks, presentations, and show notes with embedded resources"
+title: "{{ site.title }}"
+description: "{{ site.description }}"
 ---
 
 <div class="home-page">
-    <header class="hero-section">
-        <h1>Conference Talks & Presentations</h1>
-        <p class="hero-description">Show notes, resources, and embedded content from conference presentations</p>
+    <header class="hero-section" {% if site.hero_background %}style="background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(79, 70, 229, 0.5) 100%), url('{{ site.hero_background }}');"{% endif %}>
+        {% if site.avatar_url %}
+        <div class="hero-image">
+            <img src="{{ site.avatar_url }}" alt="{{ site.author_name }}" class="author-avatar">
+        </div>
+        {% endif %}
+        <div class="hero-content">
+            <h1>Presentations by {{ site.author_name }}</h1>
+            <p class="hero-description">{{ site.description }}</p>
+        </div>
     </header>
 
     {% assign talks = site.talks | sort: 'date' | reverse %}

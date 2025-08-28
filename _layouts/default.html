@@ -37,11 +37,13 @@
         <div class="wrapper">
             <a class="site-title" href="{{ '/' | relative_url }}" rel="home">{{ site.title | escape }}</a>
             
+            {% unless page.url == "/" %}
             <nav class="site-nav" role="navigation" aria-label="Main navigation">
                 <ul>
                     <li><a href="{{ '/' | relative_url }}">Home</a></li>
                 </ul>
             </nav>
+            {% endunless %}
         </div>
     </header>
 
