@@ -42,15 +42,15 @@ Usage: {% include embedded_resource.html resource=resource preview_mode=true siz
     
     {% if preview_mode %}
       <div class="preview-thumbnail preview-{{ size }}">
-        <img src="{{ thumb_url }}" 
-             alt="{{ title | escape }}" 
-             class="preview-image"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        <div class="slides-fallback" style="display: none;">
-          <svg class="slides-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-          </svg>
-          <span class="preview-type">Slides</span>
+        <div class="slides-visual-preview">
+          <div class="slide-mockup">
+            <div class="slide-header"></div>
+            <div class="slide-content">
+              <div class="slide-line long"></div>
+              <div class="slide-line medium"></div>
+              <div class="slide-line short"></div>
+            </div>
+          </div>
         </div>
       </div>
     {% else %}
