@@ -20,15 +20,25 @@ description: "Conference talks, presentations, and show notes with embedded reso
             <div class="featured-talks-grid">
                 {% for talk in recent_talks %}
                 <article class="featured-talk-card">
-                    {% comment %} Extract preview thumbnail from resources {% endcomment %}
+                    {% comment %} Extract slides resource for preview (prioritize slides over video) {% endcomment %}
                     {% assign preview_resource = null %}
                     {% if talk.resources %}
+                        {% comment %} First try to find slides {% endcomment %}
                         {% for resource in talk.resources %}
-                            {% if resource.type == 'slides' or resource.type == 'video' %}
+                            {% if resource.type == 'slides' %}
                                 {% assign preview_resource = resource %}
                                 {% break %}
                             {% endif %}
                         {% endfor %}
+                        {% comment %} If no slides found, use video as fallback {% endcomment %}
+                        {% if preview_resource == null %}
+                            {% for resource in talk.resources %}
+                                {% if resource.type == 'video' %}
+                                    {% assign preview_resource = resource %}
+                                    {% break %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
                     {% endif %}
 
                     {% if preview_resource %}
@@ -98,15 +108,25 @@ description: "Conference talks, presentations, and show notes with embedded reso
             <div class="talks-list">
                 {% for talk in older_talks %}
                 <article class="talk-list-item">
-                    {% comment %} Extract preview thumbnail from resources {% endcomment %}
+                    {% comment %} Extract slides resource for preview (prioritize slides over video) {% endcomment %}
                     {% assign preview_resource = null %}
                     {% if talk.resources %}
+                        {% comment %} First try to find slides {% endcomment %}
                         {% for resource in talk.resources %}
-                            {% if resource.type == 'slides' or resource.type == 'video' %}
+                            {% if resource.type == 'slides' %}
                                 {% assign preview_resource = resource %}
                                 {% break %}
                             {% endif %}
                         {% endfor %}
+                        {% comment %} If no slides found, use video as fallback {% endcomment %}
+                        {% if preview_resource == null %}
+                            {% for resource in talk.resources %}
+                                {% if resource.type == 'video' %}
+                                    {% assign preview_resource = resource %}
+                                    {% break %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
                     {% endif %}
 
                     {% if preview_resource %}

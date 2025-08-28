@@ -768,16 +768,41 @@ a:hover {
     margin-left: 2px;
 }
 
-.slides-preview-bg {
+.slides-preview-container {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    position: relative;
+    background: var(--gray-100);
+    border-radius: inherit;
+    overflow: hidden;
+}
+
+.preview-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    pointer-events: none;
+    transform: scale(0.8);
+    transform-origin: top left;
+}
+
+.preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
-    color: white;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.preview-thumbnail:hover .preview-overlay {
+    opacity: 1;
 }
 
 .slides-icon {
