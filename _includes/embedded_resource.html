@@ -33,20 +33,24 @@ Usage: {% include embedded_resource.html resource=resource preview_mode=true siz
       {% comment %} Remove leading 'e/' from publication URLs {% endcomment %}
       {% assign clean_id = id_part | remove_first: "e/" %}
       {% assign embed_url = "https://docs.google.com/presentation/d/e/" | append: clean_id | append: "/pubembed?start=false&loop=false&delayms=3000" %}
-      {% assign thumb_url = "https://docs.google.com/presentation/d/e/" | append: clean_id | append: "/export/png?id=" | append: clean_id | append: "&pageid=g0" %}
+      {% assign thumb_url = "https://docs.google.com/presentation/d/e/" | append: clean_id | append: "/export/png" %}
     {% else %}
       {% comment %} For document IDs, try direct embed format first {% endcomment %}
       {% assign embed_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/embed?start=false&loop=false&delayms=3000" %}
-      {% assign thumb_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/export/png?pageid=g0" %}
+      {% assign thumb_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/export/png" %}
     {% endif %}
     
     {% if preview_mode %}
       <div class="preview-thumbnail preview-{{ size }}">
-        <div class="slides-thumbnail-bg">
+        <img src="{{ thumb_url }}" 
+             alt="{{ title | escape }}" 
+             class="preview-image"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="slides-fallback" style="display: none;">
           <svg class="slides-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
           </svg>
-          <span class="preview-type">Presentation</span>
+          <span class="preview-type">Slides</span>
         </div>
       </div>
     {% else %}
