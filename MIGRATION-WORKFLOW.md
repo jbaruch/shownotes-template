@@ -55,7 +55,7 @@ Example: `2025-06-20-voxxed-luxembourg-technical-enshittification.md`
 
 ## Current Migration Status
 
-### ✅ Completed Infrastructure
+### Completed Infrastructure
 - Jekyll collection configured (`_talks/`)
 - Embedding system supports:
   - Google Drive PDF previews
@@ -64,7 +64,7 @@ Example: `2025-06-20-voxxed-luxembourg-technical-enshittification.md`
 - Ordering: newest-first (by date)
 - Homepage preview system working
 
-### 🔄 Migration Process Required
+###  Migration Process Required
 1. **PDF Processing**: 
    - Download from noti.st: `https://on.notist.cloud/pdf/deck-2b48ce35fd8657d3.pdf`
    - Upload to Google Drive

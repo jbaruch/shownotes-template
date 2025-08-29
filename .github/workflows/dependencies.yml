@@ -41,9 +41,9 @@ jobs:
     - name: Log dependency update results
       if: steps.test-updated.outcome == 'success'
       run: |
-        echo "✅ Dependencies successfully updated and tested"
+        echo "Dependencies successfully updated and tested"
         echo "ℹ️  Manual PR creation may be needed if changes detected"
-        echo "📦 Core functionality: dependency updates ✅ tests ✅ security audit ✅"
+        echo "Core functionality: dependency updates, tests, security audit - all passed"
     
     - name: Security audit
       run: bundle exec bundle-audit

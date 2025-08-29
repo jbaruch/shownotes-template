@@ -7,18 +7,18 @@ Test scenarios specifically for **per-page migration validation** from noti.st t
 ## Infrastructure vs Migration Testing
 
 **Infrastructure (one-time setup - already fixed):**
-- ✅ CSP configuration in `_layouts/default.html`
-- ✅ Liquid template syntax fixes
-- ✅ Google Drive thumbnail URL pattern implementation
-- ✅ CSS styling for hover effects and badges
+- CSP configuration in `_layouts/default.html`
+- Liquid template syntax fixes
+- Google Drive thumbnail URL pattern implementation
+- CSS styling for hover effects and badges
 
 **Migration (per-page validation - this document):**
-- 🎯 Content accuracy and completeness
-- 🎯 Resource type detection and formatting  
-- 🎯 URL validation and accessibility
-- 🎯 Visual quality and functionality
+- Content accuracy and completeness
+- Resource type detection and formatting  
+- URL validation and accessibility
+- Visual quality and functionality
 
-## 🧪 Test Suite 1: Content Migration Accuracy
+## Test Suite 1: Content Migration Accuracy
 
 ### Test 1.1: Complete Resource Migration
 **Priority**: Critical 🚨
@@ -45,7 +45,7 @@ Scenario: Resource count validation
 ```
 
 ### Test 1.2: Resource Type Detection
-**Priority**: High 🔥
+**Priority**: High 
 
 ```gherkin
 Scenario: Correct resource type assignment
@@ -59,7 +59,7 @@ Scenario: Correct resource type assignment
 ```
 
 ### Test 1.3: Video Detection Accuracy
-**Priority**: High 🔥
+**Priority**: High 
 
 ```gherkin
 Scenario: Video presence is correctly detected
@@ -71,7 +71,7 @@ Scenario: Video presence is correctly detected
   And video should appear in resources list with type "video"
 ```
 
-## 🧪 Test Suite 2: Resource URL Validation
+##  Test Suite 2: Resource URL Validation
 
 ### Test 2.1: Google Slides URL Format
 **Priority**: Critical 🚨
@@ -87,7 +87,7 @@ Scenario: Google Slides URLs use correct format for thumbnails
 ```
 
 ### Test 2.2: External Link Accessibility  
-**Priority**: High 🔥
+**Priority**: High 
 
 ```gherkin
 Scenario: All migrated resource URLs work
@@ -99,7 +99,7 @@ Scenario: All migrated resource URLs work
   And Google Drive/Slides URLs should be viewable
 ```
 
-## 🧪 Test Suite 3: Visual Quality Validation
+##  Test Suite 3: Visual Quality Validation
 
 ### Test 3.1: Thumbnail Display Quality
 **Priority**: Critical 🚨
@@ -115,7 +115,7 @@ Scenario: Real content thumbnails are displayed
 ```
 
 ### Test 3.2: Resource Preview Functionality
-**Priority**: High 🔥
+**Priority**: High 
 
 ```gherkin
 Scenario: Resource previews work correctly
@@ -127,7 +127,7 @@ Scenario: Resource previews work correctly
   And all previews should be clickable and functional
 ```
 
-## 🧪 Test Suite 4: Migration Quality Assurance
+##  Test Suite 4: Migration Quality Assurance
 
 ### Test 4.1: Content Completeness Check
 **Priority**: Critical 🚨
@@ -143,7 +143,7 @@ Scenario: No content loss during migration
 ```
 
 ### Test 4.2: Link and Resource Functionality
-**Priority**: High 🔥
+**Priority**: High 
 
 ```gherkin
 Scenario: All migrated resources are functional
@@ -155,7 +155,7 @@ Scenario: All migrated resources are functional
   And video embeds should play without errors
 ```
 
-## 🎯 Per-Page Migration Checklist
+##  Per-Page Migration Checklist
 
 ### Step 1: Pre-Migration Analysis
 - [ ] Count total resources on source noti.st page (N resources)
@@ -186,12 +186,12 @@ Scenario: All migrated resources are functional
 
 **A PAGE MIGRATION IS COMPLETE ONLY WHEN:**
 
-✅ **All resources migrated** (count matches exactly: N source = N migrated)  
-✅ **All thumbnails working** (no broken images or placeholders)  
-✅ **All links functional** (external URLs return 200, no 404s)  
-✅ **Content accuracy** (titles, descriptions, metadata preserved)  
-✅ **Visual quality** (matches or exceeds original appearance)  
-✅ **Functionality preserved** (videos play, downloads work, previews show)
+ **All resources migrated** (count matches exactly: N source = N migrated)  
+ **All thumbnails working** (no broken images or placeholders)  
+ **All links functional** (external URLs return 200, no 404s)  
+ **Content accuracy** (titles, descriptions, metadata preserved)  
+ **Visual quality** (matches or exceeds original appearance)  
+ **Functionality preserved** (videos play, downloads work, previews show)
 
 **If ANY criterion fails, the page migration is NOT complete.**
 
