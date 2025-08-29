@@ -34,6 +34,7 @@ GEM
     faraday-net_http (3.4.1)
       net-http (>= 0.5.0)
     ffi (1.17.2)
+    ffi (1.17.2-x86_64-linux-gnu)
     forwardable-extended (2.6.0)
     google-apis-core (1.0.1)
       addressable (~> 2.8, >= 2.8.7)
@@ -52,6 +53,9 @@ GEM
       faraday (>= 1.0, < 3.a)
     google-logging-utils (0.2.0)
     google-protobuf (4.32.0)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.32.0-x86_64-linux-gnu)
       bigdecimal
       rake (>= 13)
     googleauth (1.15.0)
@@ -117,6 +121,8 @@ GEM
     nokogiri (1.18.9)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
+    nokogiri (1.18.9-x86_64-linux-gnu)
+      racc (~> 1.4)
     os (1.1.4)
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
@@ -142,6 +148,8 @@ GEM
     sass-embedded (1.91.0)
       google-protobuf (~> 4.31)
       rake (>= 13)
+    sass-embedded (1.91.0-x86_64-linux-gnu)
+      google-protobuf (~> 4.31)
     selenium-webdriver (4.35.0)
       base64 (~> 0.2)
       logger (~> 1.4)
@@ -167,6 +175,7 @@ GEM
 
 PLATFORMS
   ruby
+  x86_64-linux-gnu
 
 DEPENDENCIES
   bundler-audit
