@@ -1,8 +1,8 @@
 source 'https://rubygems.org'
 
-# Use compatible versions for Ruby 3.0+
-gem 'jekyll', '~> 4.2'
-gem 'minitest', '~> 5.0'
+# Modern versions for Ruby 3.4+
+gem 'jekyll', '~> 4.4'
+gem 'minitest', '~> 5.25'
 gem 'kramdown-parser-gfm'
 gem 'jekyll-feed'
 gem 'jekyll-sitemap'
@@ -18,9 +18,9 @@ gem 'google-apis-drive_v3'
 # Security auditing
 gem 'bundler-audit'
 
-# For testing only - stable versions  
+# For testing only - modern versions
 group :test do
-  gem 'capybara', '~> 3.35'
-  gem 'nokogiri', '>= 1.13.0'  # Will compile from source with config
-  gem 'selenium-webdriver', '~> 4.0'
+  gem 'capybara', '~> 3.40'
+  gem 'nokogiri', '~> 1.18.0'  # Latest with security patches
+  gem 'selenium-webdriver', '~> 4.35'
 end
