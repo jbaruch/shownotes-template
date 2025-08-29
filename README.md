@@ -15,9 +15,9 @@ A Jekyll-based static site generator for creating mobile-optimized conference ta
 
 ## 📋 Requirements
 
-- Ruby 2.6+
+- Ruby 3.4+
 - Bundler
-- Jekyll 3.8+
+- Jekyll 4.4+
 - Git
 
 ## 🛠 Installation
@@ -62,7 +62,8 @@ bundle exec rake help
 ```
 
 ### Test Results
-- **139 test runs, 792 assertions**
+
+- **161 test runs, 1081 assertions**
 - **0 failures, 0 errors, 0 skips**
 - **100% success rate** ✅
 
@@ -168,7 +169,7 @@ Built using strict test-first methodology:
 
 ## 📊 Test Coverage
 
-### Unit Tests (115 runs, 674 assertions)
+### Unit Tests (129 runs, 789 assertions)
 - Content rendering and Markdown processing
 - Security validation and XSS protection  
 - Responsive design and accessibility
@@ -176,7 +177,7 @@ Built using strict test-first methodology:
 - Navigation and user experience
 - Resource management
 
-### Integration Tests (8 runs, 32 assertions)
+### Integration Tests (16 runs, 206 assertions)
 - Jekyll build process integration
 - Template processing validation
 - Configuration management
