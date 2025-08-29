@@ -57,7 +57,7 @@ class VisualTest < Minitest::Test
     refute_includes page_title, '}}', 
       "Liquid syntax not processed in title: #{page_title}"
       
-    puts "✅ Page title: #{page_title}"
+    puts "SUCCESS Page title: #{page_title}"
   end
   
   def test_no_console_errors
@@ -76,7 +76,7 @@ class VisualTest < Minitest::Test
     assert_empty critical_errors, 
       "Console errors found:\n#{critical_errors.map(&:message).join("\n")}"
       
-    puts "✅ Console clean: #{error_logs.length} total errors, #{critical_errors.length} critical"
+    puts "SUCCESS Console clean: #{error_logs.length} total errors, #{critical_errors.length} critical"
   end
   
   def test_google_fonts_load_successfully
@@ -97,7 +97,7 @@ class VisualTest < Minitest::Test
       # Note: This test might need adjustment based on actual font choices
     end
     
-    puts "✅ Fonts loading"
+    puts "SUCCESS Fonts loading"
   end
 
   # ===========================================
@@ -124,14 +124,14 @@ class VisualTest < Minitest::Test
       if is_broken
         broken_thumbnails << "#{index + 1}: #{alt_text} (#{src})"
       else
-        puts "  ✅ Thumbnail #{index + 1}: #{alt_text}"
+        puts "  SUCCESS Thumbnail #{index + 1}: #{alt_text}"
       end
     end
     
     assert_empty broken_thumbnails, 
       "Broken thumbnail images found:\n#{broken_thumbnails.join("\n")}"
       
-    puts "✅ Thumbnails: #{thumbnails.length} images loaded successfully"
+    puts "SUCCESS Thumbnails: #{thumbnails.length} images loaded successfully"
   end
   
   def test_video_coming_soon_badge_styling
@@ -153,7 +153,7 @@ class VisualTest < Minitest::Test
       puts "  📱 Video badge background: #{background_color}"
     end
     
-    puts "✅ Video badges styled correctly" if video_badges.length > 0
+    puts "SUCCESS Video badges styled correctly" if video_badges.length > 0
   end
   
   def test_pdf_previews_no_unwanted_overlays
@@ -176,10 +176,10 @@ class VisualTest < Minitest::Test
       img = preview.find('img')
       transform = page.evaluate_script("getComputedStyle(arguments[0]).transform", img.native)
       
-      puts "  📄 PDF hover transform: #{transform}"
+      puts "  FILE PDF hover transform: #{transform}"
     end
     
-    puts "✅ PDF previews clean (no unwanted overlays)"
+    puts "SUCCESS PDF previews clean (no unwanted overlays)"
   end
 
   # ===========================================
@@ -209,7 +209,7 @@ class VisualTest < Minitest::Test
       puts "  🏠 Homepage preview #{index + 1}: OK"
     end
     
-    puts "✅ Homepage previews: #{talk_previews.length} previews working"
+    puts "SUCCESS Homepage previews: #{talk_previews.length} previews working"
   end
   
   def test_google_drive_embeds_load
@@ -237,7 +237,7 @@ class VisualTest < Minitest::Test
       puts "  💾 Drive resource: #{href[0..50]}..."
     end
     
-    puts "✅ Google Drive resources: #{drive_resources.length} resources verified"
+    puts "SUCCESS Google Drive resources: #{drive_resources.length} resources verified"
   end
 
   # ===========================================
@@ -268,7 +268,7 @@ class VisualTest < Minitest::Test
     # Reset to desktop
     page.driver.browser.manage.window.resize_to(1280, 720)
     
-    puts "✅ Mobile responsive: thumbnails fit properly"
+    puts "SUCCESS Mobile responsive: thumbnails fit properly"
   end
 
   # ===========================================
@@ -292,7 +292,7 @@ class VisualTest < Minitest::Test
     assert load_time < 5, 
       "Thumbnail loading too slow: #{load_time.round(2)}s (should be < 5s)"
       
-    puts "✅ Performance: All thumbnails loaded in #{load_time.round(2)}s"
+    puts "SUCCESS Performance: All thumbnails loaded in #{load_time.round(2)}s"
   end
   
   # ===========================================

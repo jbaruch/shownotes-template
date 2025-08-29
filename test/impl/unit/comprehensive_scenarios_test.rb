@@ -163,7 +163,7 @@ class ComprehensiveScenariosTest < Minitest::Test
   # Internationalization scenarios
   def test_unicode_content_handling
     unicode_talk = @test_talk.merge(
-      'title' => '🎤 Unicode Talk 🚀',
+      'title' => '🎤 Unicode Talk STARTING',
       'speaker' => 'José María García',
       'description' => 'A talk about 国际化 and العربية'
     )

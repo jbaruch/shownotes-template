@@ -311,7 +311,7 @@ class ValidationTest < Minitest::Test
     edge_cases = [
       # Unicode characters
       {
-        'title' => '🎤 Unicode Talk with Emojis 🚀',
+        'title' => '🎤 Unicode Talk with Emojis STARTING',
         'speaker' => 'François Müller',
         'description' => 'A talk about 国际化 and localization'
       },

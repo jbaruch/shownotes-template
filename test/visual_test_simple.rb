@@ -40,7 +40,7 @@ class VisualTestSimple < Minitest::Test
     refute response.body.include?('{{'), 
       "Unprocessed liquid syntax found in homepage"
       
-    puts "✅ Homepage loads successfully (HTTP #{response.code})"
+    puts "SUCCESS Homepage loads successfully (HTTP #{response.code})"
   end
   
   def test_luxembourg_talk_page_loads
@@ -57,7 +57,7 @@ class VisualTestSimple < Minitest::Test
     assert response.body.include?('resources'), 
       "Talk page missing resources section"
       
-    puts "✅ Luxembourg talk page loads successfully (HTTP #{response.code})"
+    puts "SUCCESS Luxembourg talk page loads successfully (HTTP #{response.code})"
   end
 
   # ===========================================
@@ -72,7 +72,7 @@ class VisualTestSimple < Minitest::Test
     assert response.code.to_i.between?(200, 399), 
       "Talks list page failed to load: HTTP #{response.code}"
       
-    puts "✅ Talks list page loads successfully (HTTP #{response.code})"
+    puts "SUCCESS Talks list page loads successfully (HTTP #{response.code})"
   end
 
   # ===========================================
@@ -94,10 +94,10 @@ class VisualTestSimple < Minitest::Test
       refute response.code.to_i.between?(400, 599), 
         "Error page found: #{page_path} returned HTTP #{response.code}"
         
-      puts "  ✅ #{page_path}: HTTP #{response.code}"
+      puts "  SUCCESS #{page_path}: HTTP #{response.code}"
     end
     
-    puts "✅ All test pages load without errors"
+    puts "SUCCESS All test pages load without errors"
   end
   
   def test_html_structure_validity
@@ -115,7 +115,7 @@ class VisualTestSimple < Minitest::Test
     assert response.body.include?('<body>'), 
       "Missing body section"
       
-    puts "✅ HTML structure is valid"
+    puts "SUCCESS HTML structure is valid"
   end
 
   # ===========================================
@@ -139,10 +139,10 @@ class VisualTestSimple < Minitest::Test
       assert_empty liquid_errors, 
         "Unprocessed liquid syntax found in #{page_path}: #{liquid_errors}"
         
-      puts "  ✅ #{page_path}: No liquid template errors"
+      puts "  SUCCESS #{page_path}: No liquid template errors"
     end
     
-    puts "✅ No liquid template errors in generated HTML"
+    puts "SUCCESS No liquid template errors in generated HTML"
   end
   
   def test_google_drive_thumbnail_urls_present
@@ -169,7 +169,7 @@ class VisualTestSimple < Minitest::Test
     assert thumbnail_count > 0, 
       "No Google Drive/Slides thumbnail URLs found in homepage or Luxembourg talk page HTML"
       
-    puts "✅ Found #{thumbnail_count} thumbnail URLs in generated HTML"
+    puts "SUCCESS Found #{thumbnail_count} thumbnail URLs in generated HTML"
   end
 
   # ===========================================
@@ -187,7 +187,7 @@ class VisualTestSimple < Minitest::Test
     assert page_size_kb < 500, 
       "Homepage too large: #{page_size_kb.round(1)}KB (should be < 500KB)"
       
-    puts "✅ Homepage size reasonable: #{page_size_kb.round(1)}KB"
+    puts "SUCCESS Homepage size reasonable: #{page_size_kb.round(1)}KB"
   end
   
   def test_no_common_broken_links
@@ -210,6 +210,6 @@ class VisualTestSimple < Minitest::Test
         "Broken link pattern found: #{pattern}"
     end
     
-    puts "✅ No common broken link patterns found"
+    puts "SUCCESS No common broken link patterns found"
   end
 end

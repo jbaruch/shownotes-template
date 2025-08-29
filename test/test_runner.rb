@@ -8,7 +8,7 @@ require 'yaml'
 # This runner ensures all 121 test scenarios are covered by failing tests
 class ShownotesTestRunner
   def self.run
-    puts "🧪 Running Shownotes Test Suite (TDD - All tests should FAIL)"
+    puts "TEST Running Shownotes Test Suite (TDD - All tests should FAIL)"
     puts "=" * 60
     
     # Load all test files
@@ -151,9 +151,9 @@ class ShownotesTestRunner
     puts
     
     # Report by test file
-    puts "📋 RESULTS BY TEST FILE:"
+    puts "LIST RESULTS BY TEST FILE:"
     results[:test_details].each do |file_result|
-      status = file_result[:failures] > 0 ? "❌ FAIL" : "✅ PASS"
+      status = file_result[:failures] > 0 ? "FAIL FAIL" : "SUCCESS PASS"
       puts "   #{status} #{file_result[:file]}: #{file_result[:tests]} tests, #{file_result[:failures]} failures"
     end
     puts
@@ -164,7 +164,7 @@ class ShownotesTestRunner
     puts "=" * 30
     
     if results[:total_failures] == results[:total_tests] && results[:total_errors] == 0
-      puts "✅ PERFECT TDD COMPLIANCE!"
+      puts "SUCCESS PERFECT TDD COMPLIANCE!"
       puts "   - All #{results[:total_tests]} tests are failing as expected"
       puts "   - No errors (tests are well-structured)"
       puts "   - Ready for implementation phase"
@@ -174,7 +174,7 @@ class ShownotesTestRunner
       puts "   - #{results[:total_tests] - results[:total_failures]} tests passing (unexpected!)"
       puts "   - Some implementation may already exist"
     else
-      puts "❌ TDD VIOLATION"
+      puts "FAIL TDD VIOLATION"
       puts "   - No failing tests found"
       puts "   - Either no tests exist or implementation already exists"
       puts "   - This violates test-first development principles"
@@ -198,16 +198,16 @@ class ShownotesTestRunner
     puts "Coverage:                #{coverage_percentage}%"
     
     if coverage_percentage >= 90
-      puts "✅ EXCELLENT test scenario coverage!"
+      puts "SUCCESS EXCELLENT test scenario coverage!"
     elsif coverage_percentage >= 75
       puts "⚠️  GOOD test scenario coverage, some gaps remain"
     else
-      puts "❌ INSUFFICIENT test scenario coverage"
+      puts "FAIL INSUFFICIENT test scenario coverage"
     end
     
     puts
-    puts "🎯 NEXT STEPS:"
-    puts "   1. All tests should be failing (✅ if true above)"
+    puts "TARGET NEXT STEPS:"
+    puts "   1. All tests should be failing (SUCCESS if true above)"
     puts "   2. Begin implementation phase to make tests pass"
     puts "   3. Implement only enough code to make each test pass"
     puts "   4. Refactor while maintaining test coverage"

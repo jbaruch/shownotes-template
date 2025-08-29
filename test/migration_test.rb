@@ -73,7 +73,7 @@ class MigrationTest < Minitest::Test
       # Description is optional but should be present for most resources
     end
     
-    puts "✅ Luxembourg talk: #{resources.length}/#{expected_count} resources migrated"
+    puts "SUCCESS Luxembourg talk: #{resources.length}/#{expected_count} resources migrated"
   end
   
   def test_complete_resource_migration_robocoders
@@ -94,7 +94,7 @@ class MigrationTest < Minitest::Test
       assert resource['type'], "Resource #{index + 1} missing type"
     end
     
-    puts "✅ RoboCoders talk: #{resources.length}/#{expected_count} resources migrated"
+    puts "SUCCESS RoboCoders talk: #{resources.length}/#{expected_count} resources migrated"
   end
   
   def test_resource_type_detection_luxembourg
@@ -131,7 +131,7 @@ class MigrationTest < Minitest::Test
         "PDF resource should be marked as 'slides' type: #{resource['url']}"
     end
     
-    puts "✅ Resource types: #{type_counts}"
+    puts "SUCCESS Resource types: #{type_counts}"
   end
   
   def test_video_detection_accuracy_luxembourg
@@ -154,7 +154,7 @@ class MigrationTest < Minitest::Test
       )
     end
     
-    puts "✅ Video detection: #{video_resources.length} videos found"
+    puts "SUCCESS Video detection: #{video_resources.length} videos found"
   end
 
   # ===========================================
@@ -180,11 +180,11 @@ class MigrationTest < Minitest::Test
       if url.match(/\/d\/([a-zA-Z0-9\-_]+)/)
         doc_id = $1
         thumbnail_url = "https://lh3.googleusercontent.com/d/#{doc_id}=s400"
-        puts "  📄 #{resource['title']}: #{doc_id} → #{thumbnail_url}"
+        puts "  FILE #{resource['title']}: #{doc_id} → #{thumbnail_url}"
       end
     end
     
-    puts "✅ Google Slides URL format: #{slides_resources.length} slides checked"
+    puts "SUCCESS Google Slides URL format: #{slides_resources.length} slides checked"
   end
   
   def test_slides_are_embedded_not_downloadable
@@ -207,10 +207,10 @@ class MigrationTest < Minitest::Test
           "Google Drive slides URL must be in /file/d/{id}/view format: #{url}"
       end
       
-      puts "  📄 Slides OK: #{title} → #{url}"
+      puts "  FILE Slides OK: #{title} → #{url}"
     end
     
-    puts "✅ All slides properly embedded (not downloadable)"
+    puts "SUCCESS All slides properly embedded (not downloadable)"
   end
   
   def test_exact_resource_count_validation
@@ -229,7 +229,7 @@ class MigrationTest < Minitest::Test
         "This means the migration script failed to extract ALL resources from the original page!\n" \
         "EVERY SINGLE RESOURCE must be migrated or the migration is FAILED."
       
-      puts "✅ #{talk_name}: Exact count verified #{resources.length}/#{expected_count}"
+      puts "SUCCESS #{talk_name}: Exact count verified #{resources.length}/#{expected_count}"
     end
   end
   
@@ -260,7 +260,7 @@ class MigrationTest < Minitest::Test
           "Actual: #{actual_video_url}"
       end
       
-      puts "✅ #{test_name}: Video correctly detected"
+      puts "SUCCESS #{test_name}: Video correctly detected"
     end
   end
   
@@ -284,7 +284,7 @@ class MigrationTest < Minitest::Test
         assert response.code.to_i.between?(200, 399), 
           "URL returned #{response.code}: #{url}"
           
-        puts "  ✅ #{response.code}: #{url}"
+        puts "  SUCCESS #{response.code}: #{url}"
       rescue Net::ReadTimeout, Timeout::Error => e
         puts "  ⚠️  TIMEOUT: #{url} (#{e.class})"
         # Don't fail on timeouts - external sites can be slow
@@ -293,7 +293,7 @@ class MigrationTest < Minitest::Test
       end
     end
     
-    puts "✅ External link accessibility: #{sample_urls.length}/#{external_urls.length} URLs tested"
+    puts "SUCCESS External link accessibility: #{sample_urls.length}/#{external_urls.length} URLs tested"
   end
 
   # ===========================================
@@ -328,7 +328,7 @@ class MigrationTest < Minitest::Test
         assert response.code.to_i.between?(200, 399),
           "PDF thumbnail not accessible: #{thumbnail_url} (#{response.code})"
           
-        puts "  📄 PDF thumbnail OK: #{resource['title']}"
+        puts "  FILE PDF thumbnail OK: #{resource['title']}"
       end
     end
     
@@ -345,11 +345,11 @@ class MigrationTest < Minitest::Test
         assert thumbnail_url.start_with?('https://lh3.googleusercontent.com/d/'),
           "Invalid slides thumbnail URL format: #{thumbnail_url}"
           
-        puts "  🎯 Slides thumbnail URL: #{resource['title']}"
+        puts "  TARGET Slides thumbnail URL: #{resource['title']}"
       end
     end
     
-    puts "✅ Thumbnail URLs validated"
+    puts "SUCCESS Thumbnail URLs validated"
   end
 
   # ===========================================
@@ -372,7 +372,7 @@ class MigrationTest < Minitest::Test
       assert yaml['date'], "Missing date in #{expected[:file]}"
       assert yaml['resources'], "Missing resources in #{expected[:file]}"
       
-      puts "✅ #{test_name}: Content complete"
+      puts "SUCCESS #{test_name}: Content complete"
     end
   end
   
@@ -396,7 +396,7 @@ class MigrationTest < Minitest::Test
       refute url.include?('https://https://'), "Double protocol in URL: #{url}"
     end
     
-    puts "✅ URL integrity: #{all_resources.length} URLs validated"
+    puts "SUCCESS URL integrity: #{all_resources.length} URLs validated"
   end
   
   # ===========================================
@@ -419,7 +419,7 @@ class MigrationTest < Minitest::Test
       end
     end
     
-    puts "✅ No liquid syntax in YAML front matter"
+    puts "SUCCESS No liquid syntax in YAML front matter"
   end
   
   def test_no_placeholder_resources
@@ -437,7 +437,7 @@ class MigrationTest < Minitest::Test
       refute title.downcase.include?('todo'), "TODO in title found: #{title}"
     end
     
-    puts "✅ No placeholder resources found"
+    puts "SUCCESS No placeholder resources found"
   end
   
   # ===========================================
@@ -453,7 +453,7 @@ class MigrationTest < Minitest::Test
       yaml = talk_data[:yaml]
       resources = yaml['resources'] || []
       
-      puts "📄 #{talk_name}"
+      puts "FILE #{talk_name}"
       puts "   Title: #{yaml['title']}"
       puts "   Resources: #{resources.length}"
       puts "   Types: #{resources.group_by { |r| r['type'] }.transform_values(&:count)}"
