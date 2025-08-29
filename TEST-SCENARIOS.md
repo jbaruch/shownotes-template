@@ -197,7 +197,7 @@ Scenario: All migrated resources are functional
 
 ---
 
-## 📋 Migration vs Infrastructure
+##  Migration vs Infrastructure
 
 **Use this document for**: Content migration validation (per talk page)  
 **Not for**: Site-wide infrastructure, CSS, CSP, templates (those are one-time setup)

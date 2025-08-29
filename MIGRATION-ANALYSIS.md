@@ -32,7 +32,7 @@ This document analyzes the complete migration process from noti.st to Jekyll for
 - **Impact**: Broken thumbnail generation for all Google Slides presentations
 - **Fix**: Replace all with working shared document URL format
 
-## 🔥 UI/UX Issues
+##  UI/UX Issues
 
 ### 5. Content Security Policy (CSP) Violations
 - **Problem**: Multiple console errors blocking Google Fonts, inline scripts, and Google Drive iframes
@@ -75,7 +75,7 @@ This document analyzes the complete migration process from noti.st to Jekyll for
 - **Impact**: Visual clutter, inconsistent with user expectations
 - **Fix**: Remove all icon overlays for clean, simple design
 
-## 🛠️ Technical/Process Issues
+##  Technical/Process Issues
 
 ### 11. Placeholder Usage Instead of Real Implementation
 - **Problem**: Used SVG placeholders for slides instead of real thumbnails
@@ -102,7 +102,7 @@ This document analyzes the complete migration process from noti.st to Jekyll for
 - **Impact**: Broken presentation links
 - **Fix**: Manual correction of each malformed URL
 
-## 🧪 Comprehensive Test Scenarios
+##  Comprehensive Test Scenarios
 
 ### Test Suite 1: Content Migration Accuracy
 
@@ -311,7 +311,7 @@ Scenario: Graceful handling of thumbnail failures
   And should log errors for debugging
 ```
 
-## 📊 Implementation Priority
+##  Implementation Priority
 
 ### High Priority (Must Fix)
 1. Complete resource migration accuracy
@@ -329,7 +329,7 @@ Scenario: Graceful handling of thumbnail failures
 2. Progressive loading states
 3. Mobile-specific optimizations
 
-## 🚀 Prevention Strategy
+##  Prevention Strategy
 
 1. **Always use comprehensive test scenarios** before claiming migration complete
 2. **Never use placeholders** - implement real solutions from the start
@@ -340,13 +340,13 @@ Scenario: Graceful handling of thumbnail failures
 
 ## 📈 Success Metrics
 
-- ✅ Zero console errors
-- ✅ All original resources migrated (40/40)
-- ✅ Working thumbnails for all resource types
-- ✅ Consistent hover effects and UI behavior
-- ✅ Cross-browser compatibility
-- ✅ Fast loading times (<3s for thumbnails)
-- ✅ Clean, professional appearance matching original quality
+-  Zero console errors
+-  All original resources migrated (40/40)
+-  Working thumbnails for all resource types
+-  Consistent hover effects and UI behavior
+-  Cross-browser compatibility
+-  Fast loading times (<3s for thumbnails)
+-  Clean, professional appearance matching original quality
 
 ## 🔗 Related Files
 
