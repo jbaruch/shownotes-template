@@ -12,6 +12,10 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Google API credentials
+"Google API.json"
+Google API.json
+
 # Build outputs
 dist/
 build/
@@ -61,6 +65,7 @@ pids
 
 # Dependency directories
 jspm_packages/
+vendor/
 
 # Optional npm cache directory
 .npm
@@ -73,3 +78,6 @@ jspm_packages/
 
 # Yarn Integrity file
 .yarn-integrity
+
+# PDFs (will be uploaded to Google Drive)
+pdfs/*.pdf

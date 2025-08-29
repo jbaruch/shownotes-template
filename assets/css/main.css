@@ -416,6 +416,29 @@ a:hover {
     padding-bottom: 56.25%; /* 16:9 aspect ratio */
 }
 
+.embed-container.pdf-embed {
+    padding-bottom: 56.25% !important; /* Same 16:9 aspect ratio as video */
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+.pdf-embed-attempt {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.pdf-embed-attempt iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
 .responsive-iframe {
     position: absolute;
     top: 0;
@@ -767,8 +790,8 @@ a:hover {
 }
 
 .talk-preview-small {
-    width: 120px;
-    height: 80px;
+    width: 160px;
+    height: 90px;
     border-radius: var(--radius-md);
     overflow: hidden;
     flex-shrink: 0;
@@ -932,14 +955,181 @@ a:hover {
     margin-top: var(--space-3);
 }
 
-.video-published {
+.status-badge.video-published {
     background: var(--success-color);
     color: white;
 }
 
-.video-pending {
-    background: var(--warning-color);
+/* PDF fallback styling */
+.pdf-fallback-preview {
+    display: flex;
+    align-items: center;
+    padding: var(--space-4);
+    background: var(--gray-50);
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    text-align: center;
+    min-height: 120px;
+}
+
+.pdf-icon {
+    font-size: 2rem;
+    margin-right: var(--space-3);
+}
+
+/* PDF preview styling */
+.pdf-preview {
+    opacity: 1 !important;
+    transition: opacity 0.3s ease;
+    background: white;
+    min-height: 200px;
+}
+
+.pdf-preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.pdf-embed-preview:hover .pdf-preview-overlay {
+    opacity: 0.3;
+}
+
+/* Thumbnail preview styling - shared styles */
+.pdf-thumbnail-preview,
+.slides-thumbnail-preview {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.pdf-thumb,
+.slides-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+}
+
+.pdf-thumbnail-preview:hover .pdf-thumb,
+.slides-thumbnail-preview:hover .slides-thumb {
+    transform: scale(1.02);
+}
+
+    height: 16px;
     color: white;
+}
+
+/* Hide Google Drive controls in full preview mode */
+.pdf-embed-preview {
+    overflow: hidden;
+    position: relative;
+}
+
+.pdf-info h4 {
+    margin: 0 0 var(--space-1) 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.pdf-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.pdf-fallback {
+    padding: var(--space-6);
+    text-align: center;
+    background: var(--gray-50);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--primary-color);
+    min-height: 200px;
+    display: block !important;
+}
+
+.pdf-icon-large {
+    font-size: 4rem;
+    margin-bottom: var(--space-4);
+}
+
+.pdf-fallback h3 {
+    margin: 0 0 var(--space-2) 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.pdf-fallback p {
+    margin: 0 0 var(--space-4) 0;
+    color: var(--text-secondary);
+}
+
+.pdf-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    color: white;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-50);
+    color: var(--text-primary);
+}
+    color: white;
+}
+
+.status-badge.video-pending {
+    background: var(--warning-color) !important;
+    color: white !important;
+}
+
+/* Fallback for video status badges */
+.video-pending {
+    background: var(--warning-color) !important;
+    color: white !important;
+}
+
+.video-published {
+    background: var(--success-color) !important;
+    color: white !important;
 }
 
 .preview-link {

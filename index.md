@@ -1,7 +1,5 @@
 ---
 layout: default
-title: "{{ site.title }}"
-description: "{{ site.description }}"
 ---
 
 <div class="home-page">
