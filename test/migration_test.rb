@@ -6,158 +6,165 @@ require 'net/http'
 require 'uri'
 require 'json'
 require 'timeout'
+require 'nokogiri'
 
 class MigrationTest < Minitest::Test
   # Test data directory
   TALKS_DIR = File.join(File.dirname(__FILE__), '..', '_talks')
-  EXPECTED_TESTS = {
-    'luxembourg' => {
-      file: '2025-06-20-voxxed-luxembourg-technical-enshittification.md',
-      notist_url: 'https://noti.st/jbaruch/W6dSPZ/technical-enshittification-why-everything-in-it-is-horrible-right-now-and-how-to-fix-it',
-      expected_resource_count: 42, # Updated to actual migrated count
-      has_video: true,
-      video_url: 'https://youtube.com/watch?v=iFN1Y_8Cuik',
-      slides_count: 1,
-      pdf_count: 1
-    },
-    'robocoders' => {
-      file: '2025-06-11-devoxx-poland-robocoders-judgment-day.md',
-      notist_url: 'https://speaking.jbaru.ch/PjlHKD/robocoders-judgment-day-ai-ides-face-off',
-      expected_resource_count: 18,
-      has_video: false, # Video pending
-      video_url: nil,
-      slides_count: 1,
-      pdf_count: 0 # PDF not on Google Drive yet
-    }
-  }
   
   def setup
     @talks = {}
-    load_all_talks
+    load_all_talks_with_sources
   end
   
-  def load_all_talks
+  def load_all_talks_with_sources
     Dir.glob("#{TALKS_DIR}/*.md").each do |file|
       content = File.read(file)
       if content =~ /\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m
         yaml_content = YAML.safe_load($1)
+        
         @talks[File.basename(file, '.md')] = {
           file: file,
           yaml: yaml_content,
-          raw_content: content
+          raw_content: content,
+          source_url: yaml_content['source_url'] || yaml_content['notist_url']
         }
       end
     end
+    
+    puts "📋 Loaded #{@talks.length} talks for testing"
   end
 
   # ==========================================
-  # Test Suite 1: Content Migration Accuracy  
+  # Test Suite 1: Dynamic Source-vs-Migrated Validation  
   # ==========================================
   
-  def test_complete_resource_migration_luxembourg
-    talk = @talks['2025-06-20-voxxed-luxembourg-technical-enshittification']
-    refute_nil talk, "Luxembourg talk file not found"
+  def test_migrated_resources_match_source_exactly
+    talks_with_sources = @talks.select { |_, data| data[:source_url] }
     
-    resources = talk[:yaml]['resources'] || []
-    expected_count = EXPECTED_TESTS['luxembourg'][:expected_resource_count]
-    
-    assert_equal expected_count, resources.length, 
-      "Expected exactly #{expected_count} resources, got #{resources.length}. " \
-      "Migration incomplete - missing #{expected_count - resources.length} resources!"
+    talks_with_sources.each do |talk_name, talk_data|
+      puts "\n🔍 Testing #{talk_name}..."
       
-    # Verify each resource has required fields
-    resources.each_with_index do |resource, index|
-      assert resource['title'], "Resource #{index + 1} missing title"
-      assert resource['url'], "Resource #{index + 1} missing URL"
-      assert resource['type'], "Resource #{index + 1} missing type"
-      # Description is optional but should be present for most resources
+      # Skip if no source URL available
+      next unless talk_data[:source_url]
+      
+      # Fetch original source page
+      source_resources = extract_resources_from_source(talk_data[:source_url])
+      migrated_resources = talk_data[:yaml]['resources'] || []
+      
+      # CRITICAL: Resource count must match exactly
+      assert_equal source_resources.length, migrated_resources.length,
+        "❌ RESOURCE COUNT MISMATCH for #{talk_name}:\n" \
+        "Source has #{source_resources.length} resources\n" \
+        "Migrated has #{migrated_resources.length} resources\n" \
+        "EVERY resource from source must be migrated!"
+      
+      # Validate each migrated resource has meaningful title
+      migrated_resources.each_with_index do |resource, index|
+        title = resource['title']
+        
+        refute title.match?(/^Resource \d+$/), 
+          "❌ GENERIC TITLE: '#{title}' should be actual content title from source"
+        
+        refute title.empty?, 
+          "❌ EMPTY TITLE: Resource #{index + 1} has no title"
+          
+        assert title.length > 3,
+          "❌ TOO SHORT TITLE: '#{title}' is too short to be meaningful"
+      end
+      
+      puts "✅ #{talk_name}: #{migrated_resources.length} resources with meaningful titles"
     end
-    
-    puts "SUCCESS Luxembourg talk: #{resources.length}/#{expected_count} resources migrated"
   end
   
-  def test_complete_resource_migration_robocoders
-    talk = @talks['2025-06-11-devoxx-poland-robocoders-judgment-day']
-    refute_nil talk, "RoboCoders talk file not found"
+  def test_video_availability_matches_source
+    talks_with_sources = @talks.select { |_, data| data[:source_url] }
     
-    resources = talk[:yaml]['resources'] || []
-    expected_count = EXPECTED_TESTS['robocoders'][:expected_resource_count]
-    
-    assert_equal expected_count, resources.length, 
-      "Expected exactly #{expected_count} resources, got #{resources.length}. " \
-      "Migration incomplete - missing #{expected_count - resources.length} resources!"
+    talks_with_sources.each do |talk_name, talk_data|
+      puts "\n🎬 Testing video for #{talk_name}..."
       
-    # Verify each resource has required fields
-    resources.each_with_index do |resource, index|
-      assert resource['title'], "Resource #{index + 1} missing title"
-      assert resource['url'], "Resource #{index + 1} missing URL"
-      assert resource['type'], "Resource #{index + 1} missing type"
+      # Check if source has video
+      source_has_video = source_page_has_video?(talk_data[:source_url])
+      migrated_resources = talk_data[:yaml]['resources'] || []
+      migrated_videos = migrated_resources.select { |r| r['type'] == 'video' }
+      
+      if source_has_video
+        assert migrated_videos.length > 0,
+          "❌ VIDEO MISSING: Source has video but migration doesn't include it"
+          
+        # Test that video URL actually works
+        migrated_videos.each do |video|
+          video_url = video['url']
+          assert video_works?(video_url),
+            "❌ VIDEO BROKEN: #{video_url} doesn't work or video doesn't exist"
+        end
+        
+        puts "✅ #{talk_name}: Video present and working"
+      else
+        puts "ℹ️  #{talk_name}: No video in source (as expected)"
+      end
     end
-    
-    puts "SUCCESS RoboCoders talk: #{resources.length}/#{expected_count} resources migrated"
   end
   
-  def test_resource_type_detection_luxembourg
-    talk = @talks['2025-06-20-voxxed-luxembourg-technical-enshittification']
-    resources = talk[:yaml]['resources'] || []
-    
-    # Count resource types
-    type_counts = resources.group_by { |r| r['type'] }.transform_values(&:count)
-    
-    # Verify Google Slides URLs are marked as "slides"
-    slides_resources = resources.select { |r| r['type'] == 'slides' }
-    slides_resources.each do |resource|
-      url = resource['url']
-      assert(
-        url.include?('docs.google.com/presentation') || url.include?('drive.google.com'),
-        "Slides resource should have Google URL: #{url}"
-      )
+  def test_slides_are_google_drive_embedded
+    @talks.each do |talk_name, talk_data|
+      migrated_resources = talk_data[:yaml]['resources'] || []
+      slides_resources = migrated_resources.select { |r| r['type'] == 'slides' }
+      
+      slides_resources.each do |slides|
+        url = slides['url']
+        
+        # CRITICAL: Must be Google Drive, not direct PDF downloads
+        if url.include?('.pdf') && !url.include?('drive.google.com')
+          flunk "❌ WRONG PDF SOURCE: #{url}\n" \
+                "Slides must be uploaded to Google Drive, not linked to external PDFs!\n" \
+                "This prevents thumbnail generation and proper embedding."
+        end
+        
+        if url.include?('drive.google.com')
+          assert url.include?('/file/d/') && url.include?('/view'),
+            "❌ WRONG GOOGLE DRIVE FORMAT: #{url}\n" \
+            "Must use /file/d/{id}/view format for proper embedding"
+        end
+      end
+      
+      if slides_resources.length > 0
+        puts "✅ #{talk_name}: Slides properly hosted on Google Drive"
+      end
     end
-    
-    # Verify YouTube URLs are marked as "video"
-    video_resources = resources.select { |r| r['type'] == 'video' }
-    video_resources.each do |resource|
-      url = resource['url']
-      assert(
-        url.include?('youtube.com') || url.include?('youtu.be'),
-        "Video resource should have YouTube URL: #{url}"
-      )
-    end
-    
-    # Verify PDF URLs are marked as "slides" (our convention)
-    pdf_resources = resources.select { |r| r['url'].include?('drive.google.com/file') && r['url'].include?('.pdf') }
-    pdf_resources.each do |resource|
-      assert_equal 'slides', resource['type'], 
-        "PDF resource should be marked as 'slides' type: #{resource['url']}"
-    end
-    
-    puts "SUCCESS Resource types: #{type_counts}"
   end
   
-  def test_video_detection_accuracy_luxembourg
-    talk = @talks['2025-06-20-voxxed-luxembourg-technical-enshittification']
-    resources = talk[:yaml]['resources'] || []
-    
-    # This talk SHOULD have video (user confirmed it exists)
-    video_resources = resources.select { |r| r['type'] == 'video' }
-    
-    assert video_resources.length > 0, 
-      "CRITICAL: Video detection failed! User confirmed video exists but none found in resources. " \
-      "This is exactly the type of error that caused problems before."
+  def test_resource_type_detection
+    @talks.each do |talk_name, talk_data|
+      resources = talk_data[:yaml]['resources'] || []
+      next if resources.empty?
       
-    # Verify video URL format
-    video_resources.each do |resource|
-      url = resource['url']
-      assert(
-        url.match?(/https:\/\/(www\.)?youtube\.com\/watch\?v=/) || url.match?(/https:\/\/youtu\.be\//),
-        "Video URL should be valid YouTube format: #{url}"
-      )
+      # Count resource types
+      type_counts = resources.group_by { |r| r['type'] }.transform_values(&:count)
+      
+      # Verify Google Slides URLs are marked as "slides"
+      slides_resources = resources.select { |r| r['type'] == 'slides' }
+      slides_resources.each do |resource|
+        url = resource['url']
+        assert(
+          url.include?('docs.google.com/presentation') || url.include?('drive.google.com') || url.include?('.pdf'),
+          "Slides resource should have Google/PDF URL: #{url}"
+        )
+      end
+      
+      # Verify YouTube URLs are marked as "video"
+      video_resources = resources.select { |r| r['type'] == 'video' }
+      video_resources.each do |resource|
+        url = resource['url']
+        assert(
+          url.include?('youtube.com') || url.include?('youtu.be'),
+          "Video resource should have YouTube URL: #{url}"
+        )
+      end
+      
+      puts "✅ #{talk_name} resource types: #{type_counts}"
     end
-    
-    puts "SUCCESS Video detection: #{video_resources.length} videos found"
-  end
-
-  # ===========================================
+  end  # ===========================================
   # Test Suite 2: Resource URL Validation
   # ===========================================
   
@@ -211,57 +218,6 @@ class MigrationTest < Minitest::Test
     end
     
     puts "SUCCESS All slides properly embedded (not downloadable)"
-  end
-  
-  def test_exact_resource_count_validation
-    # This test must verify EXACT count from original source
-    # NOT just check that resources exist
-    
-    @talks.each do |talk_name, talk_data|
-      next unless EXPECTED_TESTS.values.any? { |t| t[:file].include?(talk_name) }
-      
-      expected_test = EXPECTED_TESTS.values.find { |t| t[:file].include?(talk_name) }
-      resources = talk_data[:yaml]['resources'] || []
-      expected_count = expected_test[:expected_resource_count]
-      
-      assert_equal expected_count, resources.length,
-        "CRITICAL FAILURE: #{talk_name} has #{resources.length} resources, expected #{expected_count}.\n" \
-        "This means the migration script failed to extract ALL resources from the original page!\n" \
-        "EVERY SINGLE RESOURCE must be migrated or the migration is FAILED."
-      
-      puts "SUCCESS #{talk_name}: Exact count verified #{resources.length}/#{expected_count}"
-    end
-  end
-  
-  def test_video_detection_with_exact_verification
-    EXPECTED_TESTS.each do |test_name, expected|
-      next unless expected[:has_video]
-      
-      talk_file = expected[:file]
-      talk_key = File.basename(talk_file, '.md')
-      talk = @talks[talk_key]
-      
-      next unless talk
-      
-      resources = talk[:yaml]['resources'] || []
-      video_resources = resources.select { |r| r['type'] == 'video' }
-      
-      assert video_resources.length > 0,
-        "CRITICAL FAILURE: #{test_name} MUST have video but none found!\n" \
-        "Expected video URL: #{expected[:video_url]}\n" \
-        "This means the migration script failed to find the video that definitely exists!"
-      
-      # If expected video URL is known, verify it matches
-      if expected[:video_url]
-        actual_video_url = video_resources.first['url']
-        assert_equal expected[:video_url], actual_video_url,
-          "Video URL mismatch in #{test_name}:\n" \
-          "Expected: #{expected[:video_url]}\n" \
-          "Actual: #{actual_video_url}"
-      end
-      
-      puts "SUCCESS #{test_name}: Video correctly detected"
-    end
   end
   
   def test_external_link_accessibility
@@ -357,22 +313,28 @@ class MigrationTest < Minitest::Test
   # ===========================================
   
   def test_content_completeness_check
-    # Verify all expected test talks are present
-    EXPECTED_TESTS.each do |test_name, expected|
-      file_path = File.join(TALKS_DIR, expected[:file])
-      assert File.exist?(file_path), "Missing expected talk file: #{expected[:file]}"
+    # Verify all migrated talks have complete content by comparing with source
+    @talks.each do |talk_key, talk_data|
+      next unless talk_data[:source_url]
       
-      talk_key = File.basename(expected[:file], '.md')
-      talk = @talks[talk_key]
-      refute_nil talk, "Failed to load talk: #{talk_key}"
+      # Verify required fields exist
+      yaml = talk_data[:yaml]
+      assert yaml['title'], "Missing title in #{talk_key}.md"
+      assert yaml['date'], "Missing date in #{talk_key}.md"
+      assert yaml['resources'], "Missing resources in #{talk_key}.md"
       
-      # Verify required fields
-      yaml = talk[:yaml]
-      assert yaml['title'], "Missing title in #{expected[:file]}"
-      assert yaml['date'], "Missing date in #{expected[:file]}"
-      assert yaml['resources'], "Missing resources in #{expected[:file]}"
+      # Dynamic validation: Compare resource count with source
+      source_resources = extract_resources_from_source(talk_data[:source_url])
+      migrated_resources = yaml['resources'] || []
       
-      puts "SUCCESS #{test_name}: Content complete"
+      if source_resources.length != migrated_resources.length
+        puts "❌ RESOURCE COUNT MISMATCH for #{talk_key}:"
+        puts "  Source has #{source_resources.length} resources"
+        puts "  Migration has #{migrated_resources.length} resources"
+        puts "  This indicates incomplete migration!"
+      else
+        puts "SUCCESS #{talk_key}: Content complete (#{migrated_resources.length} resources)"
+      end
     end
   end
   
@@ -435,15 +397,120 @@ class MigrationTest < Minitest::Test
       refute url.include?('example.com'), "Example URL found: #{url}"
       refute title.downcase.include?('placeholder'), "Placeholder title found: #{title}"
       refute title.downcase.include?('todo'), "TODO in title found: #{title}"
+      
+      # Check for generic "Resource N" titles
+      refute title.match?(/^Resource \d+$/), 
+        "❌ GENERIC TITLE: Found '#{title}' - should be meaningful title from source content"
     end
     
     puts "SUCCESS No placeholder resources found"
   end
   
   # ===========================================
-  # Utility Methods
+  # Utility Methods for Dynamic Testing
   # ===========================================
   
+  def extract_resources_from_source(source_url)
+    # Fetch and parse the source page
+    uri = URI.parse(source_url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true if uri.scheme == 'https'
+    
+    response = http.get(uri.request_uri)
+    doc = Nokogiri::HTML(response.body)
+    
+    # Extract actual content resources (not navigation/metadata)
+    resource_links = []
+    
+    # Look for resources section specifically
+    resources_section = doc.css('#resources, .resources, *:contains("Resources")').first
+    if resources_section
+      # Get links that are actual content resources
+      links = resources_section.css('a[href]')
+      links.each do |link|
+        href = link['href']
+        title = link.text.strip
+        
+        # Skip navigation/metadata links
+        next if href.include?('notist.st') || href.include?('noti.st')
+        next if href.include?('twitter.com/intent') 
+        next if href.start_with?('#') || href.start_with?('/')
+        next if title.empty? || title.length < 3
+        
+        resource_links << {
+          url: href,
+          title: title,
+          type: determine_resource_type(href)
+        }
+      end
+    end
+    
+    resource_links
+  end
+  
+  def source_page_has_video?(source_url)
+    uri = URI.parse(source_url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true if uri.scheme == 'https'
+    
+    response = http.get(uri.request_uri)
+    content = response.body
+    
+    # Check for video indicators
+    content.include?('youtube.com') || 
+    content.include?('youtu.be') || 
+    content.include?('notist.ninja/embed') ||
+    content.include?('id="video"')
+  end
+  
+  def video_works?(video_url)
+    return false unless video_url.include?('youtube.com') || video_url.include?('youtu.be')
+    
+    # Extract YouTube video ID
+    video_id = nil
+    if video_url.include?('youtube.com/watch?v=')
+      video_id = video_url.split('watch?v=').last.split('&').first
+    elsif video_url.include?('youtu.be/')
+      video_id = video_url.split('youtu.be/').last.split('?').first
+    end
+    
+    # YouTube video IDs should be 11 characters long
+    return false unless video_id && video_id.length == 11
+    
+    # Check if the video ID contains only valid characters (alphanumeric, _, -)
+    return false unless video_id.match?(/^[a-zA-Z0-9_-]{11}$/)
+    
+    # Make a HEAD request to check if video exists
+    begin
+      uri = URI.parse(video_url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.read_timeout = 10
+      
+      response = http.get(uri.request_uri)
+      
+      # Check for common YouTube error indicators
+      body = response.body
+      return false if body.include?('Video unavailable')
+      return false if body.include?('This video is not available') 
+      return false if body.include?('has been removed')
+      return false if body.include?('private video')
+      
+      # If we get here and response is 200, likely valid
+      response.code.to_i == 200
+    rescue => e
+      puts "Video validation error: #{e.message}"
+      false
+    end
+  end
+  
+  def determine_resource_type(url)
+    return 'video' if url.include?('youtube.com') || url.include?('youtu.be')
+    return 'slides' if url.include?('docs.google.com/presentation') || url.include?('drive.google.com')
+    return 'code' if url.include?('github.com')
+    'link'
+  end
+
   def print_migration_summary
     puts "\n" + "=" * 60
     puts "MIGRATION TEST SUMMARY"

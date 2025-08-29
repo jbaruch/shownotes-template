@@ -550,12 +550,42 @@ a:hover {
 }
 
 .hero-description {
-    font-size: 1.25rem;
-    margin: 0;
-    line-height: 1.5;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-    font-weight: 500;
-    color: white;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.speaker-social-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.speaker-social-links .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.speaker-social-links .social-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.speaker-social-links .social-icon {
+    width: 24px;
+    height: 24px;
+    fill: white;
 }
 
 @media (max-width: 768px) {
@@ -1583,5 +1613,155 @@ pre code {
     
     .talk-card {
         padding: var(--space-6);
+    }
+}
+
+/* =============================================
+   Speaker Section Styling
+   ============================================= */
+
+.speaker-section {
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--space-8);
+    margin: var(--space-8) 0;
+}
+
+.speaker-info {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+}
+
+.speaker-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.speaker-details {
+    flex: 1;
+}
+
+.speaker-name {
+    margin: 0 0 var(--space-3) 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.speaker-bio {
+    margin: 0 0 var(--space-5) 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.speaker-social {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--background);
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.social-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-color);
+}
+
+.social-icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+/* Platform-specific colors */
+.social-link.linkedin:hover {
+    background: #0077b5;
+    border-color: #0077b5;
+    color: white;
+}
+
+.social-link.twitter:hover {
+    background: #1da1f2;
+    border-color: #1da1f2;
+    color: white;
+}
+
+.social-link.github:hover {
+    background: #333;
+    border-color: #333;
+    color: white;
+}
+
+.social-link.mastodon:hover {
+    background: #6364ff;
+    border-color: #6364ff;
+    color: white;
+}
+
+.social-link.bluesky:hover {
+    background: #0085ff;
+    border-color: #0085ff;
+    color: white;
+}
+
+/* Responsive speaker section */
+@media (max-width: 768px) {
+    .speaker-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .speaker-avatar {
+        align-self: center;
+    }
+    
+    .speaker-social {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .speaker-section {
+        padding: var(--space-6);
+        margin: var(--space-6) 0;
+    }
+    
+    .speaker-avatar {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .speaker-name {
+        font-size: 1.25rem;
+    }
+    
+    .social-link {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .social-icon {
+        width: 18px;
+        height: 18px;
     }
 }

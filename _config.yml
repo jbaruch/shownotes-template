@@ -1,11 +1,6 @@
-title: "Presentations by Jonathan Baruch"
-description: "Conference talk show notes and resources"
-author: "Jonathan Baruch"
-author_name: "Jonathan Baruch"
-avatar_url: "https://avatars.githubusercontent.com/u/1123"
-hero_background: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920"
 url: "https://jbaru.ch"
 baseurl: ""
+hero_background: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920"
 
 # Jekyll configuration
 markdown: kramdown
@@ -13,6 +8,17 @@ highlighter: rouge
 permalink: /:categories/:title/
 encoding: utf-8
 timezone: UTC
+
+# Kramdown configuration
+kramdown:
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
 
 # Collections
 collections:
@@ -38,16 +44,26 @@ plugins:
   - jekyll-sitemap
   - jekyll-seo-tag
 
-# SEO and social
-twitter:
-  username: jbaruchel
-  card: summary
+# Speaker configuration (single source of truth)
+speaker:
+  name: "Baruch Sadogursky"
+  display_name: ""                 # Optional: Override for display (if empty, uses name)
+  bio: "Developer advocate and expert in DevOps, software development practices, and technology trends. Regular speaker at major conferences about improving developer productivity and software quality."
+  avatar_url: ""                   # Optional: Custom avatar URL (fallback if no social media avatars available)
+  # Social media handles (all optional - leave empty to hide)
+  social:
+    linkedin: "jbaruch"           # Optional: LinkedIn username (generates https://linkedin.com/in/jbaruch)
+    x: "jbaruch"                 # Optional: X.com username (generates https://x.com/jbaruch)  
+    github: "jbaruch"            # Optional: GitHub username (generates https://github.com/jbaruch + avatar from GitHub)
+    mastodon: ""                 # Optional: Full Mastodon URL (e.g., "https://mastodon.social/@username")
+    bluesky: "jbaru.ch"                  # Optional: BlueSky username (generates https://bsky.app/profile/jbaruch)
 
-social:
-  name: Jonathan Baruch
-  links:
-    - https://github.com/jbaruch
-    - https://twitter.com/jbaruchel
+# Site metadata (templates will use speaker config)
+title: "Speaker Presentations"
+description: "Conference talk show notes and resources"
+
+# SEO settings (will use speaker info dynamically)
+# No need for redundant author or twitter config since speaker section provides this
 
 # Exclude from build
 exclude:
@@ -61,5 +77,5 @@ exclude:
   - README.md
   - docs/
 
-# Security - Note: safe mode strips iframes, so disabled for embed functionality
+# Security - Note: safe mode https://drive.google.com/drive/folders/1Q8Auh_XnZtrDsdnKe_rFOnx3mZVhphLn?usp=drive_linkstrips iframes, so disabled for embed functionality
 # safe: true

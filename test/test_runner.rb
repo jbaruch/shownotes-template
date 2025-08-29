@@ -1,14 +1,13 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'minitest/autorun'
 require 'yaml'
 
 # Test runner for the complete shownotes test suite
 # This runner ensures all 121 test scenarios are covered by failing tests
 class ShownotesTestRunner
   def self.run
-    puts "TEST Running Shownotes Test Suite (TDD - All tests should FAIL)"
+    puts "TEST Running Shownotes Test Suite"
     puts "=" * 60
     
     # Load all test files
@@ -73,22 +72,25 @@ class ShownotesTestRunner
   end
 
   def self.run_single_test_file(file)
-    # In real implementation, this would run the test file and capture results
-    # For now, we'll simulate the expected behavior (all tests should fail)
-    
     basename = File.basename(file, '.rb')
     
-    # Simulate test counts based on known test scenarios
-    test_counts = estimate_test_count(basename)
-    
-    {
-      file: basename,
-      tests: test_counts[:tests],
-      failures: test_counts[:tests], # All should fail (no implementation yet)
-      errors: 0, # No errors expected - just missing implementations
-      skips: 0,
-      details: generate_failure_details(basename, test_counts[:tests])
-    }
+    # Actually run the test file with bundle exec
+    begin
+      result = `cd #{Dir.pwd} && bundle exec ruby "#{file}" 2>&1`
+      exit_code = $?.exitstatus
+      
+      # Parse minitest output for real results
+      parse_minitest_output(result, basename, exit_code)
+    rescue => e
+      {
+        file: basename,
+        tests: 0,
+        failures: 0,
+        errors: 1,
+        skips: 0,
+        details: ["Error running test: #{e.message}"]
+      }
+    end
   end
 
   def self.estimate_test_count(test_file_name)
@@ -160,24 +162,31 @@ class ShownotesTestRunner
   end
 
   def self.verify_tdd_compliance(results)
-    puts "🔍 TDD COMPLIANCE CHECK"
+    puts "🔍 TEST RESULTS ANALYSIS"
     puts "=" * 30
     
-    if results[:total_failures] == results[:total_tests] && results[:total_errors] == 0
-      puts "SUCCESS PERFECT TDD COMPLIANCE!"
-      puts "   - All #{results[:total_tests]} tests are failing as expected"
-      puts "   - No errors (tests are well-structured)"
-      puts "   - Ready for implementation phase"
+    passing_tests = results[:total_tests] - results[:total_failures] - results[:total_errors]
+    
+    if results[:total_tests] == 0
+      puts "FAIL NO TESTS FOUND"
+      puts "   - No tests were executed"
+    elsif results[:total_errors] > 0
+      puts "FAIL TEST EXECUTION ERRORS"
+      puts "   - #{results[:total_errors]} tests had execution errors"
+      puts "   - Fix test setup issues before proceeding"
+    elsif passing_tests == results[:total_tests]
+      puts "SUCCESS ALL TESTS PASSING!"
+      puts "   - #{results[:total_tests]} tests passing"
+      puts "   - #{results[:total_failures]} tests failing"
+      puts "   - Implementation appears complete"
     elsif results[:total_failures] > 0
-      puts "⚠️  PARTIAL TDD COMPLIANCE"
-      puts "   - #{results[:total_failures]} tests failing (expected)"
-      puts "   - #{results[:total_tests] - results[:total_failures]} tests passing (unexpected!)"
-      puts "   - Some implementation may already exist"
+      puts "⚠️  MIXED RESULTS"
+      puts "   - #{passing_tests} tests passing"
+      puts "   - #{results[:total_failures]} tests failing"
+      puts "   - Partial implementation exists"
     else
-      puts "FAIL TDD VIOLATION"
-      puts "   - No failing tests found"
-      puts "   - Either no tests exist or implementation already exists"
-      puts "   - This violates test-first development principles"
+      puts "UNKNOWN STATE"
+      puts "   - Unexpected test results pattern"
     end
     
     puts
@@ -211,6 +220,45 @@ class ShownotesTestRunner
     puts "   2. Begin implementation phase to make tests pass"
     puts "   3. Implement only enough code to make each test pass"
     puts "   4. Refactor while maintaining test coverage"
+  end
+  
+  def self.parse_minitest_output(output, basename, exit_code)
+    # Parse minitest output like: "5 runs, 17 assertions, 0 failures, 0 errors, 0 skips"
+    if match = output.match(/(\d+) runs?, (\d+) assertions?, (\d+) failures?, (\d+) errors?, (\d+) skips?/)
+      tests = match[1].to_i
+      assertions = match[2].to_i
+      failures = match[3].to_i
+      errors = match[4].to_i
+      skips = match[5].to_i
+      
+      details = []
+      if failures > 0 || errors > 0
+        # Extract failure/error details
+        failure_section = output.split("Finished in")[0] || ""
+        details = failure_section.split("\n").select { |line| 
+          line.include?("Failure:") || line.include?("Error:") || line.strip.start_with?("Expected") || line.strip.start_with?("Actual")
+        }.map(&:strip).reject(&:empty?)
+      end
+      
+      {
+        file: basename,
+        tests: tests,
+        failures: failures,
+        errors: errors,
+        skips: skips,
+        details: details.empty? ? ["All tests passed!"] : details
+      }
+    else
+      # Fallback if parsing fails
+      {
+        file: basename,
+        tests: 0,
+        failures: exit_code != 0 ? 1 : 0,
+        errors: exit_code != 0 ? 1 : 0,
+        skips: 0,
+        details: exit_code != 0 ? ["Test execution failed", output.split("\n").last(3).join("\n")] : ["No test output parsed"]
+      }
+    end
   end
 end
 

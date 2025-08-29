@@ -14,19 +14,28 @@ class SimpleTalkRenderer
     template_content = default_talk_layout
     template = Liquid::Template.parse(template_content)
     
+    # If we have raw markdown content, parse it first
+    if talk_data.is_a?(String) || (talk_data.is_a?(Hash) && talk_data['content'] && !talk_data['title'])
+      talk_data = parse_markdown_talk(talk_data.is_a?(String) ? talk_data : talk_data['content'])
+    end
+    
     # Sanitize talk data before rendering
     sanitized_data = sanitize_talk_data(talk_data)
     
-    # Generate content including resources
+    # Process content as markdown if present
     content = sanitized_data['content'] || 'Talk content goes here.'
-    if sanitized_data['resources']
-      content += "\n" + generate_resources_html(sanitized_data['resources'])
-    end
+    processed_content = Kramdown::Document.new(content).to_html
+    
+    # Add target="_blank" to external links
+    processed_content = add_target_blank_to_external_links(processed_content)
+    
+    # Improve resources section formatting
+    processed_content = improve_resources_formatting(processed_content)
     
     # Prepare template variables
     variables = {
       'page' => sanitized_data,
-      'content' => content
+      'content' => processed_content
     }
     
     # Render template
@@ -148,6 +157,108 @@ class SimpleTalkRenderer
   def assert_syntax_highlighting_applied(html, language)
     # Check for code blocks with language class (flexible matching)
     html.include?("language-#{language}") || html.include?("class=\"language-#{language}\"")
+  end
+
+  # Add target="_blank" to external links
+  def add_target_blank_to_external_links(html)
+    # Pattern to match external links (http/https)
+    html.gsub(/<a href="(https?:\/\/[^"]+)"([^>]*)>/) do |match|
+      url = $1
+      attrs = $2
+      
+      # Only add target="_blank" if it's not already present
+      unless attrs.include?('target=')
+        attrs += ' target="_blank"'
+      end
+      
+      "<a href=\"#{url}\"#{attrs}>"
+    end
+  end
+
+  # Improve resources section formatting
+  def improve_resources_formatting(html)
+    # Look for Resources section and improve formatting
+    html.gsub(/<h2 id="resources">Resources<\/h2>\s*<ul>(.*?)<\/ul>/m) do |match|
+      list_content = $1
+      
+      # Extract individual list items and convert to resource cards
+      resource_items = list_content.scan(/<li>(.*?)<\/li>/m).flatten
+      
+      formatted_items = resource_items.map do |item|
+        # Extract link and description if present
+        if item.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>(.*)/)
+          url = $1
+          title = $2
+          description = $3.strip.gsub(/^[-–—]\s*/, '') # Remove leading dash
+          
+          %{<li class="resource-link-item">
+            <a href="#{url}" target="_blank" class="resource-link">
+              <div class="resource-title">#{title}</div>
+              #{description.empty? ? '' : "<div class=\"resource-description\">#{description}</div>"}
+            </a>
+          </li>}
+        else
+          "<li class=\"resource-link-item\">#{item}</li>"
+        end
+      end
+      
+      %{<div class="talk-resources">
+        <h2>Resources</h2>
+        <ul class="resources-list">
+          #{formatted_items.join("\n          ")}
+        </ul>
+      </div>}
+    end
+  end
+
+  # Parse all-markdown talk format
+  def parse_markdown_talk(markdown_content)
+    lines = markdown_content.split("\n")
+    
+    # Extract title from first H1
+    title = nil
+    if lines[0] && lines[0].start_with?('# ')
+      title = lines[0][2..-1].strip
+    end
+    
+    # Extract metadata from bold lines
+    metadata = {}
+    content_start = 0
+    
+    lines.each_with_index do |line, index|
+      if line.match(/^\*\*(\w+):\*\*\s*(.+)$/)
+        field = $1.downcase
+        value = $2.strip
+        
+        # Extract URL from markdown link if present
+        if value.match(/\[([^\]]+)\]\(([^)]+)\)/)
+          link_text = $1
+          url = $2
+          metadata[field] = url
+        else
+          metadata[field] = value
+        end
+      elsif line.strip.empty? && index > 0
+        # First empty line after metadata marks start of content
+        content_start = index + 1
+        break
+      end
+    end
+    
+    # Extract content (everything after metadata)
+    content_lines = lines[content_start..-1] || []
+    content = content_lines.join("\n").strip
+    
+    # Build result hash
+    result = {
+      'title' => title || 'Untitled Talk',
+      'content' => content
+    }
+    
+    # Add parsed metadata
+    result.merge!(metadata)
+    
+    result
   end
 
   private
@@ -307,55 +418,7 @@ class SimpleTalkRenderer
     end
   end
 
-  # Generate HTML for resources section
-  def generate_resources_html(resources)
-    return '' unless resources
-    
-    content = "<div class=\"resources\">\n<h3>Resources</h3>\n"
-    
-    resources.each do |type, resource_data|
-      case type
-      when 'slides'
-        if resource_data.is_a?(Hash) && resource_data['url']
-          safe_url = sanitize_url(resource_data['url'])
-          # Only include link if URL is safe
-          if safe_url && !safe_url.empty?
-            content += "<div class=\"resource slides\">\n"
-            content += "<a href=\"#{safe_url}\" target=\"_blank\" rel=\"noopener\">#{resource_data['title'] || 'Slides'}</a>\n"
-            content += "</div>\n"
-          end
-        end
-      when 'code'
-        if resource_data.is_a?(Hash) && resource_data['url']
-          safe_url = sanitize_url(resource_data['url'])
-          # Only include link if URL is safe
-          if safe_url && !safe_url.empty?
-            content += "<div class=\"resource code\">\n"
-            title = resource_data['title'] || 'Code Repository'
-            content += "<span>Code:</span> <a href=\"#{safe_url}\" target=\"_blank\" rel=\"noopener\">#{title}</a>\n"
-            content += "</div>\n"
-          end
-        end
-      when 'links'
-        if resource_data.is_a?(Array)
-          resource_data.each do |link|
-            next unless link.is_a?(Hash) && link['url']
-            safe_url = sanitize_url(link['url'])
-            # Only include link if URL is safe
-            if safe_url && !safe_url.empty?
-              content += "<div class=\"resource link\">\n"
-              content += "<a href=\"#{safe_url}\" target=\"_blank\" rel=\"noopener\">#{link['title'] || link['url']}</a>\n"
-              content += "<p>#{link['description']}</p>\n" if link['description']
-              content += "</div>\n"
-            end
-          end
-        end
-      end
-    end
-    
-    content += "</div>\n"
-    content
-  end
+
 
   def default_talk_layout
     <<-HTML
@@ -444,6 +507,28 @@ class SimpleTalkRenderer
       <section class="talk-description">
         <p>{{ page.description }}</p>
       </section>
+      
+      <!-- Slides and Video embeds -->
+      {% if page.slides or page.video %}
+      <section class="talk-main-content">
+        <div class="media-container">
+          {% if page.slides %}
+          <div class="media-item slides-embed">
+            <h2>Slides</h2>
+            <iframe src="{{ page.slides }}" width="100%" height="500" frameborder="0" allowfullscreen></iframe>
+          </div>
+          {% endif %}
+          
+          {% if page.video %}
+          <div class="media-item video-embed">
+            <h2>Video</h2>
+            <iframe src="{{ page.video }}" width="100%" height="400" frameborder="0" allowfullscreen></iframe>
+          </div>
+          {% endif %}
+        </div>
+      </section>
+      {% endif %}
+      
       <section class="talk-content">
         {{ content }}
       </section>

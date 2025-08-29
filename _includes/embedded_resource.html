@@ -1,12 +1,11 @@
 {% comment %}
 Embedded resource include for Google Slides and YouTube videos
-Usage: {% include embedded_resource.html resource=resource preview_mode=true size='large' %}
+Usage: {% include embedded_resource.html url=page.slides type="slides" %}
+       {% include embedded_resource.html url=page.video type="video" %}
 {% endcomment %}
 
-{% assign resource = include.resource %}
-{% assign url = resource.url %}
-{% assign title = resource.title %}
-{% assign type = resource.type %}
+{% assign url = include.url %}
+{% assign type = include.type %}
 {% assign preview_mode = include.preview_mode | default: false %}
 {% assign size = include.size | default: 'normal' %}
 

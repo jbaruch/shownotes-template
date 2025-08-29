@@ -9,6 +9,7 @@ A Jekyll-based static site generator for creating mobile-optimized conference ta
 - **Resource Management**: Organized display of slides, code repositories, and reference links  
 - **Performance Optimized**: Fast loading on conference networks
 - **Security Focused**: XSS protection, input validation, and secure output rendering
+- **Speaker Configuration**: Centralized speaker info with social media integration and avatar priority
 - **Jekyll Compatible**: Seamless integration with Jekyll static site generation
 - **Responsive Layout**: CSS Grid-based responsive design
 - **Accessibility Compliant**: WCAG-compatible screen reader and keyboard navigation
@@ -39,46 +40,43 @@ bundle exec jekyll serve
 
 ## Testing
 
-Comprehensive test suite with 139 tests covering all functionality:
+Comprehensive test suite covering all functionality:
 
 ```bash
 # Run all tests
-bundle exec rake test
+ruby test/test_runner.rb
 
-# Run specific test categories
-bundle exec rake test:unit          # Unit tests
-bundle exec rake test:integration   # Integration tests  
-bundle exec rake test:performance   # Performance tests
-bundle exec rake test:e2e          # End-to-end tests
-
-# Quick essential test run
-bundle exec rake quick
-
-# Detailed test summary
-bundle exec rake test:all
-
-# Show all available commands
-bundle exec rake help
+# Run specific test files
+bundle exec ruby test/impl/unit/[test_file].rb
+bundle exec ruby test/impl/integration/[test_file].rb
 ```
 
-### Test Results
-
-- **161 test runs, 1081 assertions**
-- **0 failures, 0 errors, 0 skips**
-- **100% success rate**
+**Current Test Results**: 191 tests, 1,291 assertions, 0 failures
 
 ## Project Structure
 
 ```
 shownotes/
 ├── _config.yml                 # Jekyll configuration
-├── _layouts/                   # Jekyll layout templates
+├── _layouts/                   # Jekyll layout templates  
 ├── _talks/                     # Talk content collection
+├── _plugins/                   # Jekyll plugins
+│   └── markdown_parser.rb      # All-markdown format parser
 ├── assets/                     # CSS, JS, images
 ├── lib/                        # Core implementation
-│   ├── talk_renderer.rb        # Main rendering engine
-│   └── simple_talk_renderer.rb # Simplified renderer
+│   ├── talk_renderer.rb        # Full rendering engine (Jekyll + dependencies)
+│   └── simple_talk_renderer.rb # Lightweight renderer (minimal dependencies)
+├── migrate_talk.rb             # Notist migration (full-featured)
+├── migrate_talk_simple.rb      # Notist migration (lightweight)
+├── migrate_format.rb           # YAML→Markdown format converter
+├── utils/                      # Development utilities
+│   ├── cleanup_google_drive.rb # Google Drive cleanup tools
+│   ├── delete_google_drive_file.rb
+│   ├── force_delete_files.rb
+│   └── test_real_site.rb       # Site testing utilities
 ├── test/                       # Comprehensive test suite
+│   ├── visual_test_simple.rb   # Visual regression tests
+│   ├── migration_test.rb       # Migration validation tests
 │   └── impl/
 │       ├── unit/               # Unit tests (11 files)
 │       ├── integration/        # Integration tests
@@ -90,32 +88,58 @@ shownotes/
 
 ## Usage
 
+### Configuration
+
+#### Speaker Configuration
+
+Configure speaker information in `_config.yml` as a single source of truth:
+
+```yaml
+# Speaker configuration (single source of truth)
+speaker:
+  name: "Your Name"                 # Required: Full name
+  display_name: ""                  # Optional: Override for display (if empty, uses name)
+  bio: "Your professional bio..."   # Required: Speaker biography
+  avatar_url: ""                    # Optional: Custom avatar URL (fallback if no social media avatars)
+  
+  # Social media handles (all optional - leave empty to hide)
+  social:
+    linkedin: "username"            # LinkedIn username (generates profile link + avatar)
+    x: "username"                   # X.com username (generates profile link + avatar)  
+    github: "username"              # GitHub username (generates profile link + avatar)
+    mastodon: "https://instance/@user" # Full Mastodon URL
+    bluesky: "username"             # BlueSky username (generates profile link)
+```
+
+**Avatar Priority**: GitHub > LinkedIn > X.com > Custom avatar_url > Default
+
 ### Creating Talk Pages
 
 1. Add talk files to `_talks/` directory:
+
 ```yaml
 ---
-title: "Modern JavaScript Patterns"
-speaker: "Jane Developer"
-conference: "JSConf 2024" 
-date: "2024-03-15"
-status: "completed"
-resources:
-  - type: "slides"
-    title: "Presentation Slides"
-    url: "https://slides.example.com"
-  - type: "code" 
-    title: "GitHub Repository"
-    url: "https://github.com/example/repo"
-  - type: "link"
-    title: "Reference Documentation"
-    url: "https://docs.example.com"
+layout: talk
 ---
 
+# Talk Title Here
+
+**Conference:** Conference Name 2024  
+**Date:** 2024-03-15  
+**Slides:** [View Slides](https://slides.example.com)  
+**Video:** [Watch Video](https://youtube.com/watch?v=example)  
+
 Talk description and additional content in Markdown format.
+
+## Resources
+
+- [DevOps Tools For Java Developers](https://amzn.to/4io8r3I)
+- [Liquid Software](https://amzn.to/3F9i5cb)
+- [Related Article](https://example.com/article)
 ```
 
-2. Build and deploy:
+1. Build and deploy:
+
 ```bash
 bundle exec jekyll build
 ```
@@ -138,6 +162,7 @@ Generate QR codes pointing to talk URLs for conference presentations. Pages are 
 ### Test-First Development
 
 Built using strict test-first methodology:
+
 1. Requirements analyzed and documented
 2. Test scenarios created from requirements  
 3. Comprehensive test suite implemented
@@ -167,32 +192,6 @@ Built using strict test-first methodology:
 - **CDN Ready**: Static files optimized for CDN delivery
 - **Progressive Enhancement**: Core functionality without JavaScript
 
-## Test Coverage
-
-### Unit Tests (129 runs, 789 assertions)
-- Content rendering and Markdown processing
-- Security validation and XSS protection  
-- Responsive design and accessibility
-- Data validation and error handling
-- Navigation and user experience
-- Resource management
-
-### Integration Tests (16 runs, 206 assertions)
-- Jekyll build process integration
-- Template processing validation
-- Configuration management
-
-### Performance Tests (10 runs, 49 assertions)
-- Page load time optimization
-- Resource size management
-- Mobile performance validation
-
-### E2E Tests (6 runs, 37 assertions)  
-- Complete user workflow validation
-- QR code access scenarios
-- Mobile user experience
-- Error handling workflows
-
 ## Support
 
 For issues, questions, or contributions, please see the project documentation in the `docs/` directory or create an issue in the repository.
@@ -203,4 +202,4 @@ Licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file 
 
 ---
 
-**Built with test-first development** | **100% test coverage** | **Mobile-first design**
+**Built with test-first development** | **Mobile-first design** | **Jekyll-powered**

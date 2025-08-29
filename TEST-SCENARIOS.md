@@ -155,6 +155,46 @@ Scenario: All migrated resources are functional
   And video embeds should play without errors
 ```
 
+##  Test Suite 5: Regression Prevention
+
+### Test 5.1: YAML Syntax Validation
+**Priority**: Critical 🚨
+
+```gherkin
+Scenario: No Liquid syntax in YAML front matter
+  Given migrated talk files with YAML front matter
+  When I scan for Liquid template syntax
+  Then no {{site.title}} or similar Liquid syntax should be present
+  And YAML should be valid and parseable
+  And no template placeholders should remain
+```
+
+### Test 5.2: Resource Quality Validation
+**Priority**: High
+
+```gherkin
+Scenario: No placeholder or malformed resources
+  Given migrated resource lists
+  When I validate resource URLs and titles
+  Then no placeholder URLs (example.com, placeholder.pdf) should exist
+  And no malformed URLs (double protocols) should be present
+  And no TODO or placeholder titles should remain
+  And all resource entries should have required fields
+```
+
+### Test 5.3: Google Drive Embedding Requirement
+**Priority**: Critical 🚨
+
+```gherkin
+Scenario: Slides must be Google Drive embedded, not downloadable
+  Given slides resources in migrated talks
+  When I check the resource URLs
+  Then PDF slides MUST be uploaded to Google Drive (/file/d/{id}/view format)
+  And NOT be direct downloadable PDF links (notist.cloud, etc.)
+  And Google Drive URLs must support thumbnail generation
+  And slides should be embeddable in the page interface
+```
+
 ##  Per-Page Migration Checklist
 
 ### Step 1: Pre-Migration Analysis

@@ -131,15 +131,12 @@ class ErrorHandlingTest < Minitest::Test
   # TS-067: Network timeouts for external resources are handled
   def test_external_resource_timeouts
     talk_with_external = @valid_talk.merge(
-      'resources' => {
-        'links' => [
-          {
-            'title' => 'External Resource',
-            'url' => 'https://timeout-test-url.invalid',
-            'description' => 'This will timeout'
-          }
-        ]
-      }
+      'content' => 'Talk content with external resources:
+
+## Resources
+
+- [External Resource](https://timeout-test-url.invalid) - This will timeout
+'
     )
     
     page_result = generate_page_with_external_check(talk_with_external)

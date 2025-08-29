@@ -27,17 +27,27 @@ class TalkInformationDisplayTest < Minitest::Test
                     'Talk title should appear as H1 element with talk-title class'
   end
 
-  # TS-002: Speaker name displays prominently in page header
-  def test_speaker_name_displays_prominently
+  # TS-002: Speaker name should NOT have a dedicated speaker section/block on individual talk pages
+  # (Speaker name in header metadata, footer, and meta tags is acceptable)
+  def test_speaker_name_not_on_talk_page
     page_html = generate_talk_page(@talk_data)
     
-    assert_includes page_html, '<span class="speaker">Jane Developer</span>',
-                    'Speaker name should display prominently with speaker class'
+    # Verify no dedicated speaker section exists in the main talk content
+    main_section = extract_section(page_html, 'main-content')
+    refute_includes main_section, 'speaker-section',
+                    'Dedicated speaker section should not appear in main talk content'
+    refute_includes main_section, '<section class="speaker"',
+                    'Dedicated speaker section should not appear in main talk content'
     
-    # Verify speaker appears in header section
-    header_section = extract_section(page_html, 'talk-header')
-    assert_includes header_section, 'Jane Developer',
-                    'Speaker name should appear in talk header section'
+    # Verify no standalone speaker bio or info block
+    refute_includes page_html, '<div class="speaker-bio"',
+                    'Speaker bio section should not appear on talk pages'
+    refute_includes page_html, '<div class="speaker-info"',
+                    'Speaker info section should not appear on talk pages'
+    
+    # But speaker name in metadata, title, footer, and meta tags is OK
+    assert_includes page_html, 'Jane Developer',
+                    'Speaker name should still appear somewhere in the document (title, footer, meta)'
   end
 
   # TS-003: Conference name and date render in metadata section

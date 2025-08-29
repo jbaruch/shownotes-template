@@ -7,102 +7,73 @@ layout: default
     <nav class="breadcrumb" role="navigation" aria-label="Breadcrumb">
         <ol>
             <li><a href="{{ '/' | relative_url }}">Home</a></li>
-            <li aria-current="page">{{ page.title }}</li>
+            <li aria-current="page">{{ page.extracted_title | default: page.title }}</li>
         </ol>
     </nav>
 
     <!-- Talk header -->
     <header class="talk-header">
-        <h1 class="talk-title" itemprop="name">{{ page.title }}</h1>
+        <h1 class="talk-title" itemprop="name">{{ page.extracted_title | default: page.title }}</h1>
         
         <div class="talk-meta">
-            {% if page.speaker %}
-            <span class="meta-item" itemprop="author">
-                <span class="meta-icon speaker" aria-hidden="true"></span>
-                {{ page.speaker }}
-            </span>
-            {% endif %}
-            {% if page.conference %}
+            {% if page.extracted_conference %}
             <span class="meta-item" itemprop="publisher">
                 <span class="meta-icon conference" aria-hidden="true"></span>
-                {{ page.conference }}
+                {{ page.extracted_conference }}
             </span>
             {% endif %}
-            {% if page.date %}
-            <time class="meta-item" datetime="{{ page.date | date: '%Y-%m-%d' }}" itemprop="datePublished">
+            {% if page.extracted_date %}
+            <time class="meta-item" datetime="{{ page.extracted_date }}" itemprop="datePublished">
                 <span class="meta-icon date" aria-hidden="true"></span>
-                {{ page.date | date: "%B %d, %Y" }}
+                {{ page.extracted_date }}
             </time>
             {% endif %}
         </div>
         
-        {% if page.description %}
-        <p class="talk-description" itemprop="description">{{ page.description }}</p>
+        {% if page.extracted_description %}
+        <p class="talk-description" itemprop="description">{{ page.extracted_description }}</p>
         {% endif %}
     </header>
 
 
     <!-- Main content: slides and video side by side -->
-    {% if page.resources and page.resources.size > 0 %}
+    {% if page.extracted_slides or page.extracted_video %}
     <section class="talk-main-content">
-        {% assign slides_resource = null %}
-        {% assign video_resource = null %}
-        {% assign other_resources = page.resources | where_exp: "resource", "resource.type != 'slides' and resource.type != 'video'" %}
-        
-        {% comment %} Find slides and video resources {% endcomment %}
-        {% for resource in page.resources %}
-            {% if resource.type == 'slides' %}
-                {% assign slides_resource = resource %}
-            {% elsif resource.type == 'video' %}
-                {% assign video_resource = resource %}
-            {% endif %}
-        {% endfor %}
-        
         <div class="media-container">
-            {% comment %} Slides section {% endcomment %}
-            {% if slides_resource %}
-            <div class="media-item slides-section">
+            <!-- Slides embed -->
+            {% if page.extracted_slides %}
+            <div class="media-item slides-embed">
                 <h2>Slides</h2>
-                {% include embedded_resource.html resource=slides_resource %}
+                {% include embedded_resource.html url=page.extracted_slides type="slides" %}
             </div>
             {% endif %}
-            
-            {% comment %} Video section {% endcomment %}
-            <div class="media-item video-section">
+
+            <!-- Video embed -->
+            {% if page.extracted_video %}
+            <div class="media-item video-embed">
                 <h2>Video</h2>
-                {% if video_resource %}
-                    {% include embedded_resource.html resource=video_resource %}
-                {% else %}
-                    <div class="video-placeholder">
-                        <div class="placeholder-content">
-                            <div class="placeholder-icon">🎥</div>
-                            <p class="placeholder-text">Stay tuned! The video will be published soon.</p>
-                        </div>
-                    </div>
-                {% endif %}
+                {% include embedded_resource.html url=page.extracted_video type="video" %}
             </div>
+            {% endif %}
         </div>
-        
-        {% comment %} Resources section {% endcomment %}
-        {% if other_resources.size > 0 %}
-        <section class="talk-resources">
-            <h2>Resources</h2>
-            <ul class="resources-list">
-                {% for resource in other_resources %}
-                <li class="resource-link-item">
-                    <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-                        <span class="resource-title">{{ resource.title }}</span>
-                        {% if resource.description %}
-                        <span class="resource-description">{{ resource.description }}</span>
-                        {% endif %}
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
-        </section>
-        {% endif %}
     </section>
     {% endif %}
+
+    <!-- Talk content -->
+    <section class="talk-content">
+        {% if page.extracted_description %}
+            <div class="talk-description">
+                {{ page.extracted_description | markdownify }}
+            </div>
+        {% endif %}
+        
+        {% if page.extracted_resources and page.extracted_resources != "" %}
+            <div class="talk-resources">
+                <h2>Resources</h2>
+                {{ page.extracted_resources | markdownify }}
+            </div>
+        {% endif %}
+    </section>
 
 </article>
 
@@ -111,18 +82,81 @@ layout: default
 {
   "@context": "https://schema.org",
   "@type": "PresentationDigitalDocument",
-  "name": "{{ page.title | escape }}",
+  "name": "{{ page.extracted_title | default: page.title | escape }}",
   "author": {
     "@type": "Person",
-    "name": "{{ page.speaker | escape }}"
+    "name": "{{ site.speaker.display_name | default: site.speaker.name | escape }}"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "{{ page.conference | escape }}"
+    "name": "{{ page.extracted_conference | escape }}"
   },
-  "datePublished": "{{ page.date | date: '%Y-%m-%d' }}",
-  {% if page.description %}"description": "{{ page.description | escape }}",{% endif %}
-  {% if page.abstract %}"abstract": "{{ page.abstract | strip_html | escape }}",{% endif %}
+  "datePublished": "{{ page.extracted_date }}",
+  {% if page.extracted_description %}"description": "{{ page.extracted_description | escape }}",{% endif %}
   "url": "{{ page.url | absolute_url }}"
 }
+</script>
+
+<!-- Resource enhancement script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add target="_blank" to external links
+    const links = document.querySelectorAll('a[href^="http"]');
+    links.forEach(link => {
+        if (!link.hasAttribute('target')) {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener');
+        }
+    });
+    
+    // Enhance resources section formatting
+    const resourcesSection = document.querySelector('#resources');
+    if (resourcesSection && resourcesSection.nextElementSibling) {
+        const ul = resourcesSection.nextElementSibling;
+        if (ul.tagName === 'UL') {
+            // Wrap resources in proper container
+            const container = document.createElement('div');
+            container.className = 'talk-resources';
+            
+            const title = document.createElement('h2');
+            title.textContent = 'Resources';
+            
+            const resourcesList = document.createElement('ul');
+            resourcesList.className = 'resources-list';
+            
+            // Convert existing list items
+            Array.from(ul.children).forEach(li => {
+                const newLi = document.createElement('li');
+                newLi.className = 'resource-link-item';
+                
+                const link = li.querySelector('a');
+                if (link) {
+                    const newLink = document.createElement('a');
+                    newLink.href = link.href;
+                    newLink.target = '_blank';
+                    newLink.rel = 'noopener';
+                    newLink.className = 'resource-link';
+                    
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'resource-title';
+                    titleDiv.textContent = link.textContent;
+                    
+                    newLink.appendChild(titleDiv);
+                    newLi.appendChild(newLink);
+                } else {
+                    newLi.innerHTML = li.innerHTML;
+                }
+                
+                resourcesList.appendChild(newLi);
+            });
+            
+            container.appendChild(title);
+            container.appendChild(resourcesList);
+            
+            // Replace the original section
+            resourcesSection.parentNode.replaceChild(container, resourcesSection);
+            ul.remove();
+        }
+    }
+});
 </script>

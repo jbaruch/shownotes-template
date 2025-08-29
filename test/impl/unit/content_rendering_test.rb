@@ -11,7 +11,10 @@ class ContentRenderingTest < Minitest::Test
     @markdown_content = <<~MARKDOWN
       ---
       title: "Test Talk"
-      speaker: "Test Speaker"
+      conference: "Test Conference"
+      date: "2024-03-15"
+      slides: "https://slides.example.com"
+      video: "https://youtube.com/watch?v=example"
       ---
 
       ## Talk Abstract
@@ -76,15 +79,18 @@ class ContentRenderingTest < Minitest::Test
     assert_equal 'Test Talk', page_data['title'],
                  'Title should parse from frontmatter'
     
-    assert_equal 'Test Speaker', page_data['speaker'],
-                 'Speaker should parse from frontmatter'
+    assert_equal 'Test Conference', page_data['conference'],
+                 'Conference should parse from frontmatter'
+    
+    assert_equal 'https://slides.example.com', page_data['slides'],
+                 'Slides URL should parse from frontmatter'
     
     # Verify frontmatter is accessible in template context
     template_variables = extract_template_variables(@markdown_content)
     assert_includes template_variables, 'page.title',
                     'Page title should be available as template variable'
-    assert_includes template_variables, 'page.speaker',
-                    'Page speaker should be available as template variable'
+    assert_includes template_variables, 'page.conference',
+                    'Page conference should be available as template variable'
   end
 
   # TS-013: Special characters render safely (no XSS)

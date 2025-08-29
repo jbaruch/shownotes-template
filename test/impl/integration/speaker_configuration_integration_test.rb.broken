@@ -1,0 +1,254 @@
+#!/usr/bin/env ruby
+
+require 'minitest/autorun'
+require 'yaml'
+require 'fileutils'
+require 'tempfile'
+require 'open3'
+
+class SpeakerConfigurationIntegrationTest < Minitest::Test
+  def setup
+    @test_dir = Dir.mktmpdir('speaker_integration_test')
+    @original_dir = Dir.pwd
+    
+    # Copy entire Jekyll site to test directory
+    copy_jekyll_site
+    
+    Dir.chdir(@test_dir)
+  end
+
+  def teardown
+    Dir.chdir(@original_dir)
+    FileUtils.rm_rf(@test_dir)
+  end
+
+  def test_github_avatar_integration
+    update_speaker_config(
+      avatar_url: "",
+      social: { github: "octocat" }
+    )
+    
+    output = build_jekyll_site
+    index_content = File.read(File.join(@test_dir, '_site', 'index.html'))
+    
+    # Should use GitHub avatar (check for GitHub avatar pattern, not hardcoded URL)
+    assert_includes index_content, 'github.com/'
+    assert_includes index_content, '.png?size=200'
+    assert_includes index_content, 'alt="Test Display Name"'
+  end
+
+  def test_custom_avatar_fallback_integration
+    update_speaker_config(
+      avatar_url: "https://example.com/custom.jpg",
+      social: { github: "" }
+    )
+    
+    output = build_jekyll_site
+    index_content = File.read(File.join(@test_dir, '_site', 'index.html'))
+    
+    # Should use custom avatar
+    assert_includes index_content, 'https://example.com/custom.jpg'
+    refute_includes index_content, 'github.com'
+  end
+
+  def test_no_avatar_integration
+    update_speaker_config(
+      avatar_url: "",
+      social: { github: "" }
+    )
+    
+    output = build_jekyll_site
+    index_content = File.read(File.join(@test_dir, '_site', 'index.html'))
+    
+    # Should not have avatar image
+    refute_includes index_content, 'class="author-avatar"'
+    refute_includes index_content, '<img src='
+  end
+
+  def test_social_media_links_integration
+    update_speaker_config(
+      social: {
+        linkedin: "testlinkedin",
+        x: "testtwitter",
+        github: "testgithub",
+        mastodon: "https://mastodon.social/@testuser",
+        bluesky: ""  # Should be hidden
+      }
+    )
+    
+    output = build_jekyll_site
+    index_content = File.read(File.join(@test_dir, '_site', 'index.html'))
+    
+    # Check social links are properly generated (check for classes, not hardcoded URLs)
+    assert_includes index_content, 'class="social-link linkedin"'
+    assert_includes index_content, 'class="social-link x"'
+    assert_includes index_content, 'class="social-link github"'
+    assert_includes index_content, 'class="social-link mastodon"'
+    
+    # BlueS​ky should be hidden since it's empty
+    refute_includes index_content, 'class="social-link bluesky"'
+  end
+
+  def test_talk_page_no_speaker_section_integration
+    update_speaker_config(
+      name: "Talk Page Speaker",
+      display_name: "Talk Page Display",
+      bio: "Talk page bio content",
+      social: { github: "talkuser" }
+    )
+    
+    # Create a test talk
+    create_test_talk
+    
+    output = build_jekyll_site
+    
+    # Check if talk page exists and does NOT have speaker section
+    talk_files = Dir.glob(File.join(@test_dir, '_site', 'talks', '**', 'index.html'))
+    assert !talk_files.empty?, "No talk pages were generated"
+    
+    talk_content = File.read(talk_files.first)
+    
+    # Verify speaker section is NOT present on talk pages (speaker info only on index)
+    refute_includes talk_content, 'speaker-section'
+    refute_includes talk_content, 'speaker-avatar'
+    refute_includes talk_content, 'speaker-name'
+    refute_includes talk_content, 'speaker-bio'
+  end
+
+  def test_missing_speaker_config_integration
+    # Create config without speaker section
+    config = {
+      'title' => 'Test Site',
+      'description' => 'Test description',
+      'collections' => {
+        'talks' => {
+          'output' => true,
+          'permalink' => '/talks/:path/'
+        }
+      }
+    }
+    
+    File.write('_config.yml', config.to_yaml)
+    
+    output = build_jekyll_site
+    index_content = File.read(File.join(@test_dir, '_site', 'index.html'))
+    
+    # Should handle missing speaker config gracefully
+    refute_includes index_content, 'Presentations by'
+    refute_includes index_content, 'speaker-social-links'
+  end
+
+  def test_jekyll_build_errors_with_invalid_config
+    # Create invalid YAML config
+    File.write('_config.yml', "invalid: yaml: content: [")
+    
+    output, error, status = build_jekyll_site_with_error_capture
+    
+    # Should fail to build with invalid YAML
+    refute status.success?, "Jekyll should fail with invalid YAML"
+    assert_includes error, "YAML"
+  end
+
+  def test_social_media_url_validation_integration
+    # Test with potentially problematic usernames
+    update_speaker_config(
+      social: {
+        linkedin: "user-with-dashes",
+        x: "user_with_underscores",
+        github: "user123",
+        mastodon: "https://custom.mastodon.instance/@user",
+        bluesky: "user.bsky.social"
+      }
+    )
+    
+    output = build_jekyll_site
+    index_content = File.read(File.join(@test_dir, '_site', 'index.html'))
+    
+    # Verify all social link classes are properly generated (not hardcoded URLs)
+    assert_includes index_content, 'class="social-link linkedin"'
+    assert_includes index_content, 'class="social-link x"'
+    assert_includes index_content, 'class="social-link github"'
+    assert_includes index_content, 'class="social-link mastodon"'
+    assert_includes index_content, 'class="social-link bluesky"'
+    assert_includes index_content, 'https://bsky.app/profile/user.bsky.social'
+  end
+
+  private
+
+  def copy_jekyll_site
+    # Copy essential Jekyll files
+    source_files = %w[_config.yml index.md Gemfile Gemfile.lock]
+    source_dirs = %w[_layouts _includes assets]
+    
+    source_files.each do |file|
+      source_path = File.join(@original_dir, file)
+      FileUtils.cp(source_path, @test_dir) if File.exist?(source_path)
+    end
+    
+    source_dirs.each do |dir|
+      source_path = File.join(@original_dir, dir)
+      FileUtils.cp_r(source_path, @test_dir) if Dir.exist?(source_path)
+    end
+    
+    # Create minimal _talks directory
+    FileUtils.mkdir_p(File.join(@test_dir, '_talks'))
+    
+    # Install bundle dependencies in test directory
+    system('bundle', 'install', '--quiet', chdir: @test_dir)
+  end
+
+  def update_speaker_config(speaker_config)
+    config = {
+      'title' => 'Test Site',
+      'description' => 'Test description',
+      'collections' => {
+        'talks' => {
+          'output' => true,
+          'permalink' => '/talks/:path/'
+        }
+      },
+      'speaker' => {
+        'name' => speaker_config[:name] || 'Test Speaker',
+        'display_name' => speaker_config[:display_name] || 'Test Display Name',
+        'bio' => speaker_config[:bio] || 'Test bio content for speaker',
+        'avatar_url' => speaker_config[:avatar_url] || '',
+        'social' => speaker_config[:social] || {}
+      }
+    }
+    
+    File.write('_config.yml', config.to_yaml)
+  end
+
+  def create_test_talk
+    talk_content = <<~YAML
+      ---
+      title: "Test Talk"
+      date: 2025-01-01
+      conference: "Test Conference"
+      description: "A test talk for integration testing"
+      ---
+      
+      This is a test talk content.
+    YAML
+    
+    File.write('_talks/test-talk.md', talk_content)
+  end
+
+  def build_jekyll_site
+    output, error, status = build_jekyll_site_with_error_capture
+    
+    unless status.success?
+      puts "Jekyll build failed:"
+      puts "STDOUT: #{output}"
+      puts "STDERR: #{error}"
+      flunk "Jekyll build failed"
+    end
+    
+    output
+  end
+
+  def build_jekyll_site_with_error_capture
+    # Build Jekyll site and capture output
+    Open3.capture3('bundle', 'exec', 'jekyll', 'build', '--quiet')
+  end
+end

@@ -1,0 +1,428 @@
+#!/usr/bin/env ruby
+
+require 'minitest/autorun'
+require 'yaml'
+require 'fileutils'
+require 'tempfile'
+require 'open3'
+
+class SpeakerConfigurationVisualTest < Minitest::Test
+  def setup
+    @test_dir = Dir.mktmpdir('speaker_visual_test')
+    @original_dir = Dir.pwd
+    @screenshots_dir = File.join(@original_dir, 'test', 'screenshots', 'speaker_config')
+    
+    FileUtils.mkdir_p(@screenshots_dir)
+    
+    # Copy Jekyll site for testing
+    copy_jekyll_site
+    Dir.chdir(@test_dir)
+  end
+
+  def teardown
+    Dir.chdir(@original_dir)
+    FileUtils.rm_rf(@test_dir)
+  end
+
+  def test_homepage_with_github_avatar_visual
+    update_speaker_config(
+      name: "GitHub Avatar User",
+      display_name: "GitHub Avatar Display",
+      bio: "This is a bio for testing GitHub avatar display on the homepage",
+      avatar_url: "",
+      social: {
+        linkedin: "githubuser",
+        x: "githubuser",
+        github: "octocat"
+      }
+    )
+    
+    start_jekyll_server do |port|
+      take_screenshot("http://localhost:#{port}", "homepage_github_avatar.png")
+      
+      # Verify specific elements are visible
+      verify_homepage_elements(port, {
+        title: "GitHub Avatar Display",
+        bio: "testing GitHub avatar",
+        avatar: true,
+        social_links: %w[linkedin x github]
+      })
+    end
+  end
+
+  def test_homepage_with_custom_avatar_visual
+    update_speaker_config(
+      name: "Custom Avatar User",
+      display_name: "Custom Avatar Display", 
+      bio: "This is a bio for testing custom avatar display",
+      avatar_url: "https://avatars.githubusercontent.com/u/1?v=4",
+      social: {
+        linkedin: "customuser",
+        x: "",  # Hidden
+        github: ""  # No GitHub, so uses custom avatar
+      }
+    )
+    
+    start_jekyll_server do |port|
+      take_screenshot("http://localhost:#{port}", "homepage_custom_avatar.png")
+      
+      verify_homepage_elements(port, {
+        title: "Custom Avatar Display",
+        bio: "testing custom avatar",
+        avatar: true,
+        social_links: %w[linkedin],
+        hidden_social: %w[x github]
+      })
+    end
+  end
+
+  def test_homepage_no_avatar_visual
+    update_speaker_config(
+      name: "No Avatar User",
+      display_name: "No Avatar Display",
+      bio: "This is a bio for testing no avatar display",
+      avatar_url: "",
+      social: {
+        linkedin: "",
+        x: "noavataruser",
+        github: "",
+        mastodon: "https://mastodon.social/@noavataruser"
+      }
+    )
+    
+    start_jekyll_server do |port|
+      take_screenshot("http://localhost:#{port}", "homepage_no_avatar.png")
+      
+      verify_homepage_elements(port, {
+        title: "No Avatar Display",
+        bio: "testing no avatar",
+        avatar: false,
+        social_links: %w[x mastodon],
+        hidden_social: %w[linkedin github]
+      })
+    end
+  end
+
+  def test_talk_page_no_speaker_section_visual
+    update_speaker_config(
+      name: "Talk Speaker",
+      display_name: "Talk Speaker Display",
+      bio: "Speaker bio for talk page testing with multiple lines of content to test layout",
+      social: {
+        linkedin: "talkspeaker",
+        x: "talkspeaker",
+        github: "talkspeaker",
+        mastodon: "",
+        bluesky: "talkspeaker"
+      }
+    )
+    
+    create_test_talk("Visual Test Talk", "A talk for visual testing without speaker sections")
+    
+    start_jekyll_server do |port|
+      # Take screenshot of talk page (should not have speaker section)
+      talk_url = "http://localhost:#{port}/talks/visual-test-talk/"
+      take_screenshot(talk_url, "talk_page_no_speaker_section.png")
+      
+      verify_talk_page_elements(port, "visual-test-talk", {
+        has_speaker_section: false,  # No speaker section on talk pages
+        content_only: true
+      })
+    end
+  end
+
+  def test_responsive_layout_visual
+    update_speaker_config(
+      name: "Responsive Test",
+      display_name: "Responsive Test User",
+      bio: "Testing responsive layout with a longer bio that should wrap properly on different screen sizes",
+      social: {
+        linkedin: "responsive",
+        x: "responsive",
+        github: "responsive",
+        mastodon: "https://mastodon.social/@responsive",
+        bluesky: "responsive"
+      }
+    )
+    
+    start_jekyll_server do |port|
+      # Test different viewport sizes
+      viewports = [
+        { width: 320, height: 568, name: "mobile" },
+        { width: 768, height: 1024, name: "tablet" },
+        { width: 1920, height: 1080, name: "desktop" }
+      ]
+      
+      viewports.each do |viewport|
+        take_screenshot(
+          "http://localhost:#{port}",
+          "homepage_responsive_#{viewport[:name]}.png",
+          viewport
+        )
+      end
+    end
+  end
+
+  def test_edge_cases_visual
+    # Test with very long content
+    update_speaker_config(
+      name: "Edge Case User",
+      display_name: "Very Long Display Name That Should Handle Gracefully",
+      bio: "This is an extremely long bio that tests how the layout handles large amounts of text content and whether it wraps properly without breaking the design or causing layout issues in the speaker section.",
+      social: {
+        linkedin: "very-long-username-test",
+        x: "very_long_username_test",
+        github: "very-long-username-test",
+        mastodon: "https://very-long-mastodon-instance-name.social/@very-long-username",
+        bluesky: "very.long.username.test"
+      }
+    )
+    
+    start_jekyll_server do |port|
+      take_screenshot("http://localhost:#{port}", "homepage_edge_cases.png")
+    end
+  end
+
+  private
+
+  def copy_jekyll_site
+    # Copy essential files for visual testing
+    source_files = %w[_config.yml index.md Gemfile]
+    source_dirs = %w[_layouts _includes assets]
+    
+    source_files.each do |file|
+      source_path = File.join(@original_dir, file)
+      FileUtils.cp(source_path, @test_dir) if File.exist?(source_path)
+    end
+    
+    source_dirs.each do |dir|
+      source_path = File.join(@original_dir, dir)
+      FileUtils.cp_r(source_path, @test_dir) if Dir.exist?(source_path)
+    end
+    
+    FileUtils.mkdir_p(File.join(@test_dir, '_talks'))
+  end
+
+  def update_speaker_config(speaker_config)
+    config = {
+      'title' => 'Visual Test Site',
+      'description' => 'Testing speaker configuration visuals',
+      'hero_background' => 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920',
+      'collections' => {
+        'talks' => {
+          'output' => true,
+          'permalink' => '/talks/:path/'
+        }
+      },
+      'defaults' => [
+        {
+          'scope' => { 'path' => '', 'type' => 'talks' },
+          'values' => { 'layout' => 'talk' }
+        }
+      ],
+      'speaker' => {
+        'name' => speaker_config[:name] || 'Test Speaker',
+        'display_name' => speaker_config[:display_name] || 'Test Display Name',
+        'bio' => speaker_config[:bio] || 'Test bio content',
+        'avatar_url' => speaker_config[:avatar_url] || '',
+        'social' => speaker_config[:social] || {}
+      }
+    }
+    
+    File.write('_config.yml', config.to_yaml)
+  end
+
+  def create_test_talk(title, description)
+    slug = title.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/^-+|-+$/, '')
+    
+    talk_content = <<~YAML
+      ---
+      title: "#{title}"
+      date: 2025-01-01
+      conference: "Visual Test Conference"
+      description: "#{description}"
+      resources:
+        - type: slides
+          title: "Slides"
+          url: "https://example.com/slides.pdf"
+      ---
+      
+      This is test content for the talk: #{title}
+      
+      ## Test Section
+      
+      Some content to test the talk layout.
+    YAML
+    
+    File.write("_talks/#{slug}.md", talk_content)
+  end
+
+  def start_jekyll_server
+    # Build site first
+    output, error, status = Open3.capture3('bundle', 'exec', 'jekyll', 'build', '--quiet')
+    unless status.success?
+      flunk "Jekyll build failed: #{error}"
+    end
+    
+    # Start Jekyll server
+    port = find_free_port
+    server_pid = nil
+    
+    begin
+      # Start server in background
+      server_pid = spawn('bundle', 'exec', 'jekyll', 'serve', '--port', port.to_s, '--host', '127.0.0.1', '--quiet')
+      
+      # Wait for server to start
+      wait_for_server(port)
+      
+      yield port
+      
+    ensure
+      Process.kill('TERM', server_pid) if server_pid
+      Process.wait(server_pid) if server_pid
+    end
+  end
+
+  def find_free_port
+    4000 + rand(1000)
+  end
+
+  def wait_for_server(port, timeout = 30)
+    start_time = Time.now
+    
+    loop do
+      begin
+        `curl -s http://localhost:#{port} > /dev/null 2>&1`
+        return if $?.success?
+      rescue
+        # Server not ready yet
+      end
+      
+      if Time.now - start_time > timeout
+        flunk "Jekyll server failed to start within #{timeout} seconds"
+      end
+      
+      sleep 0.5
+    end
+  end
+
+  def take_screenshot(url, filename, viewport = nil)
+    screenshot_path = File.join(@screenshots_dir, filename)
+    
+    # Use headless browser to take screenshot
+    if command_available?('npx') && command_available?('playwright')
+      take_screenshot_with_playwright(url, screenshot_path, viewport)
+    elsif command_available?('wkhtmltoimage')
+      take_screenshot_with_wkhtmltoimage(url, screenshot_path, viewport)
+    else
+      puts "Warning: No screenshot tool available. Install Playwright or wkhtmltoimage for visual testing."
+      return
+    end
+    
+    puts "Screenshot saved: #{screenshot_path}"
+  end
+
+  def take_screenshot_with_playwright(url, path, viewport)
+    viewport_arg = ""
+    if viewport
+      viewport_arg = "--viewport-size=#{viewport[:width]},#{viewport[:height]}"
+    end
+    
+    # Create a simple Playwright script
+    script = <<~JS
+      const { chromium } = require('playwright');
+      
+      (async () => {
+        const browser = await chromium.launch();
+        const page = await browser.newPage();
+        
+        #{viewport ? "await page.setViewportSize({ width: #{viewport[:width]}, height: #{viewport[:height]} });" : ""}
+        
+        await page.goto('#{url}');
+        await page.waitForTimeout(1000); // Wait for any animations
+        await page.screenshot({ path: '#{path}', fullPage: true });
+        await browser.close();
+      })();
+    JS
+    
+    script_path = File.join(@test_dir, 'screenshot.js')
+    File.write(script_path, script)
+    
+    system('npx', 'playwright', 'install', 'chromium', { out: '/dev/null', err: '/dev/null' })
+    system('node', script_path)
+  end
+
+  def take_screenshot_with_wkhtmltoimage(url, path, viewport)
+    width = viewport ? viewport[:width] : 1200
+    
+    system('wkhtmltoimage', '--width', width.to_s, '--quality', '50', url, path)
+  end
+
+  def command_available?(command)
+    system("which #{command} > /dev/null 2>&1")
+  end
+
+  def verify_homepage_elements(port, expected)
+    # Use curl to fetch page content for verification
+    content = `curl -s http://localhost:#{port}`
+    
+    if expected[:title]
+      assert_includes content, expected[:title], "Homepage should contain speaker name"
+    end
+    
+    if expected[:bio]
+      assert_includes content, expected[:bio], "Homepage should contain bio content"
+    end
+    
+    if expected[:avatar]
+      assert_includes content, 'class="author-avatar"', "Homepage should have avatar"
+    else
+      refute_includes content, 'class="author-avatar"', "Homepage should not have avatar"
+    end
+    
+    if expected[:social_links]
+      expected[:social_links].each do |platform|
+        assert_includes content, "social-link #{platform}", "Should have #{platform} social link"
+      end
+    end
+    
+    if expected[:hidden_social]
+      expected[:hidden_social].each do |platform|
+        refute_includes content, "social-link #{platform}", "Should not have #{platform} social link"
+      end
+    end
+  end
+
+  def verify_talk_page_elements(port, talk_slug, expected)
+    content = `curl -s http://localhost:#{port}/talks/#{talk_slug}/`
+    
+    # If has_speaker_section is explicitly false, verify speaker elements are NOT present
+    if expected[:has_speaker_section] == false
+      refute_includes content, 'speaker-section', "Talk page should not have speaker section"
+      refute_includes content, 'speaker-avatar', "Talk page should not have speaker avatar"
+      refute_includes content, 'speaker-name', "Talk page should not have speaker name"
+      refute_includes content, 'speaker-bio', "Talk page should not have speaker bio"
+      refute_includes content, 'speaker-social', "Talk page should not have speaker social links"
+      return
+    end
+    
+    # Legacy checks for speaker elements (now only valid for index page tests)
+    if expected[:speaker_name]
+      assert_includes content, expected[:speaker_name], "Talk page should contain speaker name"
+    end
+    
+    if expected[:bio]
+      assert_includes content, expected[:bio], "Talk page should contain bio"
+    end
+    
+    if expected[:avatar]
+      assert_includes content, 'class="speaker-avatar"', "Talk page should have speaker avatar"
+    end
+    
+    if expected[:social_links]
+      expected[:social_links].each do |platform|
+        assert_includes content, "social-link #{platform}", "Talk page should have #{platform} social link"
+      end
+    end
+  end
+end

@@ -6,22 +6,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
     <!-- SEO -->
-    <title>{% if page.title %}{{ page.title | escape }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
-    <meta name="description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.description }}{% endif %}">
+    <title>{% if page.title %}{{ page.title | escape }} - {% endif %}{% if site.speaker.display_name and site.speaker.display_name != "" %}Presentations by {{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}Presentations by {{ site.speaker.name }}{% else %}Presentations{% endif %}</title>
+    <meta name="description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.speaker.bio }}{% endif %}">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title }}{% endif %}">
-    <meta property="og:description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.description }}{% endif %}">
+    <meta property="og:title" content="{% if page.title %}{{ page.title | escape }}{% else %}{% if site.speaker.display_name and site.speaker.display_name != "" %}Presentations by {{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}Presentations by {{ site.speaker.name }}{% else %}Presentations{% endif %}{% endif %}">
+    <meta property="og:description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.speaker.bio }}{% endif %}">
     <meta property="og:type" content="{% if page.layout == 'talk' %}article{% else %}website{% endif %}">
     <meta property="og:url" content="{{ page.url | absolute_url }}">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title }}{% endif %}">
-    <meta name="twitter:description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.description }}{% endif %}">
+    <meta name="twitter:title" content="{% if page.title %}{{ page.title | escape }}{% else %}{% if site.speaker.display_name and site.speaker.display_name != "" %}Presentations by {{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}Presentations by {{ site.speaker.name }}{% else %}Presentations{% endif %}{% endif %}">
+    <meta name="twitter:description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.speaker.bio }}{% endif %}">
     
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self' https://www.youtube-nocookie.com https://docs.google.com https://drive.google.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self' https://www.youtube-nocookie.com https://docs.google.com https://drive.google.com; connect-src 'self'{% if jekyll.environment == 'development' %} ws://127.0.0.1:35729{% endif %};">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     
     <!-- Stylesheets -->
@@ -37,7 +37,7 @@
     <!-- Header -->
     <header class="site-header" role="banner">
         <div class="wrapper">
-            <a class="site-title" href="{{ '/' | relative_url }}" rel="home">{{ site.title | escape }}</a>
+            <a class="site-title" href="{{ '/' | relative_url }}" rel="home">{% if site.speaker.display_name and site.speaker.display_name != "" %}{{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}{{ site.speaker.name }}{% else %}Speaker{% endif %} - Presentations</a>
             
             {% unless page.url == "/" %}
             <nav class="site-nav" role="navigation" aria-label="Main navigation">
@@ -59,7 +59,7 @@
     <!-- Footer -->
     <footer class="site-footer" role="contentinfo">
         <div class="wrapper">
-            <p>&copy; {{ 'now' | date: '%Y' }} {{ site.author | default: site.title }}. All rights reserved.</p>
+            <p>&copy; {{ 'now' | date: '%Y' }} {% if site.speaker.display_name and site.speaker.display_name != "" %}{{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}{{ site.speaker.name }}{% else %}Speaker{% endif %}. All rights reserved.</p>
         </div>
     </footer>
 </body>
