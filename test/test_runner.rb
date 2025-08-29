@@ -14,7 +14,7 @@ class ShownotesTestRunner
     # Load all test files
     test_files = discover_test_files
     
-    puts "📁 Discovered #{test_files.length} test files:"
+    puts "FOLDER Discovered #{test_files.length} test files:"
     test_files.each { |file| puts "   #{file}" }
     puts
     
@@ -141,7 +141,7 @@ class ShownotesTestRunner
 
   def self.report_results(results)
     puts "\n" + "=" * 60
-    puts "📊 TEST SUITE RESULTS"
+    puts "CHART TEST SUITE RESULTS"
     puts "=" * 60
     
     puts "Total Tests: #{results[:total_tests]}"
