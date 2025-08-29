@@ -24,7 +24,7 @@ A Jekyll-based static site generator for creating mobile-optimized conference ta
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/jbaruch/shownotes.git
 cd shownotes
 
 # Install dependencies  
@@ -199,7 +199,7 @@ For issues, questions, or contributions, please see the project documentation in
 
 ## 📄 License
 
-[Add your license information here]
+This project is maintained by [Jonathan Baruch](https://github.com/jbaruch). Please contact the author for usage permissions.
 
 ---
 
