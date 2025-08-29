@@ -2,7 +2,7 @@
 
 A Jekyll-based static site generator for creating mobile-optimized conference talk pages with resource management and QR code accessibility.
 
-## 🚀 Features
+## Features
 
 - **Mobile-First Design**: Optimized for conference attendees accessing via mobile devices
 - **QR Code Accessibility**: Quick verification during presentations
@@ -13,18 +13,18 @@ A Jekyll-based static site generator for creating mobile-optimized conference ta
 - **Responsive Layout**: CSS Grid-based responsive design
 - **Accessibility Compliant**: WCAG-compatible screen reader and keyboard navigation
 
-## 📋 Requirements
+## Requirements
 
 - Ruby 3.4+
 - Bundler
 - Jekyll 4.4+
 - Git
 
-## 🛠 Installation
+## Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/jbaruch/shownotes.git
+git clone <repository-url>
 cd shownotes
 
 # Install dependencies  
@@ -37,7 +37,7 @@ bundle exec jekyll build
 bundle exec jekyll serve
 ```
 
-## 🧪 Testing
+## Testing
 
 Comprehensive test suite with 139 tests covering all functionality:
 
@@ -65,9 +65,9 @@ bundle exec rake help
 
 - **161 test runs, 1081 assertions**
 - **0 failures, 0 errors, 0 skips**
-- **100% success rate** ✅
+- **100% success rate**
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 shownotes/
@@ -88,7 +88,7 @@ shownotes/
 └── Rakefile                    # Test automation
 ```
 
-## 🎯 Usage
+## Usage
 
 ### Creating Talk Pages
 
@@ -124,7 +124,7 @@ bundle exec jekyll build
 
 Generate QR codes pointing to talk URLs for conference presentations. Pages are optimized for quick mobile access during talks.
 
-## 🔧 Development
+## Development
 
 ### Architecture
 
@@ -152,7 +152,7 @@ Built using strict test-first methodology:
 4. Ensure all tests pass: `bundle exec rake test`
 5. Submit pull request
 
-## 🔒 Security
+## Security
 
 - **XSS Protection**: All user input properly escaped
 - **Input Validation**: Comprehensive data validation  
@@ -160,14 +160,14 @@ Built using strict test-first methodology:
 - **Security Headers**: CSP, X-Frame-Options, etc.
 - **URL Validation**: Prevents malicious link injection
 
-## ⚡ Performance
+## Performance
 
 - **Mobile Optimized**: Fast loading on mobile devices
 - **Resource Efficient**: Minimized payload sizes
 - **CDN Ready**: Static files optimized for CDN delivery
 - **Progressive Enhancement**: Core functionality without JavaScript
 
-## 📊 Test Coverage
+## Test Coverage
 
 ### Unit Tests (129 runs, 789 assertions)
 - Content rendering and Markdown processing
@@ -193,13 +193,13 @@ Built using strict test-first methodology:
 - Mobile user experience
 - Error handling workflows
 
-## 🤝 Support
+## Support
 
 For issues, questions, or contributions, please see the project documentation in the `docs/` directory or create an issue in the repository.
 
-## 📄 License
+## License
 
-This project is maintained by [Jonathan Baruch](https://github.com/jbaruch). Please contact the author for usage permissions.
+Licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for details.
 
 ---
 
