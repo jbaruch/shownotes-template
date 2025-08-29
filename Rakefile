@@ -71,7 +71,7 @@ namespace :test do
     success_count = 0
     
     results.each do |category, data|
-      status = data[:success] ? "✅ PASS" : "❌ FAIL"
+      status = data[:success] ? "SUCCESS PASS" : "FAIL FAIL"
       puts "#{category.capitalize.ljust(12)}: #{status} (#{data[:time]}s)"
       total_time += data[:time]
       success_count += 1 if data[:success]
@@ -82,10 +82,10 @@ namespace :test do
     puts "Success rate: #{success_count}/#{results.size} (#{(success_count.to_f / results.size * 100).round}%)"
     
     if success_count == results.size
-      puts "\n🎉 ALL TESTS PASSED! 🎉"
+      puts "\nCELEBRATION ALL TESTS PASSED! CELEBRATION"
       exit 0
     else
-      puts "\n❌ Some tests failed"
+      puts "\nFAIL Some tests failed"
       exit 1
     end
   end
@@ -105,7 +105,7 @@ task :quick do
     puts ">>> #{File.basename(test_file)}"
     system("bundle exec ruby -Itest #{test_file}") || exit(1)
   end
-  puts "✅ Essential tests passed!"
+  puts "SUCCESS Essential tests passed!"
 end
 
 # Help task

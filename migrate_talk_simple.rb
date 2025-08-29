@@ -15,7 +15,7 @@ class SimpleTalkMigrator
   end
   
   def migrate
-    puts "🚀 SIMPLE MIGRATION (No Nokogiri)"
+    puts "STARTING SIMPLE MIGRATION (No Nokogiri)"
     puts "=" * 50
     puts "URL: #{@talk_url}"
     
@@ -49,7 +49,7 @@ class SimpleTalkMigrator
       return false
     end
     
-    puts "✅ MIGRATION SUCCESSFUL"
+    puts "SUCCESS MIGRATION SUCCESSFUL"
     puts "Talk migrated: #{@talk_data['title']}"
     puts "Resources: #{@resources.length}"
     true
@@ -264,7 +264,7 @@ class SimpleTalkMigrator
   end
   
   def report_failure(message)
-    puts "❌ #{message}"
+    puts "FAIL #{message}"
     puts "Errors:"
     @errors.each { |error| puts "  - #{error}" }
   end
@@ -279,7 +279,7 @@ if __FILE__ == $0
   
   url = ARGV[1]
   unless url.include?('speaking.jbaru.ch')
-    puts "❌ URL must be from speaking.jbaru.ch"
+    puts "FAIL URL must be from speaking.jbaru.ch"
     exit 1
   end
   

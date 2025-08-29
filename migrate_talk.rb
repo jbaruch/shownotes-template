@@ -19,7 +19,7 @@ class TalkMigrator
   end
   
   def migrate
-    puts "🚀 DETERMINISTIC TALK MIGRATION"
+    puts "STARTING DETERMINISTIC TALK MIGRATION"
     puts "=" * 50
     puts "URL: #{@talk_url}"
     
@@ -65,11 +65,11 @@ class TalkMigrator
       return false
     end
     
-    puts "✅ MIGRATION SUCCESSFUL"
-    puts "📄 File: #{@jekyll_file}"
-    puts "🎯 Resources: #{@resources.length}"
+    puts "SUCCESS MIGRATION SUCCESSFUL"
+    puts "FILE File: #{@jekyll_file}"
+    puts "TARGET Resources: #{@resources.length}"
     puts "🎬 Video: #{@talk_data[:video_url] || 'None'}"
-    puts "📄 PDF: #{@talk_data[:pdf_url] || 'None'}"
+    puts "FILE PDF: #{@talk_data[:pdf_url] || 'None'}"
     
     true
   end
@@ -92,7 +92,7 @@ class TalkMigrator
     
     begin
       @doc = Nokogiri::HTML(response.body)
-      puts "✅ Page fetched successfully"
+      puts "SUCCESS Page fetched successfully"
       return true
     rescue => e
       @errors << "Failed to parse HTML: #{e.message}"
@@ -157,7 +157,7 @@ class TalkMigrator
     abstract_elem = @doc.css('p').find { |p| p.text.length > 100 }
     @talk_data[:abstract] = abstract_elem ? abstract_elem.text.strip : ""
     
-    puts "✅ Metadata extracted:"
+    puts "SUCCESS Metadata extracted:"
     puts "   Title: #{@talk_data[:title]}"
     puts "   Date: #{@talk_data[:date]}"
     puts "   Conference: #{@talk_data[:conference]}"
@@ -217,7 +217,7 @@ class TalkMigrator
       @resources << resource
     end
     
-    puts "✅ Found #{@resources.length} resources"
+    puts "SUCCESS Found #{@resources.length} resources"
     @resources.each_with_index do |res, i|
       puts "   #{i+1}. #{res['type']}: #{res['url']}"
     end
@@ -244,7 +244,7 @@ class TalkMigrator
     end
     
     pdf_url = pdf_urls.first
-    puts "📄 Found PDF: #{pdf_url}"
+    puts "FILE Found PDF: #{pdf_url}"
     
     # Download PDF
     pdf_filename = generate_pdf_filename
@@ -273,7 +273,7 @@ class TalkMigrator
     @resources.unshift(pdf_resource) # Add at beginning
     @talk_data[:pdf_url] = drive_url
     
-    puts "✅ PDF processed and uploaded"
+    puts "SUCCESS PDF processed and uploaded"
     true
   end
   
@@ -308,7 +308,7 @@ class TalkMigrator
         insert_index = slides_index ? slides_index + 1 : 0
         @resources.insert(insert_index, video_resource)
         
-        puts "✅ Video found: #{video_url}"
+        puts "SUCCESS Video found: #{video_url}"
         return true
       end
     end
@@ -346,7 +346,7 @@ class TalkMigrator
     
     # Write file
     File.write(@jekyll_file, content)
-    puts "✅ Jekyll file generated: #{@jekyll_file}"
+    puts "SUCCESS Jekyll file generated: #{@jekyll_file}"
     
     true
   end
@@ -396,7 +396,7 @@ class TalkMigrator
         end
       end
       
-      puts "✅ Migration validation passed"
+      puts "SUCCESS Migration validation passed"
       puts "   Resources: #{resources.length}"
       puts "   Required fields: ✓"
       puts "   YAML structure: ✓"
@@ -409,7 +409,7 @@ class TalkMigrator
   end
   
   def report_failure(message)
-    puts "❌ MIGRATION FAILED: #{message}"
+    puts "FAIL MIGRATION FAILED: #{message}"
     puts "\n🔍 ERRORS:"
     @errors.each_with_index do |error, i|
       puts "   #{i+1}. #{error}"
