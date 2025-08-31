@@ -39,10 +39,9 @@ class DataPipelineIntegrationTest < Minitest::Test
     assert_includes html, talk.data['extracted_conference'], 'Conference should be displayed on index'
 
     # Verify data is displayed on talk page
-    talk_page = @site.pages.find { |page| page.url == talk.url }
-    skip 'Talk page not found' unless talk_page
+    skip 'Talk page not found' unless talk.output
 
-    talk_html = talk_page.output
+    talk_html = talk.output
     assert_includes talk_html, talk.data['extracted_title'], 'Title should be displayed on talk page'
     assert_includes talk_html, talk.data['extracted_conference'], 'Conference should be displayed on talk page'
   end
@@ -143,10 +142,9 @@ class DataPipelineIntegrationTest < Minitest::Test
     skip 'No talks found' if talks_collection.docs.empty?
 
     talk = talks_collection.docs.first
-    talk_page = @site.pages.find { |page| page.url == talk.url }
-    skip 'Talk page not found' unless talk_page
+    skip 'Talk page not found' unless talk.output
 
-    html = talk_page.output
+    html = talk.output
     doc = Nokogiri::HTML(html)
 
     # Check that different data types are rendered appropriately
@@ -164,7 +162,13 @@ class DataPipelineIntegrationTest < Minitest::Test
     end
 
     if talk.data['extracted_video']
-      assert_includes html, talk.data['extracted_video'], 'Video URL should be rendered'
+      # Video URLs get transformed to youtube-nocookie for privacy
+      video_id = talk.data['extracted_video'].match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n]+)/)[1] rescue nil
+      if video_id
+        assert_includes html, video_id, 'Video ID should be rendered'
+      else
+        assert_includes html, talk.data['extracted_video'], 'Video URL should be rendered'
+      end
     end
   end
 
