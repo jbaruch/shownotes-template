@@ -644,12 +644,6 @@ a:hover {
     padding: var(--space-8);
 }
 
-.featured-talk-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--primary-light);
-}
-
 .featured-talk-card::before {
     content: '';
     position: absolute;
@@ -665,16 +659,7 @@ a:hover {
     font-weight: 600;
     margin: 0 0 var(--space-4) 0;
     line-height: 1.3;
-}
-
-.featured-talk-card .talk-header h3 a {
     color: var(--text-primary);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-.featured-talk-card .talk-header h3 a:hover {
-    color: var(--primary-color);
 }
 
 .featured-talk-card .talk-description {
@@ -762,12 +747,6 @@ a:hover {
     gap: var(--space-5);
 }
 
-.talk-list-item:hover {
-    background: var(--surface);
-    border-color: var(--primary-light);
-    box-shadow: var(--shadow-sm);
-}
-
 .talk-list-item .talk-content {
     flex: 1;
 }
@@ -777,16 +756,7 @@ a:hover {
     font-weight: 600;
     margin: 0 0 var(--space-2) 0;
     line-height: 1.3;
-}
-
-.talk-list-item h3 a {
     color: var(--text-primary);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-.talk-list-item h3 a:hover {
-    color: var(--primary-color);
 }
 
 .talk-meta-inline {
@@ -796,6 +766,33 @@ a:hover {
     margin-bottom: var(--space-2);
     font-size: 0.875rem;
     color: var(--text-muted);
+}
+
+/* Clickable card link styles */
+.featured-talk-card-link,
+.talk-list-item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.featured-talk-card-link:hover,
+.talk-list-item-link:hover {
+    text-decoration: none;
+}
+
+.featured-talk-card-link:hover .featured-talk-card,
+.talk-list-item-link:hover .talk-list-item {
+    background: var(--surface);
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-sm);
+}
+
+.featured-talk-card-link:hover .featured-talk-card {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
 }
 
 .talk-meta-inline .conference {
@@ -1277,6 +1274,42 @@ a:hover {
     padding: var(--space-4);
     text-decoration: none;
     color: inherit;
+}
+
+/* Style markdown-generated resource links */
+.talk-resources .resources-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.talk-resources .resources-list li {
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.talk-resources .resources-list li:hover {
+    border-color: var(--primary-color);
+    background: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.talk-resources .resources-list li a {
+    display: block;
+    padding: var(--space-4);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: color 0.2s ease;
+}
+
+.talk-resources .resources-list li a:hover {
+    color: var(--primary-color);
 }
 
 .resource-title {

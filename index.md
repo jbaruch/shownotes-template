@@ -94,7 +94,7 @@ layout: default
         </div>
     </header>
 
-    {% assign talks = site.talks | sort: 'date' | reverse %}
+    {% assign talks = site.talks %}
     {% if talks.size > 0 %}
         <!-- Recent/Featured Talks Section -->
         {% assign recent_talks = talks | limit: 3 %}
@@ -103,68 +103,52 @@ layout: default
             <h2>Recent Presentations</h2>
             <div class="featured-talks-grid">
                 {% for talk in recent_talks %}
+                <a href="{{ talk.url | relative_url }}" class="featured-talk-card-link">
                 <article class="featured-talk-card">
                     {% comment %} Extract slides resource for preview (prioritize slides over video) {% endcomment %}
                     {% assign preview_resource = null %}
-                    {% if talk.resources %}
-                        {% comment %} First try to find slides {% endcomment %}
-                        {% for resource in talk.resources %}
-                            {% if resource.type == 'slides' %}
-                                {% assign preview_resource = resource %}
-                                {% break %}
-                            {% endif %}
-                        {% endfor %}
-                        {% comment %} If no slides found, use video as fallback {% endcomment %}
-                        {% if preview_resource == null %}
-                            {% for resource in talk.resources %}
-                                {% if resource.type == 'video' %}
-                                    {% assign preview_resource = resource %}
-                                    {% break %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
+                    
+                    {% comment %} Check for extracted slides/video URLs {% endcomment %}
+                    {% if talk.extracted_slides %}
+                        {% assign preview_resource = talk.extracted_slides %}
+                        {% assign preview_type = 'slides' %}
+                    {% elsif talk.extracted_video %}
+                        {% assign preview_resource = talk.extracted_video %}
+                        {% assign preview_type = 'video' %}
                     {% endif %}
 
                     {% if preview_resource %}
                     <div class="talk-preview-large">
-                        {% include embedded_resource.html resource=preview_resource preview_mode=true size='large' talk_url=talk.url %}
+                        {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='large' %}
                     </div>
                     {% endif %}
 
                     <div class="talk-content">
                         <header class="talk-header">
-                            <h3><a href="{{ talk.url | relative_url }}">{{ talk.title }}</a></h3>
+                            <h3>{{ talk.extracted_title | default: talk.title }}</h3>
                             <div class="talk-meta">
-                                {% if talk.conference %}
+                                {% if talk.extracted_conference %}
                                 <span class="meta-item conference-name">
                                     <span class="meta-icon conference" aria-hidden="true"></span>
-                                    {{ talk.conference }}
+                                    {{ talk.extracted_conference }}
                                 </span>
                                 {% endif %}
-                                {% if talk.date %}
-                                <time class="meta-item" datetime="{{ talk.date | date_to_xmlschema }}">
+                                {% if talk.extracted_date %}
+                                <time class="meta-item" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
                                     <span class="meta-icon date" aria-hidden="true"></span>
-                                    {{ talk.date | date: "%B %d, %Y" }}
+                                    {{ talk.extracted_date | date: "%B %d, %Y" }}
                                 </time>
                                 {% endif %}
                             </div>
                         </header>
 
-                        {% if talk.description %}
-                            <p class="talk-description">{{ talk.description }}</p>
+                        {% if talk.extracted_description %}
+                            <p class="talk-description">{{ talk.extracted_description }}</p>
                         {% endif %}
 
                         {% comment %} Video publication status {% endcomment %}
-                        {% assign has_video = false %}
-                        {% for resource in talk.resources %}
-                            {% if resource.type == 'video' %}
-                                {% assign has_video = true %}
-                                {% break %}
-                            {% endif %}
-                        {% endfor %}
-                        
                         <div class="video-status">
-                            {% if has_video %}
+                            {% if talk.extracted_video %}
                                 <span class="status-badge video-published">Video Available</span>
                             {% else %}
                                 <span class="status-badge video-pending">Video Coming Soon</span>
@@ -174,6 +158,7 @@ layout: default
 
                     </div>
                 </article>
+                </a>
                 {% endfor %}
             </div>
         </section>
@@ -186,59 +171,43 @@ layout: default
             <h2>All Presentations</h2>
             <div class="talks-list">
                 {% for talk in older_talks %}
+                <a href="{{ talk.url | relative_url }}" class="talk-list-item-link">
                 <article class="talk-list-item">
                     {% comment %} Extract slides resource for preview (prioritize slides over video) {% endcomment %}
                     {% assign preview_resource = null %}
-                    {% if talk.resources %}
-                        {% comment %} First try to find slides {% endcomment %}
-                        {% for resource in talk.resources %}
-                            {% if resource.type == 'slides' %}
-                                {% assign preview_resource = resource %}
-                                {% break %}
-                            {% endif %}
-                        {% endfor %}
-                        {% comment %} If no slides found, use video as fallback {% endcomment %}
-                        {% if preview_resource == null %}
-                            {% for resource in talk.resources %}
-                                {% if resource.type == 'video' %}
-                                    {% assign preview_resource = resource %}
-                                    {% break %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
+                    
+                    {% comment %} Check for extracted slides/video URLs {% endcomment %}
+                    {% if talk.extracted_slides %}
+                        {% assign preview_resource = talk.extracted_slides %}
+                        {% assign preview_type = 'slides' %}
+                    {% elsif talk.extracted_video %}
+                        {% assign preview_resource = talk.extracted_video %}
+                        {% assign preview_type = 'video' %}
                     {% endif %}
 
                     {% if preview_resource %}
                     <div class="talk-preview-small">
-                        {% include embedded_resource.html resource=preview_resource preview_mode=true size='small' talk_url=talk.url %}
+                        {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='small' %}
                     </div>
                     {% endif %}
 
                     <div class="talk-content">
-                        <h3><a href="{{ talk.url | relative_url }}">{{ talk.title }}</a></h3>
+                        <h3>{{ talk.extracted_title | default: talk.title }}</h3>
                         <div class="talk-meta-inline">
-                            {% if talk.conference %}
-                                <span class="conference">{{ talk.conference }}</span>
+                            {% if talk.extracted_conference %}
+                                <span class="conference">{{ talk.extracted_conference }}</span>
                             {% endif %}
-                            {% if talk.date %}
-                                <time datetime="{{ talk.date | date_to_xmlschema }}">{{ talk.date | date: "%B %Y" }}</time>
+                            {% if talk.extracted_date %}
+                                <time datetime="{{ talk.extracted_date | date_to_xmlschema }}">{{ talk.extracted_date | date: "%B %Y" }}</time>
                             {% endif %}
                         </div>
-                        {% if talk.description %}
-                            <p class="talk-summary">{{ talk.description | truncate: 120 }}</p>
+                        {% if talk.extracted_description %}
+                            <p class="talk-summary">{{ talk.extracted_description | truncate: 120 }}</p>
                         {% endif %}
                         
                         {% comment %} Video publication status {% endcomment %}
-                        {% assign has_video = false %}
-                        {% for resource in talk.resources %}
-                            {% if resource.type == 'video' %}
-                                {% assign has_video = true %}
-                                {% break %}
-                            {% endif %}
-                        {% endfor %}
-                        
                         <div class="video-status">
-                            {% if has_video %}
+                            {% if talk.extracted_video %}
                                 <span class="status-badge video-published">Video Available</span>
                             {% else %}
                                 <span class="status-badge video-pending">Video Coming Soon</span>
@@ -246,6 +215,7 @@ layout: default
                         </div>
                     </div>
                 </article>
+                </a>
                 {% endfor %}
             </div>
         </section>

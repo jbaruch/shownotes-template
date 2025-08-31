@@ -4,17 +4,20 @@ module Jekyll
     priority :high
 
     def generate(site)
-      site.collections['talks'].docs.each do |doc|
-        content = doc.content
-        
-        # Extract metadata from markdown content
-        doc.data['extracted_title'] = extract_title_from_content(content)
-        doc.data['extracted_conference'] = extract_metadata_from_content(content, 'conference')
-        doc.data['extracted_date'] = extract_metadata_from_content(content, 'date')
-        doc.data['extracted_slides'] = extract_metadata_from_content(content, 'slides')
-        doc.data['extracted_video'] = extract_metadata_from_content(content, 'video')
-        doc.data['extracted_description'] = extract_description_from_content(content)
-        doc.data['extracted_resources'] = extract_resources_from_content(content)
+      talks_collection = site.collections['talks']
+      if talks_collection && talks_collection.docs
+        talks_collection.docs.each do |doc|
+          content = doc.content
+          
+          # Extract metadata from markdown content
+          doc.data['extracted_title'] = extract_title_from_content(content)
+          doc.data['extracted_conference'] = extract_metadata_from_content(content, 'conference')
+          doc.data['extracted_date'] = extract_metadata_from_content(content, 'date')
+          doc.data['extracted_slides'] = extract_metadata_from_content(content, 'slides')
+          doc.data['extracted_video'] = extract_metadata_from_content(content, 'video')
+          doc.data['extracted_description'] = extract_description_from_content(content)
+          doc.data['extracted_resources'] = extract_resources_from_content(content)
+        end
       end
     end
 

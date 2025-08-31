@@ -16,18 +16,18 @@ layout: default
         <h1 class="talk-title" itemprop="name">{{ page.extracted_title | default: page.title }}</h1>
         
         <div class="talk-meta">
-            {% if page.extracted_conference %}
-            <span class="meta-item" itemprop="publisher">
-                <span class="meta-icon conference" aria-hidden="true"></span>
-                {{ page.extracted_conference }}
-            </span>
-            {% endif %}
-            {% if page.extracted_date %}
-            <time class="meta-item" datetime="{{ page.extracted_date }}" itemprop="datePublished">
-                <span class="meta-icon date" aria-hidden="true"></span>
-                {{ page.extracted_date }}
-            </time>
-            {% endif %}
+                                    {% if page.extracted_conference %}
+                        <span class="meta-item conference-name">
+                            <span class="meta-icon conference" aria-hidden="true"></span>
+                            {{ page.extracted_conference }}
+                        </span>
+                        {% endif %}
+                        {% if page.extracted_date %}
+                        <time class="meta-item" datetime="{{ page.extracted_date | date_to_xmlschema }}">
+                            <span class="meta-icon date" aria-hidden="true"></span>
+                            {{ page.extracted_date | date: "%B %d, %Y" }}
+                        </time>
+                        {% endif %}
         </div>
         
         {% if page.extracted_description %}
@@ -70,7 +70,9 @@ layout: default
         {% if page.extracted_resources and page.extracted_resources != "" %}
             <div class="talk-resources">
                 <h2>Resources</h2>
-                {{ page.extracted_resources | markdownify }}
+                <div class="resources-list">
+                    {{ page.extracted_resources | markdownify }}
+                </div>
             </div>
         {% endif %}
     </section>
