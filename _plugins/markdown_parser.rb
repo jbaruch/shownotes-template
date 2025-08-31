@@ -19,6 +19,14 @@ module Jekyll
           doc.data['extracted_resources'] = extract_resources_from_content(content)
         end
       end
+
+      # Add convenience method for accessing talks collection
+      unless site.respond_to?(:talks)
+        site.define_singleton_method(:talks) do
+          talks_collection = collections['talks']
+          talks_collection ? talks_collection.docs : []
+        end
+      end
     end
 
     private
