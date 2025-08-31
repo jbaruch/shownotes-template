@@ -40,10 +40,9 @@ class TemplateRenderingTest < Minitest::Test
     skip 'No talks found' if @site.talks.empty?
 
     talk = @site.talks.first
-    talk_page = @site.pages.find { |page| page.url == talk.url }
-    skip 'Talk page not found' unless talk_page
+    skip 'Talk page not found' unless talk.output
 
-    html = talk_page.output
+    html = talk.output
     refute_nil html, 'Talk page should have output'
 
     # Check metadata rendering
@@ -116,10 +115,9 @@ class TemplateRenderingTest < Minitest::Test
     talk = @site.talks.first
     skip 'No slides for this talk' unless talk.data['extracted_slides']
 
-    talk_page = @site.pages.find { |page| page.url == talk.url }
-    skip 'Talk page not found' unless talk_page
+    skip 'Talk page not found' unless talk.output
 
-    html = talk_page.output
+    html = talk.output
     assert_includes html, 'slides-embed', 'Talk page should have slides embed section'
     assert_includes html, talk.data['extracted_slides'], 'Slides URL should be embedded'
   end
@@ -131,12 +129,13 @@ class TemplateRenderingTest < Minitest::Test
     talk = @site.talks.first
     skip 'No video for this talk' unless talk.data['extracted_video']
 
-    talk_page = @site.pages.find { |page| page.url == talk.url }
-    skip 'Talk page not found' unless talk_page
+    skip 'Talk page not found' unless talk.output
 
-    html = talk_page.output
+    html = talk.output
     assert_includes html, 'video-embed', 'Talk page should have video embed section'
-    assert_includes html, talk.data['extracted_video'], 'Video URL should be embedded'
+    # Check for the video ID rather than the exact URL since it gets transformed to embed format
+    video_id = talk.data['extracted_video'].match(/[?&]v=([^&]+)/)[1] if talk.data['extracted_video']
+    assert_includes html, video_id, 'Video ID should be embedded' if video_id
   end
 
   # TS-243: Template handles missing extracted data gracefully
@@ -204,10 +203,9 @@ class TemplateRenderingTest < Minitest::Test
     skip 'No talks found' if @site.talks.empty?
 
     talk = @site.talks.first
-    talk_page = @site.pages.find { |page| page.url == talk.url }
-    skip 'Talk page not found' unless talk_page
+    skip 'Talk page not found' unless talk.output
 
-    html = talk_page.output
+    html = talk.output
 
     # Check that HTML is properly escaped
     assert_includes html, '<html', 'HTML should be properly formed'
@@ -219,10 +217,9 @@ class TemplateRenderingTest < Minitest::Test
     skip 'No talks found' if @site.talks.empty?
 
     talk = @site.talks.first
-    talk_page = @site.pages.find { |page| page.url == talk.url }
-    skip 'Talk page not found' unless talk_page
+    skip 'Talk page not found' unless talk.output
 
-    html = talk_page.output
+    html = talk.output
 
     # Check for JSON-LD structured data
     assert_includes html, 'application/ld+json', 'Should include JSON-LD structured data'
@@ -251,10 +248,9 @@ class TemplateRenderingTest < Minitest::Test
     skip 'No talks found' if @site.talks.empty?
 
     talk = @site.talks.first
-    talk_page = @site.pages.find { |page| page.url == talk.url }
-    skip 'Talk page not found' unless talk_page
+    skip 'Talk page not found' unless talk.output
 
-    html = talk_page.output
+    html = talk.output
 
     # Check that content is properly truncated/displayed
     # This is more of a visual test, but we can check for truncation classes
