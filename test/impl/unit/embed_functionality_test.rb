@@ -53,7 +53,7 @@ class EmbedFunctionalityTest < Minitest::Test
     # Then it should be detected as YouTube and embedded
     assert_includes html, 'video-embed', 'Should include video-embed class'
     assert_includes html, 'responsive-iframe', 'Should include responsive-iframe class'
-    assert_includes html, 'youtube-nocookie.com/embed/dQw4w9WgXcQ', 'Should convert to nocookie embed URL'
+    assert_includes html, 'youtube.com/embed/dQw4w9WgXcQ', 'Should convert to standard embed URL'
     assert_includes html, 'frameborder="0"', 'Should have frameborder="0"'
     assert_includes html, 'allowfullscreen', 'Should have allowfullscreen attribute'
   end
@@ -76,7 +76,7 @@ class EmbedFunctionalityTest < Minitest::Test
 
     # Then it should be detected as YouTube and embedded
     assert_includes html, 'video-embed', 'Should detect youtu.be as YouTube'
-    assert_includes html, 'youtube-nocookie.com/embed/dQw4w9WgXcQ', 'Should convert short URL to embed'
+    assert_includes html, 'youtube.com/embed/dQw4w9WgXcQ', 'Should convert short URL to embed'
   end
 
   # Test non-embeddable URL fallback to link
@@ -141,7 +141,7 @@ class EmbedFunctionalityTest < Minitest::Test
     html = @renderer.generate_talk_page(talk_data)
 
     # Then the video ID should be extracted correctly
-    assert_includes html, 'youtube-nocookie.com/embed/dQw4w9WgXcQ', 'Should extract clean video ID'
+    assert_includes html, 'youtube.com/embed/dQw4w9WgXcQ', 'Should extract clean video ID'
     refute_includes html, '&t=30s', 'Should not include timestamp parameter'
     refute_includes html, '&list=', 'Should not include playlist parameter'
   end
@@ -201,7 +201,7 @@ class EmbedFunctionalityTest < Minitest::Test
     assert_includes html, 'video-embed', 'Video should be embedded'
     assert_includes html, '<a href="https://example.com/article"', 'Link should remain as link'
     assert_includes html, 'docs.google.com/presentation/d/e/1ABC123/pubembed', 'Slides should use embed URL'
-    assert_includes html, 'youtube-nocookie.com/embed/dQw4w9WgXcQ', 'Video should use embed URL'
+    assert_includes html, 'youtube.com/embed/dQw4w9WgXcQ', 'Video should use embed URL'
   end
 
   # Test HTML escaping for security

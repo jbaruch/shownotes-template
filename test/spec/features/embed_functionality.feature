@@ -21,7 +21,7 @@ Feature: Embed functionality for slides and video content
     When I generate the resource HTML
     Then the URL should be detected as YouTube
     And it should be rendered as an embedded iframe
-    And the iframe should use the converted embed URL "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
+    And the iframe should use the converted embed URL "https://www.youtube.com/embed/dQw4w9WgXcQ"
     And the iframe should have class "responsive-iframe"
     And the container should have class "video-embed"
 
@@ -30,7 +30,7 @@ Feature: Embed functionality for slides and video content
     When I generate the resource HTML
     Then the URL should be detected as YouTube
     And it should be rendered as an embedded iframe
-    And the iframe should use the converted embed URL "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
+    And the iframe should use the converted embed URL "https://www.youtube.com/embed/dQw4w9WgXcQ"
 
   Scenario: Non-embeddable URL fallback to link
     Given a resource with URL "https://example.com/document.pdf"
@@ -50,7 +50,7 @@ Feature: Embed functionality for slides and video content
     Given a resource with URL "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=30s&list=PLtest"
     When I generate the resource HTML
     Then the video ID should be extracted correctly
-    And the iframe should use the clean embed URL "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
+    And the iframe should use the clean embed URL "https://www.youtube.com/embed/dQw4w9WgXcQ"
 
   Scenario: Responsive iframe attributes
     Given a resource with an embeddable URL

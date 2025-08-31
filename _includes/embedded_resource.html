@@ -189,7 +189,7 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
   {% endif %}
   
   {% if video_id != "" %}
-    {% assign embed_url = "https://www.youtube-nocookie.com/embed/" | append: video_id %}
+    {% assign embed_url = "https://www.youtube.com/embed/" | append: video_id %}
     
     {% if preview_mode %}
       <div class="preview-thumbnail preview-{{ size }}">

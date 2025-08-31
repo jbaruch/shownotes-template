@@ -162,7 +162,7 @@ class DataPipelineIntegrationTest < Minitest::Test
     end
 
     if talk.data['extracted_video']
-      # Video URLs get transformed to youtube-nocookie for privacy
+      # Video URLs get transformed to standard youtube embed format
       video_id = talk.data['extracted_video'].match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n]+)/)[1] rescue nil
       if video_id
         assert_includes html, video_id, 'Video ID should be rendered'

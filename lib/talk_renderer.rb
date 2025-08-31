@@ -137,7 +137,7 @@ class TalkRenderer
     video_id = extract_youtube_video_id(url)
     return url unless video_id
     
-    "https://www.youtube-nocookie.com/embed/#{video_id}"
+    "https://www.youtube.com/embed/#{video_id}"
   end
 
   # Extract YouTube video ID from various URL formats

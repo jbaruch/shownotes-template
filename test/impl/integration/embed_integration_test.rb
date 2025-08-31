@@ -55,7 +55,7 @@ class EmbedIntegrationTest < Minitest::Test
     assert_includes html, 'slides-embed', 'Should embed Google Slides'
     assert_includes html, 'video-embed', 'Should embed YouTube video'
     assert_includes html, 'docs.google.com/presentation/d/e/', 'Should convert slides URL'
-    assert_includes html, 'youtube-nocookie.com/embed/Yh_hs4mZTiY', 'Should convert video URL'
+    assert_includes html, 'youtube.com/embed/Yh_hs4mZTiY', 'Should convert video URL'
     
     # Fallback links
     assert_includes html, 'github.com/example/modern-js-patterns', 'Should keep code link'
@@ -171,7 +171,7 @@ class EmbedIntegrationTest < Minitest::Test
     assert_includes html, '<h1 class="talk-title">Error Handling Test</h1>', 'Should still generate page structure'
     
     # Valid content should still work
-    assert_includes html, 'youtube-nocookie.com/embed/validVideo123', 'Valid video should still embed'
+    assert_includes html, 'youtube.com/embed/validVideo123', 'Valid video should still embed'
     
     # Invalid content should not break the page
     refute_includes html, 'not-a-valid-url', 'Invalid URLs should be handled gracefully'
@@ -258,7 +258,7 @@ class EmbedIntegrationTest < Minitest::Test
 
       # Then it should convert to proper embed URL
       assert_includes html, 'video-embed', "Should detect video URL: #{test_case['input']}"
-      assert_includes html, "youtube-nocookie.com/embed/#{test_case['expected_id']}", 
+      assert_includes html, "youtube.com/embed/#{test_case['expected_id']}", 
                       "Should extract correct video ID: #{test_case['expected_id']}"
       refute_includes html, '&t=', 'Should not include timestamp parameters'
       refute_includes html, '&list=', 'Should not include playlist parameters'
