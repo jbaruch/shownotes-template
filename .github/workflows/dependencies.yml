@@ -18,10 +18,11 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.4.5'
-        bundler-cache: true
+        bundler-cache: false
     
     - name: Update dependencies
       run: |
+        bundle config set frozen false
         bundle update
         bundle exec bundle-audit --update
       env:
