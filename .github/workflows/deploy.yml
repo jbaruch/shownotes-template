@@ -3,6 +3,13 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
+    paths:
+      - '_talks/**'
+      - 'assets/**'
+      - 'index.md'
+      - 'talks.html'
+      - '_data/**'
+      - 'pdfs/**'
   workflow_dispatch:
 
 permissions:
