@@ -23,6 +23,14 @@ class TalkMigrator
     puts "=" * 50
     puts "URL: #{@talk_url}"
     
+    # Step 0: Check if talk already exists (source of truth: source URL)
+    if talk_already_exists?
+      puts "✅ SKIPPING: Talk already exists with this source URL"
+      puts "   - Found existing talk with source: #{@talk_url}"
+      puts "   - Migration not needed (source URL is source of truth)"
+      return true
+    end
+    
     # Step 1: Fetch and parse talk page
     unless fetch_talk_page
       report_failure("Failed to fetch talk page")
@@ -107,6 +115,32 @@ class TalkMigrator
   end
   
   private
+  
+  def talk_already_exists?
+    # Check if any existing talk files have this source URL
+    Dir.glob('_talks/*.md').each do |file|
+      content = File.read(file)
+      
+      # Check for source URL in HTML comment (new format)
+      if content.match(/<!-- Source: (.+?) -->/)
+        existing_source_url = $1.strip
+        return true if existing_source_url == @talk_url
+      end
+      
+      # Check legacy YAML frontmatter format for backward compatibility
+      if content =~ /\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m
+        begin
+          yaml_content = YAML.safe_load($1, permitted_classes: [Date])
+          existing_source_url = yaml_content['source_url'] || yaml_content['notist_url']
+          return true if existing_source_url == @talk_url
+        rescue => e
+          # Continue if YAML parsing fails
+        end
+      end
+    end
+    
+    false
+  end
   
   def fetch_talk_page
     puts "\n1️⃣ Fetching talk page..."
@@ -469,12 +503,12 @@ class TalkMigrator
     
     # Generate minimal YAML front matter (clean format)
     yaml_data = {
-      'layout' => 'talk',
-      'source_url' => @talk_url
+      'layout' => 'talk'
     }
     
-    # Generate clean markdown content
+    # Generate clean markdown content with source tracking
     content = "---\n#{yaml_data.to_yaml.gsub(/^---\n/, '')}---\n\n"
+    content += "<!-- Source: #{@talk_url} -->\n"
     content += generate_clean_markdown_body
     
     # Write file

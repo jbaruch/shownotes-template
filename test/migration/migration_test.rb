@@ -24,17 +24,20 @@ class MigrationTest < Minitest::Test
       
       # Handle both YAML frontmatter format and markdown-only format
       if content =~ /\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m
-        # YAML frontmatter format
+        # YAML frontmatter format (legacy)
         yaml_content = YAML.safe_load($1, permitted_classes: [Date])
+        
+        # Check for legacy source_url field first, then look in HTML comments
+        source_url = yaml_content['source_url'] || yaml_content['notist_url'] || extract_source_url_from_markdown(content)
         
         @talks[File.basename(file, '.md')] = {
           file: file,
           yaml: yaml_content,
           raw_content: content,
-          source_url: yaml_content['source_url'] || yaml_content['notist_url']
+          source_url: source_url
         }
       else
-        # Markdown-only format - extract source URL from content
+        # Markdown-only format - extract source URL from HTML comment
         source_url = extract_source_url_from_markdown(content)
         
         if source_url

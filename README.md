@@ -236,6 +236,7 @@ ruby migrate_talk.rb --speaker https://yourdomain.com/speaker-page
 
 The migration script will:
 
+- Check if talk already exists (using source URL as source of truth) and skip if found
 - Extract talk content and metadata from the existing webpage
 - Create properly formatted Jekyll talk files
 - Download and organize any referenced PDFs/resources
