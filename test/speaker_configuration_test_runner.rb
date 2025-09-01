@@ -1,32 +1,13 @@
 #!/usr/bin/env ruby
 
-require 'minitest/autorun'
-require 'minitest/reporters'
+require_relative 'run_tests'
 
-# Configure test output
-Minitest::Reporters.use! [
-  Minitest::Reporters::DefaultReporter.new(color: true, slow_threshold: 5),
-  Minitest::Reporters::JUnitReporter.new('test/reports')
-]
-
-class SpeakerConfigurationTestRunner
-  def self.run_all_tests
-    puts "\n" + "="*80
-    puts "SPEAKER CONFIGURATION COMPREHENSIVE TEST SUITE"
-    puts "="*80
-    
-    # Create reports directory
-    FileUtils.mkdir_p('test/reports')
-    
-    test_files = [
-      'test/impl/unit/speaker_configuration_test.rb',
-      'test/impl/integration/speaker_configuration_integration_test.rb',
-      'test/impl/integration/speaker_configuration_visual_test.rb'
-    ]
-    
-    puts "\nTest files to execute:"
-    test_files.each { |f| puts "  - #{f}" }
-    puts "\n" + "-"*80
+# Convenience runner for speaker configuration tests only
+# This is a wrapper around the main test runner
+if __FILE__ == $0
+  puts "🎤 Running Speaker Configuration Test Suite"
+  ShownotesTestRunner.run(category: 'speaker')
+end
     
     # Check if all test files exist
     missing_files = test_files.reject { |f| File.exist?(f) }

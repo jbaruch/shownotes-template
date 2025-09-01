@@ -1,23 +1,13 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'yaml'
+# Legacy test runner - redirects to the new unified runner
+require_relative 'run_tests'
 
-# Test runner for the complete shownotes test suite
-# This runner ensures all 121 test scenarios are covered by failing tests
-class ShownotesTestRunner
-  def self.run
-    puts "TEST Running Shownotes Test Suite"
-    puts "=" * 60
-    
-    # Load all test files
-    test_files = discover_test_files
-    
-    puts "FOLDER Discovered #{test_files.length} test files:"
-    test_files.each { |file| puts "   #{file}" }
-    puts
-    
-    # Run tests and capture results
+if __FILE__ == $0
+  puts "⚠️  Using legacy test runner. Consider using 'test/run_tests.rb' directly."
+  ShownotesTestRunner.run(category: 'all')
+end
     results = run_test_files(test_files)
     
     # Report results

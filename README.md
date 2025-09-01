@@ -44,18 +44,27 @@ Comprehensive test suite covering all functionality:
 
 ```bash
 # Run all tests
-ruby test/test_runner.rb
+bundle exec ruby test/run_tests.rb
 
-# Run specific test files
-bundle exec ruby test/impl/unit/[test_file].rb
-bundle exec ruby test/impl/integration/[test_file].rb
+# Run specific test categories
+bundle exec ruby test/run_tests.rb --category unit
+bundle exec ruby test/run_tests.rb --category migration
+bundle exec ruby test/run_tests.rb --category external
 ```
 
 **Current Test Results**: 191 tests, 1,291 assertions, 0 failures
 
+See [docs/TESTING.md](docs/TESTING.md) for detailed test documentation.
+
+## Documentation
+
+- **[Migration Guide](docs/MIGRATION.md)**: Complete migration procedures from noti.st to Jekyll
+- **[Testing Documentation](docs/TESTING.md)**: Test scenarios, coverage analysis, and validation
+- **[Development Guide](docs/DEVELOPMENT.md)**: Development practices, AI guidelines, and maintenance procedures
+
 ## Project Structure
 
-```
+```text
 shownotes/
 ├── _config.yml                 # Jekyll configuration
 ├── _layouts/                   # Jekyll layout templates  
@@ -66,24 +75,23 @@ shownotes/
 ├── lib/                        # Core implementation
 │   ├── talk_renderer.rb        # Full rendering engine (Jekyll + dependencies)
 │   └── simple_talk_renderer.rb # Lightweight renderer (minimal dependencies)
-├── migrate_talk.rb             # Notist migration (full-featured)
-├── migrate_talk_simple.rb      # Notist migration (lightweight)
-├── migrate_format.rb           # YAML→Markdown format converter
-├── utils/                      # Development utilities
-│   ├── cleanup_google_drive.rb # Google Drive cleanup tools
-│   ├── delete_google_drive_file.rb
-│   ├── force_delete_files.rb
-│   └── test_real_site.rb       # Site testing utilities
-├── test/                       # Comprehensive test suite
-│   ├── visual_test_simple.rb   # Visual regression tests
-│   ├── migration_test.rb       # Migration validation tests
-│   └── impl/
-│       ├── unit/               # Unit tests (11 files)
-│       ├── integration/        # Integration tests
-│       ├── performance/        # Performance tests  
-│       └── e2e/                # End-to-end tests
-├── docs/                       # Project documentation
-└── Rakefile                    # Test automation
+├── utils/                      # Migration and maintenance utilities
+│   ├── README.md               # Utility documentation
+│   ├── migration/              # Migration scripts and validation
+│   │   ├── migrate_talk.rb     # Main migration script (noti.st → Jekyll)
+│   │   └── test_real_site.rb   # Site validation utility
+│   └── google_drive/           # Google Drive management tools
+├── test/                       # Organized test suite
+│   ├── run_tests.rb            # Main test runner
+│   ├── migration/              # Migration validation tests
+│   ├── external/               # External API tests
+│   ├── tools/                  # Build tool tests
+│   └── impl/                   # Implementation tests
+├── docs/                       # Consolidated documentation
+│   ├── MIGRATION.md            # Migration procedures
+│   ├── TESTING.md              # Test documentation
+│   └── DEVELOPMENT.md          # Development guide
+└── README.md                   # This file
 ```
 
 ## Usage
