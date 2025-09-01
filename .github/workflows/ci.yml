@@ -108,6 +108,9 @@ jobs:
     
     - name: Run external tests
       run: bundle exec rake test:external
+      env:
+        # Pass Google API credentials if available (will be empty if secret not set)
+        GOOGLE_API_CREDENTIALS_JSON: ${{ secrets.GOOGLE_API_CREDENTIALS }}
 
   build:
     runs-on: ubuntu-latest

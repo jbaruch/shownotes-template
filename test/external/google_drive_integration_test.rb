@@ -3,13 +3,45 @@
 require 'google/apis/drive_v3'
 require 'googleauth'
 
+#!/usr/bin/env ruby
+
+require 'google/apis/drive_v3'
+require 'googleauth'
+
+# Check for credentials in environment variable first (CI), then local file
+def load_credentials
+  if ENV['GOOGLE_API_CREDENTIALS_JSON'] && !ENV['GOOGLE_API_CREDENTIALS_JSON'].empty?
+    # Create temporary file from environment variable (CI environment)
+    require 'tempfile'
+    temp_file = Tempfile.new(['google_api', '.json'])
+    temp_file.write(ENV['GOOGLE_API_CREDENTIALS_JSON'])
+    temp_file.rewind
+    temp_file
+  elsif File.exist?('Google API.json')
+    # Use local file (development environment)
+    File.open('Google API.json')
+  else
+    nil
+  end
+end
+
+credentials_file = load_credentials
+
+unless credentials_file
+  puts "⚠️  SKIPPING Google Drive tests: No credentials available"
+  puts "   - For CI: Set GOOGLE_API_CREDENTIALS as a GitHub secret"
+  puts "   - For local: Ensure 'Google API.json' exists in project root"
+  puts "✅ External tests completed (skipped due to missing credentials)"
+  exit 0
+end
+
 # Comprehensive Google Drive API integration test
 begin
   service = Google::Apis::DriveV3::DriveService.new
   service.client_options.application_name = 'Shownotes Migration Test'
   
   service.authorization = Google::Auth::ServiceAccountCredentials.make_creds(
-    json_key_io: File.open('Google API.json'),
+    json_key_io: credentials_file,
     scope: ['https://www.googleapis.com/auth/drive']
   )
   

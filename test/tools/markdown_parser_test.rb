@@ -3,6 +3,7 @@
 # Add the current directory to the load path
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
+require 'jekyll'
 require_relative '../../_plugins/markdown_parser'
 
 # Sample content from our markdown file
