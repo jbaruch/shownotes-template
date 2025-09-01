@@ -54,25 +54,25 @@ class TalkMigrator
       return false
     end
     
-    # Step 6: Validate resource sources (no Notist dependencies)
-    unless validate_resource_sources
-      report_failure("Resource validation failed")
-      return false
-    end
-    
-    # Step 7: Generate Jekyll file
+    # Step 6: Generate Jekyll file
     unless generate_jekyll_file
       report_failure("Failed to generate Jekyll file")
       return false
     end
-    
-    # Step 8: Validate migration
+
+    # Step 6.5: Validate resource sources (no Notist dependencies)
+    unless validate_resource_sources
+      report_failure("Resource source validation failed")
+      return false
+    end
+
+    # Step 7: Validate migration
     unless validate_migration
       report_failure("Migration validation failed")
       return false
     end
     
-    # Step 9: Run migration tests
+    # Step 8: Run migration tests
     unless run_migration_tests
       puts "⚠️  Migration tests failed, but file was created"
       puts "   This may indicate incomplete migration that needs manual review"
@@ -81,6 +81,8 @@ class TalkMigrator
     puts "\n✅ MIGRATION SUCCESSFUL!"
     puts "Generated: #{@jekyll_file}"
     puts "Resources: #{@resources.length} extracted"
+    puts "🎬 Video: #{@talk_data[:video_url] || 'None'}"
+    puts "📄 PDF: #{@talk_data[:pdf_url] || 'None'}"
     puts "Next: Review generated file and commit to repository"
     
     true
@@ -260,7 +262,7 @@ class TalkMigrator
     
     # Download PDF
     pdf_filename = generate_pdf_filename
-    local_pdf_path = "../../pdfs/#{pdf_filename}"
+    local_pdf_path = "pdfs/#{pdf_filename}"
     
     unless download_file(pdf_url, local_pdf_path)
       @errors << "Failed to download PDF from #{pdf_url}"
@@ -337,7 +339,7 @@ class TalkMigrator
     date_part = @talk_data[:date]
     conference_slug = @talk_data[:conference].downcase.gsub(/[^a-z0-9]+/, '-')
     title_slug = @talk_data[:title].downcase.gsub(/[^a-z0-9]+/, '-')[0..50]
-    @jekyll_file = "../../_talks/#{date_part}-#{conference_slug}-#{title_slug}.md"
+    @jekyll_file = "_talks/#{date_part}-#{conference_slug}-#{title_slug}.md"
     
     # Generate minimal YAML front matter (clean format)
     yaml_data = {
@@ -470,8 +472,8 @@ class TalkMigrator
   def run_migration_tests
     puts "\n🧪 Running migration tests..."
     
-    # Change to project root for running tests
-    project_root = File.expand_path('../..', __dir__)
+    # Change to project root for running tests (since this script is in root)
+    project_root = Dir.pwd
     Dir.chdir(project_root) do
       puts "📍 Running from: #{Dir.pwd}"
       
@@ -575,7 +577,7 @@ class TalkMigrator
       service.client_options.application_name = 'Shownotes Migration'
       
       service.authorization = Google::Auth::ServiceAccountCredentials.make_creds(
-        json_key_io: File.open('../../Google API.json'),
+        json_key_io: File.open('Google API.json'),
         scope: ['https://www.googleapis.com/auth/drive']
       )
       
@@ -758,8 +760,8 @@ class SpeakerMigrator
     puts "🧪" * 20
     puts
     
-    # Change to project root for running tests
-    project_root = File.expand_path('../..', __dir__)
+    # Change to project root for running tests (this script is in root)
+    project_root = Dir.pwd
     Dir.chdir(project_root) do
       puts "📍 Running migration tests from: #{Dir.pwd}"
       
