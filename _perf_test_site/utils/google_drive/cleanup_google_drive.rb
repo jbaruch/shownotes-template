@@ -3,60 +3,60 @@
 require 'google/apis/drive_v3'
 require 'googleauth'
 
-def list_google_drive_files
-  puts "Listing Google Drive files..."
+def cleanup_google_drive_files
+  puts "🧹 Google Drive Cleanup Script"
+  puts "=" * 50
   
   # Initialize Google Drive service
   service = Google::Apis::DriveV3::DriveService.new
   service.authorization = Google::Auth::ServiceAccountCredentials.make_creds(
-    json_key_io: File.open('../../Google API.json'),
+    json_key_io: File.open('Google API.json'),
     scope: Google::Apis::DriveV3::AUTH_DRIVE
   )
   
+  puts "✅ Google Drive service initialized"
+  
   begin
-    # List files in the shared drive folder
-    folder_id = '1Q8Auh_XnZtrDsdnKe_rFOnx3mZVhphLn'
+    # Simple approach: Get ALL files the service account has access to that are not trashed
+    puts "\n� Finding all accessible non-trashed files..."
     
-    files = service.list_files(
-      q: "'#{folder_id}' in parents",
+    all_files = service.list_files(
+      q: "trashed=false",
       supports_all_drives: true,
       include_items_from_all_drives: true,
       fields: 'files(id, name, createdTime)'
     )
     
-    puts "Files in Google Drive folder:"
-    files.files.each do |file|
-      puts "ID: #{file.id}"
-      puts "Name: #{file.name}"
-      puts "Created: #{file.created_time}"
-      puts "---"
+    puts "\n📋 Found #{all_files.files.length} files to move to trash:"
+    all_files.files.each do |file|
+      puts "   ID: #{file.id} - Name: #{file.name}"
     end
     
-    # Look for RoboCoders files specifically
-    robocoders_files = files.files.select { |f| f.name.downcase.include?('robocoders') || f.name.downcase.include?('judgment') || f.name.downcase.include?('devoxx') }
-    
-    if robocoders_files.any?
-      puts "\nRoboCoders related files found:"
-      robocoders_files.each do |file|
-        puts "ID: #{file.id} - Name: #{file.name}"
-      end
-      
-      puts "\nDeleting RoboCoders files..."
-      robocoders_files.each do |file|
+    if all_files.files.any?
+      puts "\nMoving all files to trash..."
+      all_files.files.each do |file|
         begin
-          service.delete_file(file.id, supports_all_drives: true)
-          puts "✅ Deleted: #{file.name} (#{file.id})"
+          file_metadata = Google::Apis::DriveV3::File.new(trashed: true)
+          service.update_file(file.id, file_metadata, supports_all_drives: true)
+          puts "✅ Moved to trash: #{file.name} (#{file.id})"
         rescue Google::Apis::Error => e
-          puts "❌ Error deleting #{file.name} (#{file.id}): #{e.message}"
+          puts "❌ Error moving #{file.name} (#{file.id}) to trash: #{e.message}"
         end
       end
+      
+      puts "\n🎉 Cleanup complete! #{all_files.files.length} files processed."
     else
-      puts "\nNo RoboCoders files found"
+      puts "\n✨ No files found to clean up. Drive is already clean!"
     end
     
   rescue Google::Apis::Error => e
-    puts "❌ Error: #{e.message}"
+    puts "❌ Google Drive API Error: #{e.message}"
+    puts "Full error: #{e.inspect}"
+  rescue => e
+    puts "❌ Unexpected error: #{e.message}"
+    puts "Full error: #{e.inspect}"
   end
 end
 
-list_google_drive_files
+# Run the cleanup
+cleanup_google_drive_files

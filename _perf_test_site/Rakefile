@@ -6,7 +6,7 @@ task default: :test
 # Test task for all tests
 Rake::TestTask.new(:test) do |t|
   t.libs << 'test'
-  t.pattern = 'test/impl/**/*_test.rb'
+  t.pattern = 'test/**/*_test.rb'
   t.verbose = true
 end
 
@@ -40,6 +40,27 @@ namespace :test do
     t.verbose = true
   end
 
+  desc "Run migration tests"
+  Rake::TestTask.new(:migration) do |t|
+    t.libs << 'test'
+    t.pattern = 'test/migration/*_test.rb'
+    t.verbose = true
+  end
+
+  desc "Run external tests"
+  Rake::TestTask.new(:external) do |t|
+    t.libs << 'test'
+    t.pattern = 'test/external/*_test.rb'
+    t.verbose = true
+  end
+
+  desc "Run tool tests"
+  Rake::TestTask.new(:tools) do |t|
+    t.libs << 'test'
+    t.pattern = 'test/tools/*_test.rb'
+    t.verbose = true
+  end
+
   desc "Run all tests with summary"
   task :all do
     puts "Running comprehensive test suite..."
@@ -48,7 +69,7 @@ namespace :test do
     # Track results
     results = {}
     
-    %w[unit integration performance e2e].each do |category|
+    %w[unit integration performance e2e migration tools].each do |category|
       puts "\n>>> #{category.upcase} TESTS <<<"
       puts "-" * 30
       

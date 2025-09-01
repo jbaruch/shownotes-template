@@ -117,6 +117,19 @@ class TalkMigrator
     
     response = http.get(uri.path)
     
+    # Handle redirects (HTTP 301, 302, 303, 307, 308)
+    if [301, 302, 303, 307, 308].include?(response.code.to_i)
+      location = response['location']
+      if location
+        puts "🔄 Following redirect to: #{location}"
+        @talk_url = location
+        return fetch_talk_page  # Recursive call with new URL
+      else
+        @errors << "HTTP #{response.code} redirect without location header"
+        return false
+      end
+    end
+    
     unless response.code.to_i.between?(200, 299)
       @errors << "HTTP #{response.code} when fetching #{@talk_url}"
       return false
@@ -428,10 +441,30 @@ class TalkMigrator
   def generate_jekyll_file
     puts "\n6️⃣ Generating Jekyll file..."
     
-    # Generate filename
+    # Generate filename with intelligent length management
     date_part = @talk_data[:date]
-    conference_slug = @talk_data[:conference].downcase.gsub(/[^a-z0-9]+/, '-')
-    title_slug = @talk_data[:title].downcase.gsub(/[^a-z0-9]+/, '-')[0..50]
+    
+    # Smart conference slug generation - extract key terms
+    conference_slug = generate_smart_conference_slug(@talk_data[:conference])
+    
+    # Smart title slug generation - extract key terms
+    title_slug = generate_smart_title_slug(@talk_data[:title])
+    
+    # Ensure reasonable total length (prefer under 80 characters)
+    base_length = date_part.length + 1 + conference_slug.length + 1 + 3  # date + - + conference + - + .md
+    available_for_title = 75 - base_length  # Leave some buffer
+    
+    if title_slug.length > available_for_title && available_for_title > 15
+      # Truncate at word boundary
+      truncated = title_slug[0...available_for_title]
+      last_dash = truncated.rindex('-')
+      if last_dash && last_dash > available_for_title * 0.6
+        title_slug = truncated[0...last_dash]
+      else
+        title_slug = truncated.gsub(/-+$/, '')
+      end
+    end
+    
     @jekyll_file = "_talks/#{date_part}-#{conference_slug}-#{title_slug}.md"
     
     # Generate minimal YAML front matter (clean format)
@@ -826,6 +859,58 @@ class TalkMigrator
     end
     
     content
+  end
+
+  def generate_smart_conference_slug(conference)
+    # Extract key terms from conference name for a concise slug
+    slug = conference.downcase
+    
+    # Remove common conference words to shorten
+    slug = slug.gsub(/\b(conference|days?|summit|tech|technology|developers?|dev|meetup|event|annual|international|world|global)\b/, '')
+    
+    # Clean up and extract meaningful parts
+    slug = slug.gsub(/[^a-z0-9\s]+/, ' ').strip.gsub(/\s+/, '-')
+    
+    # Split into parts and take meaningful ones
+    parts = slug.split('-').reject(&:empty?)
+    
+    # Smart selection of parts (prefer location/brand over year/generic terms)
+    selected_parts = []
+    year_pattern = /^20\d{2}$/
+    
+    parts.each do |part|
+      next if part.length < 2  # Skip very short parts
+      next if part.match(year_pattern) && selected_parts.length >= 2  # Skip year if we have enough parts
+      selected_parts << part
+      break if selected_parts.length >= 3  # Limit to 3 parts max
+    end
+    
+    selected_parts.join('-')
+  end
+
+  def generate_smart_title_slug(title)
+    # Extract key terms from title for a readable slug
+    slug = title.downcase
+    
+    # Remove common stop words but keep technical terms
+    stop_words = %w[a an and the or but in on at to for of with from by is are was were be been being have has had do does did will would could should can may might must shall why how what when where who]
+    
+    # Clean and split into words
+    words = slug.gsub(/[^a-z0-9\s]+/, ' ').strip.split(/\s+/)
+    
+    # Keep important words (not stop words, or if they're technical terms)
+    important_words = words.select do |word|
+      word.length > 2 && (!stop_words.include?(word) || word.length > 8)  # Keep longer words even if they're stop words
+    end
+    
+    # If we filtered too aggressively, keep some stop words
+    if important_words.length < 2 && words.length > important_words.length
+      important_words = words.reject { |w| stop_words.include?(w) && w.length <= 3 }
+    end
+    
+    # Take first 2 key words to keep URL concise and readable
+    selected_words = important_words.first(2)
+    selected_words.join('-')
   end
 end
 
