@@ -56,6 +56,36 @@ bundle exec ruby test/run_tests.rb --category external
 
 See [docs/TESTING.md](docs/TESTING.md) for detailed test documentation.
 
+### CI/CD Setup
+
+The project includes comprehensive GitHub Actions CI that runs all test categories. To enable external API tests in CI:
+
+#### Setting Up External Test Credentials
+
+1. **Go to your GitHub repository** → **Settings** → **Secrets and variables** → **Actions**
+2. **Create a new repository secret**:
+   - **Name**: `GOOGLE_API_CREDENTIALS`
+   - **Value**: Copy the entire contents of your `Google API.json` file
+
+#### Test Categories in CI
+
+- **Unit Tests**: Core functionality validation
+- **Integration Tests**: Component interaction testing  
+- **Migration Tests**: Data migration validation (expected to fail on incomplete migrations)
+- **Tools Tests**: Build tool and parser validation
+- **External Tests**: Google Drive API integration (skipped without credentials)
+- **Performance Tests**: Load and response time validation
+- **Security Tests**: Dependency vulnerability scanning
+- **E2E Tests**: Full user workflow validation
+
+#### Local vs CI Testing
+
+- **Local Development**: Uses local `Google API.json` file for external tests
+- **CI Environment**: Uses `GOOGLE_API_CREDENTIALS` secret when available, gracefully skips when not
+- **Migration Tests**: Always run and properly detect incomplete migrations
+
+The CI pipeline will pass even without external test credentials - they skip gracefully with helpful messages.
+
 ## Documentation
 
 - **[Migration Guide](docs/MIGRATION.md)**: Complete migration procedures from noti.st to Jekyll
