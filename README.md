@@ -38,6 +38,61 @@ bundle exec jekyll build
 bundle exec jekyll serve
 ```
 
+## Getting Started - Personalization Required
+
+⚠️ **Important**: This repository contains sample content and speaker configuration. You must personalize it before use:
+
+### 1. Clear Sample Content
+
+```bash
+# Remove sample talks
+rm _talks/*.md
+
+# Or move to backup if you want to reference them
+mkdir backup
+mv _talks/*.md backup/
+```
+
+### 2. Update Speaker Configuration
+
+Edit `_config.yml` and update the speaker configuration:
+
+```yaml
+speaker:
+  name: "Your Full Name"
+  display_name: ""                 # Optional: Override for display
+  bio: "Your professional bio..."
+  avatar_url: ""                   # Optional: Custom avatar URL
+  
+  social:
+    linkedin: "your-username"      # Your LinkedIn username
+    x: "your-username"            # Your X.com username  
+    github: "your-username"       # Your GitHub username
+    mastodon: ""                  # Your Mastodon URL
+    bluesky: "your-handle"        # Your BlueSky handle
+```
+
+### 3. Update Site Metadata
+
+Also in `_config.yml`, update:
+
+```yaml
+url: "https://yourdomain.com"      # Your site URL
+title: "Your Site Title"
+description: "Your site description"
+```
+
+### 4. Verify Changes
+
+```bash
+# Test your configuration
+bundle exec jekyll serve
+
+# Visit http://localhost:4000 to verify personalization
+```
+
+**Ready to add your content!** See the [Usage](#usage) section below for creating talk pages.
+
 ## Testing
 
 Comprehensive test suite covering all functionality:
@@ -138,6 +193,10 @@ speaker:
 
 ### Creating Talk Pages
 
+You can create talk pages in two ways:
+
+#### Method 1: Manual Creation
+
 1. Add talk files to `_talks/` directory:
 
 ```yaml
@@ -160,6 +219,29 @@ Talk description and additional content in Markdown format.
 - [Liquid Software](https://amzn.to/3F9i5cb)
 - [Related Article](https://example.com/article)
 ```
+
+#### Method 2: Migration from Existing Talk
+
+If you have an existing talk webpage you want to migrate, use the migration script:
+
+```bash
+# Migrate a single talk
+ruby migrate_talk.rb https://yourdomain.com/your-existing-talk
+
+# Migrate all talks from a speaker's existing website  
+ruby migrate_talk.rb --speaker https://yourdomain.com/speaker-page
+```
+
+The migration script will:
+
+- Extract talk content and metadata from the existing webpage
+- Create properly formatted Jekyll talk files
+- Download and organize any referenced PDFs/resources
+- Automatically run tests to verify the migration
+
+For detailed migration options and troubleshooting, see [`docs/MIGRATION.md`](docs/MIGRATION.md).
+
+#### Building and Deploying
 
 1. Build and deploy:
 

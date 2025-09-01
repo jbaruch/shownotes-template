@@ -106,6 +106,102 @@ For automated migration testing in CI/CD pipelines:
 
 This enables comprehensive migration validation in your CI pipeline while keeping credentials secure.
 
+## Migration Scripts
+
+### Enhanced Migration Tool v2.0
+
+The migration process is automated through an enhanced script that supports two migration modes:
+
+#### Single Talk Migration
+
+For migrating individual talks:
+
+```bash
+bundle exec ruby migrate_talk.rb <talk_url>
+```
+
+**Example:**
+```bash
+bundle exec ruby migrate_talk.rb https://speaking.jbaru.ch/PjlHKD/robocoders-judgment-day-ai-ides-face-off
+```
+
+**Process:**
+1. Fetches and parses the individual talk page
+2. Extracts metadata (title, conference, date, speaker)
+3. Downloads and uploads PDF slides to Google Drive
+4. Finds video URLs (YouTube/Vimeo)
+5. Extracts all resource links
+6. Validates resource sources (no Notist dependencies)
+7. Generates Jekyll markdown file
+8. **Automatically runs migration tests** to validate completeness
+9. Reports success/failure with actionable feedback
+
+#### Bulk Speaker Migration
+
+For migrating all talks from a speaker's profile:
+
+```bash
+bundle exec ruby migrate_talk.rb --speaker <speaker_profile_url>
+```
+
+**Example:**
+```bash
+bundle exec ruby migrate_talk.rb --speaker https://speaking.jbaru.ch
+```
+
+**Process:**
+1. **Discovery**: Automatically finds all talk URLs on the speaker's profile page
+2. **Batch Migration**: Migrates each talk sequentially using single talk process
+3. **Progress Tracking**: Shows real-time progress with detailed status
+4. **Error Handling**: Continues even if individual talks fail
+5. **Comprehensive Testing**: Runs migration tests after all migrations complete
+6. **Summary Report**: Provides detailed success/failure analysis with recommendations
+
+#### Migration Script Features
+
+**🧪 Automatic Test Integration:**
+- Runs `bundle exec rake test:migration` after each migration
+- Validates migration completeness immediately
+- Provides feedback on incomplete migrations
+- Same tests that run in CI pipeline
+
+**📊 Enhanced Reporting:**
+- Real-time progress for bulk migrations
+- Success rate tracking and analysis
+- Clear error messages with actionable steps
+- Recommendations for manual review
+
+**🔧 Robust Error Handling:**
+- Graceful failure handling for network issues
+- Continues bulk migration even if individual talks fail
+- Detailed error logging for debugging
+- Recovery guidance for common issues
+
+**CLI Help & Versioning:**
+```bash
+# Get detailed help
+bundle exec ruby migrate_talk.rb --help
+
+# Check version and capabilities
+bundle exec ruby migrate_talk.rb --version
+```
+
+#### Migration Workflow
+
+**For New Migrations:**
+1. Set up Google Drive credentials (see Google Drive Setup section)
+2. Choose migration mode (single talk vs. bulk speaker)
+3. Run migration script with appropriate URL
+4. Review generated files in `_talks/` directory
+5. Check migration test results for completeness validation
+6. Commit generated files to repository
+
+**Quality Assurance:**
+- Migration tests run automatically after each migration
+- Tests validate resource count matches source
+- Tests check for proper resource types and sources
+- CI pipeline runs same tests for continuous validation
+
 ## Migration Quality Validation
 
 ### Overview
