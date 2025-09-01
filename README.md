@@ -58,16 +58,7 @@ See [docs/TESTING.md](docs/TESTING.md) for detailed test documentation.
 
 ### CI/CD Setup
 
-The project includes comprehensive GitHub Actions CI that runs all test categories. To enable external API tests in CI:
-
-#### Setting Up External Test Credentials
-
-1. **Go to your GitHub repository** → **Settings** → **Secrets and variables** → **Actions**
-2. **Create a new repository secret**:
-   - **Name**: `GOOGLE_API_CREDENTIALS`
-   - **Value**: Copy the entire contents of your `Google API.json` file
-
-#### Test Categories in CI
+The project includes comprehensive GitHub Actions CI that runs all test categories:
 
 - **Unit Tests**: Core functionality validation
 - **Integration Tests**: Component interaction testing  
@@ -78,13 +69,7 @@ The project includes comprehensive GitHub Actions CI that runs all test categori
 - **Security Tests**: Dependency vulnerability scanning
 - **E2E Tests**: Full user workflow validation
 
-#### Local vs CI Testing
-
-- **Local Development**: Uses local `Google API.json` file for external tests
-- **CI Environment**: Uses `GOOGLE_API_CREDENTIALS` secret when available, gracefully skips when not
-- **Migration Tests**: Always run and properly detect incomplete migrations
-
-The CI pipeline will pass even without external test credentials - they skip gracefully with helpful messages.
+The CI pipeline will pass even without external API credentials - they skip gracefully with helpful messages. For migration workflows requiring Google Drive integration, see the [Migration Guide](docs/MIGRATION.md).
 
 ## Documentation
 

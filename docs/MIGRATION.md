@@ -64,6 +64,48 @@ Before running the migration script, you need to set up Google Drive access:
 - Each user will need their own service account and credentials
 - Shared drive permissions are required for PDF uploads
 
+### GitHub Actions Integration
+
+For automated migration testing in CI/CD pipelines:
+
+#### Setting Up Migration Test Credentials
+
+1. **Go to your GitHub repository** → **Settings** → **Secrets and variables** → **Actions**
+2. **Create a new repository secret**:
+   - **Name**: `GOOGLE_API_CREDENTIALS_JSON`
+   - **Value**: Copy the entire contents of your `Google API.json` file
+
+#### Migration Testing in CI
+
+- **External Tests**: Will use the GitHub secret for Google Drive API integration
+- **Migration Tests**: Will validate that migrations detect incomplete data properly
+- **Local vs CI**: 
+  - Local development uses local `Google API.json` file
+  - CI environment uses `GOOGLE_API_CREDENTIALS_JSON` secret
+  - Tests skip gracefully when credentials unavailable
+
+### CI/CD Integration
+
+For automated migration testing in CI/CD pipelines:
+
+#### Setting Up GitHub Secrets for Migration Tests
+
+1. **Go to your GitHub repository** → **Settings** → **Secrets and variables** → **Actions**
+2. **Create a new repository secret**:
+   - **Name**: `GOOGLE_API_CREDENTIALS_JSON`
+   - **Value**: Copy the entire contents of your `Google API.json` file
+
+#### CI Migration Testing Behavior
+
+- **External Tests**: Will use the GitHub secret for Google Drive API integration
+- **Migration Tests**: Will validate that migrations detect incomplete data properly
+- **Local vs CI**:
+  - Local development uses local `Google API.json` file
+  - CI environment uses `GOOGLE_API_CREDENTIALS_JSON` secret
+  - Tests skip gracefully when credentials unavailable
+
+This enables comprehensive migration validation in your CI pipeline while keeping credentials secure.
+
 ## Migration Quality Validation
 
 ### Overview
