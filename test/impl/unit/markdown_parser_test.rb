@@ -15,7 +15,7 @@ class MarkdownParserTest < Minitest::Test
 
       # Technical Enshittification: Why Everything in IT is Horrible Right Now
 
-      **Conference:** Voxxed Days Luxembourg 2025
+      **Conference:** Sample Tech Conference 2025
       **Date:** 2025-06-20
       **Slides:** [View Slides](https://drive.google.com/file/d/1vAOI6cYus5abZHM2zepIQgBBPCN8qLUl/view)
       **Video:** [Watch Video](https://youtube.com/watch?v=iFN1Y_8Cuik)
@@ -39,7 +39,7 @@ class MarkdownParserTest < Minitest::Test
   # TS-222: Markdown parser extracts conference correctly
   def test_extract_conference_from_content
     conference = @parser.send(:extract_metadata_from_content, @sample_content, 'conference')
-    assert_equal 'Voxxed Days Luxembourg 2025', conference
+    assert_equal 'Sample Tech Conference 2025', conference
   end
 
   # TS-223: Markdown parser extracts date correctly

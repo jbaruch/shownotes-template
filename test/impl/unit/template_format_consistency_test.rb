@@ -9,7 +9,9 @@ require 'yaml'
 class TemplateFormatConsistencyTest < Minitest::Test
   def setup
     @readme_path = File.join(Dir.pwd, 'README.md')
-    @talk_example_path = File.join(Dir.pwd, '_talks', '2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-.md')
+    
+    # Find any available talk file dynamically instead of hardcoding
+    @talk_example_path = find_any_talk_file
   end
 
   # TS-200: README template format matches actual talk file format
@@ -17,8 +19,8 @@ class TemplateFormatConsistencyTest < Minitest::Test
     assert File.exist?(@readme_path), "❌ FAILED: README.md not found at #{@readme_path}"
     
     # Skip if no example talk exists (empty repository state)
-    unless File.exist?(@talk_example_path)
-      skip "❌ SKIPPED: Example talk file not found at #{@talk_example_path} - repository has no talks"
+    if @talk_example_path.nil? || !File.exist?(@talk_example_path)
+      skip "❌ SKIPPED: No talk files found - repository has no talks"
       return
     end
 
@@ -96,6 +98,15 @@ class TemplateFormatConsistencyTest < Minitest::Test
     # Look for **Field:** patterns
     content.scan(/\*\*(\w+):\*\*/).each { |match| fields << match[0].downcase }
     fields.uniq
+  end
+
+  def find_any_talk_file
+    # Find any talk file in the _talks directory
+    talks_dir = File.join(Dir.pwd, '_talks')
+    return nil unless Dir.exist?(talks_dir)
+    
+    talk_files = Dir.glob(File.join(talks_dir, '*.md'))
+    talk_files.first # Return the first available talk file, or nil if none exist
   end
 
   def assert_template_format_consistency(readme_template, talk_content)

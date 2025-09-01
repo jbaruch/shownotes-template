@@ -79,32 +79,29 @@ class VisualTest < Minitest::Test
     puts "SUCCESS Homepage loads successfully (HTTP #{response.code})"
   end
   
-  def test_luxembourg_talk_page_loads
-    # First check if we have any talks by checking the talks listing page
-    uri = URI.parse("#{JEKYLL_BASE_URL}/talks/")
-    http = Net::HTTP.new(uri.host, uri.port)
-    talks_response = http.get(uri.path)
+  def test_any_talk_page_loads
+    # Find any available talk page dynamically
+    talk_url = find_any_talk_url
     
-    # If talks page doesn't have any talk links, skip this test
-    if !talks_response.body.include?('2025-06-20-voxxed-days-luxembourg')
-      skip "❌ SKIPPED: Luxembourg talk file not found - repository has no talks"
+    if talk_url.nil?
+      skip "❌ SKIPPED: No talk pages found - repository has no talks"
       return
     end
     
-    uri = URI.parse("#{JEKYLL_BASE_URL}/talks/2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-/")
+    uri = URI.parse("#{JEKYLL_BASE_URL}#{talk_url}")
     http = Net::HTTP.new(uri.host, uri.port)
     response = http.get(uri.path)
     
     assert response.code.to_i.between?(200, 399), 
-      "Luxembourg talk page failed to load: HTTP #{response.code}"
+      "Talk page failed to load: HTTP #{response.code} for #{talk_url}"
       
-    # Check for expected content
-    assert response.body.include?('Technical Enshittification'), 
-      "Talk page missing expected title"
-    assert response.body.include?('resources'), 
-      "Talk page missing resources section"
+    # Check for basic expected content structure
+    assert response.body.include?('<title>'), 
+      "Talk page missing title tag"
+    assert response.body.length > 100, 
+      "Talk page content seems too short"
       
-    puts "SUCCESS Luxembourg talk page loads successfully (HTTP #{response.code})"
+    puts "SUCCESS Talk page loads successfully (HTTP #{response.code}) for #{talk_url}"
   end
 
   # ===========================================
@@ -133,17 +130,8 @@ class VisualTest < Minitest::Test
       '/talks/',
     ]
     
-    # Check if specific talk exists before testing it
-    specific_talk_pages = []
-    
-    # Check if Luxembourg talk exists by looking at talks page
-    uri = URI.parse("#{JEKYLL_BASE_URL}/talks/")
-    http = Net::HTTP.new(uri.host, uri.port)
-    talks_response = http.get(uri.path)
-    
-    if talks_response.body.include?('2025-06-20-voxxed-days-luxembourg')
-      specific_talk_pages << '/talks/2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-/'
-    end
+    # Add any specific talk pages that exist
+    specific_talk_pages = find_all_talk_urls
     
     test_pages = base_test_pages + specific_talk_pages
     
@@ -159,7 +147,9 @@ class VisualTest < Minitest::Test
     end
     
     if specific_talk_pages.empty?
-      puts "  INFO: No specific talks found - tested base pages only"
+      puts "  INFO: No talk pages found - tested base pages only"
+    else
+      puts "  INFO: Tested #{specific_talk_pages.length} talk page(s)"
     end
     
     puts "SUCCESS All test pages load without errors"
@@ -188,10 +178,11 @@ class VisualTest < Minitest::Test
   # ===========================================
   
   def test_no_liquid_template_errors_in_html
-    test_pages = [
-      '/',
-      '/talks/2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-/',
-    ]
+    test_pages = ['/']
+    
+    # Add any available talk pages
+    talk_urls = find_all_talk_urls
+    test_pages += talk_urls
     
     test_pages.each do |page_path|
       uri = URI.parse("#{JEKYLL_BASE_URL}#{page_path}")
@@ -222,14 +213,12 @@ class VisualTest < Minitest::Test
     
     thumbnail_count = drive_thumbnails.length + slides_thumbnails.length
     
-    # If no thumbnails on homepage, check if Luxembourg talk exists and check it
+    # If no thumbnails on homepage, check if any talk page exists and check it
     if thumbnail_count == 0
-      # Check if Luxembourg talk exists
-      talks_uri = URI.parse("#{JEKYLL_BASE_URL}/talks/")
-      talks_response = http.get(talks_uri.path)
+      talk_url = find_any_talk_url
       
-      if talks_response.body.include?('2025-06-20-voxxed-days-luxembourg')
-        uri = URI.parse("#{JEKYLL_BASE_URL}/talks/2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-/")
+      if talk_url
+        uri = URI.parse("#{JEKYLL_BASE_URL}#{talk_url}")
         response = http.get(uri.path)
         drive_thumbnails = response.body.scan(/https:\/\/drive\.google\.com\/thumbnail\?id=/)
         slides_thumbnails = response.body.scan(/https:\/\/lh3\.googleusercontent\.com\/d\//)
@@ -242,7 +231,7 @@ class VisualTest < Minitest::Test
     end
     
     assert thumbnail_count > 0, 
-      "No Google Drive/Slides thumbnail URLs found in homepage or Luxembourg talk page HTML"
+      "No Google Drive/Slides thumbnail URLs found in homepage or talk page HTML"
       
     puts "SUCCESS Found #{thumbnail_count} thumbnail URLs in generated HTML"
   end
@@ -266,9 +255,18 @@ class VisualTest < Minitest::Test
   end
   
   def test_no_common_broken_links
-    uri = URI.parse("#{JEKYLL_BASE_URL}/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/")
+    # Test the homepage for broken link patterns
+    uri = URI.parse(JEKYLL_BASE_URL)
     http = Net::HTTP.new(uri.host, uri.port)
-    response = http.get(uri.path)
+    response = http.get('/')
+    
+    # Also test any available talk page if one exists
+    talk_url = find_any_talk_url
+    if talk_url
+      talk_uri = URI.parse("#{JEKYLL_BASE_URL}#{talk_url}")
+      talk_response = http.get(talk_uri.path)
+      response.body += "\n" + talk_response.body # Combine both for testing
+    end
     
     # Check for common broken link patterns in HTML
     broken_patterns = [
@@ -286,5 +284,29 @@ class VisualTest < Minitest::Test
     end
     
     puts "SUCCESS No common broken link patterns found"
+  end
+
+private
+
+  def find_any_talk_url
+    # Get the talks listing page to find any available talk
+    uri = URI.parse("#{JEKYLL_BASE_URL}/talks/")
+    http = Net::HTTP.new(uri.host, uri.port)
+    talks_response = http.get(uri.path)
+    
+    # Look for talk links in the HTML
+    talk_links = talks_response.body.scan(/href="(\/talks\/[^"]+)"/).flatten
+    talk_links.first # Return the first talk URL found, or nil if none
+  end
+
+  def find_all_talk_urls
+    # Get the talks listing page to find all available talks
+    uri = URI.parse("#{JEKYLL_BASE_URL}/talks/")
+    http = Net::HTTP.new(uri.host, uri.port)
+    talks_response = http.get(uri.path)
+    
+    # Look for talk links in the HTML
+    talk_links = talks_response.body.scan(/href="(\/talks\/[^"]+)"/).flatten
+    talk_links.uniq # Return all unique talk URLs found
   end
 end

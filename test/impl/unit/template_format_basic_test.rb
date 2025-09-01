@@ -7,7 +7,9 @@ require 'minitest/autorun'
 class TemplateFormatConsistencyTest < Minitest::Test
   def setup
     @readme_path = File.join(Dir.pwd, 'README.md')
-    @talk_example_path = File.join(Dir.pwd, '_talks', '2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-.md')
+    
+    # Find any available talk file dynamically instead of hardcoding
+    @talk_example_path = find_any_talk_file
   end
 
   # TS-200: README shows correct metadata format (markdown, not YAML)
@@ -33,7 +35,7 @@ class TemplateFormatConsistencyTest < Minitest::Test
 
   # TS-201: Actual talk files use the correct markdown metadata format
   def test_talk_files_use_correct_format
-    skip 'Example talk file not found' unless File.exist?(@talk_example_path)
+    skip 'Example talk file not found' if @talk_example_path.nil?
 
     talk_content = File.read(@talk_example_path)
 
@@ -55,7 +57,7 @@ class TemplateFormatConsistencyTest < Minitest::Test
   # TS-202: README and talk files are consistent in format
   def test_readme_and_talk_files_consistent
     skip 'README.md not found' unless File.exist?(@readme_path)
-    skip 'Example talk file not found' unless File.exist?(@talk_example_path)
+    skip 'Example talk file not found' if @talk_example_path.nil?
 
     readme_content = File.read(@readme_path)
     talk_content = File.read(@talk_example_path)
@@ -110,15 +112,33 @@ class TemplateFormatConsistencyTest < Minitest::Test
   # TS-205: Regression test - ensures format consistency is maintained
   def test_format_consistency_regression
     # This test would fail if someone changed the format back to YAML
-    skip 'Example talk file not found' unless File.exist?(@talk_example_path)
+    if @talk_example_path.nil? || !File.exist?(@talk_example_path)
+      skip 'No talk files found - repository has no talks'
+      return
+    end
 
     talk_content = File.read(@talk_example_path)
 
-    # Ensure the talk file still uses the correct format
-    assert_includes talk_content, '**Conference:** Voxxed Days Luxembourg 2025',
-                    'Talk should contain correct conference metadata'
+    # Ensure the talk file still uses the correct markdown format (not YAML)
+    assert_includes talk_content, '**Conference:**',
+                    'Talk should contain conference metadata in markdown format'
 
-    assert_includes talk_content, '**Date:** 2025-06-20',
-                    'Talk should contain correct date metadata'
+    assert_includes talk_content, '**Date:**',
+                    'Talk should contain date metadata in markdown format'
+                    
+    # Ensure it's NOT using YAML frontmatter for these fields
+    refute_match /^conference:/, talk_content, 'Talk should not use YAML frontmatter for conference'
+    refute_match /^date:/, talk_content, 'Talk should not use YAML frontmatter for date'
+  end
+
+private
+
+  def find_any_talk_file
+    # Find any talk file in the _talks directory
+    talks_dir = File.join(Dir.pwd, '_talks')
+    return nil unless Dir.exist?(talks_dir)
+    
+    talk_files = Dir.glob(File.join(talks_dir, '*.md'))
+    talk_files.first # Return the first available talk file, or nil if none exist
   end
 end

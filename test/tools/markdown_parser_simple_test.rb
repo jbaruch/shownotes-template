@@ -81,9 +81,9 @@ end
 
 # Sample content from our markdown file
 content = <<~MARKDOWN
-# Voxxed Luxembourg Technical Enshittification
+# Sample Tech Conference Technical Example
 
-**Conference:** Voxxed Days Luxembourg 2025
+**Conference:** Sample Tech Conference 2025
 **Date:** 2025-06-20  
 **Slides:** [View Slides](https://drive.google.com/file/d/1vAOI6cYus5abZHM2zepIQgBBPCN8qLUl/view)
 **Video:** [Watch Video](https://youtube.com/watch?v=iFN1Y_8Cuik)
