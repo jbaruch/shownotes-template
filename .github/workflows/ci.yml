@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ main ]
   push:
-    branches: [ develop ]
+    branches: [ develop, main ]
     paths:
       - 'lib/**'
       - 'test/**'
@@ -16,6 +16,7 @@ on:
       - '.github/workflows/**'
       - 'Rakefile'
       - '*.rb'
+      - 'utils/**'
 
 jobs:
   test:
