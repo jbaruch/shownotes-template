@@ -26,8 +26,10 @@ _site/
 
 # Static site generators
 .jekyll-cache/
+.jekyll-metadata
 .cache/
 .vuepress/dist/
+_test_site/
 
 # IDE and editors
 .vscode/
