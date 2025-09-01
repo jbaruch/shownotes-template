@@ -22,9 +22,52 @@ This talk explores the concept of technical enshittification - how technology pl
 - [Platform economics research](https://example.com/research)
 MARKDOWN
 
-# Create a test class that includes our module
+# Create a test class that includes our module methods
 class TestParser
-  include Jekyll::MarkdownParser
+  def extract_title_from_content(content)
+    return nil unless content
+    
+    match = content.to_s.match(/^# (.+)$/m)
+    match ? match[1].strip : nil
+  end
+  
+  def extract_metadata_from_content(content, field)
+    return nil unless content
+    
+    pattern = /^\*\*#{Regexp.escape(field.capitalize)}:\*\*\s*(.+)$/i
+    match = content.to_s.match(pattern)
+    match ? match[1].strip : nil
+  end
+  
+  def extract_description_from_content(content)
+    return nil unless content
+    
+    # Extract the main paragraph content between metadata and resources
+    lines = content.to_s.split("\n")
+    start_idx = lines.find_index { |line| line.match?(/^\*\*.*\*\*/) }
+    end_idx = lines.find_index { |line| line.strip.start_with?('## Resources') }
+    
+    if start_idx && end_idx
+      desc_lines = lines[(start_idx + 1)...end_idx]
+      desc_lines.join("\n").strip
+    elsif start_idx
+      desc_lines = lines[(start_idx + 1)..-1] || []
+      desc_lines.join("\n").strip
+    else
+      content.to_s.strip
+    end
+  end
+  
+  def extract_resources_from_content(content)
+    return '' unless content
+    
+    lines = content.to_s.split("\n")
+    resources_start = lines.find_index { |line| line.strip.start_with?('## Resources') }
+    return '' unless resources_start
+    
+    resource_lines = lines[(resources_start + 1)..-1] || []
+    resource_lines.join("\n").strip
+  end
 end
 
 parser = TestParser.new

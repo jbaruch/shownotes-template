@@ -14,8 +14,21 @@ class ShownotesTestRunner
     test_files = discover_test_files(test_category)
     
     puts "📂 Test Category: #{test_category}"
+    
+    if test_category == 'all'
+      puts "ℹ️  Running all tests except migration (use -c migration for migration tests)"
+    elsif test_category == 'migration'
+      puts "⚠️  Migration tests require Google Drive API access (Google API.json file)"
+    end
+    
     puts "📋 Found #{test_files.length} test files:"
     test_files.each { |file| puts "   #{file}" }
+    puts
+    
+    # Load and execute the test files
+    test_files.each do |file|
+      require_relative "../#{file}"
+    end
     puts
     
     # Load and run test files
@@ -35,9 +48,14 @@ class ShownotesTestRunner
     when 'e2e'
       Dir.glob('test/impl/e2e/*_test.rb')
     when 'migration'
-      Dir.glob('test/migration/*_test.rb')
+      # All migration-related tests (requires Google Drive API access)
+      migration_files = []
+      migration_files.concat(Dir.glob('test/migration/*_test.rb'))
+      migration_files.concat(Dir.glob('test/external/google_drive_integration_test.rb'))
+      migration_files
     when 'external'
-      Dir.glob('test/external/*_test.rb')
+      # External tests excluding migration-specific ones
+      Dir.glob('test/external/*_test.rb').reject { |f| f.include?('google_drive_integration') }
     when 'tools'
       Dir.glob('test/tools/*_test.rb')
     when 'performance'
@@ -49,10 +67,22 @@ class ShownotesTestRunner
         'test/impl/integration/speaker_configuration_visual_test.rb'
       ].select { |f| File.exist?(f) }
     when 'all'
-      Dir.glob('test/**/*_test.rb').reject { |f| f.include?('fixtures') }
+      # All tests EXCEPT migration-related ones (for users who don't need migration)
+      all_files = Dir.glob('test/**/*_test.rb').reject { |f| f.include?('fixtures') }
+      migration_files = Dir.glob('test/migration/*_test.rb') + Dir.glob('test/external/google_drive_integration_test.rb')
+      all_files - migration_files
     else
       puts "❌ Unknown test category: #{category}"
-      puts "📖 Available categories: unit, integration, e2e, migration, external, tools, performance, speaker, all"
+      puts "📖 Available categories:"
+      puts "   unit        - Unit tests only"
+      puts "   integration - Integration tests only" 
+      puts "   e2e         - End-to-end tests only"
+      puts "   external    - External tests (excluding migration)"
+      puts "   tools       - Tool tests only"
+      puts "   performance - Performance tests only"
+      puts "   speaker     - Speaker configuration tests"
+      puts "   migration   - Migration tests (requires Google Drive API)"
+      puts "   all         - All tests except migration (default for most users)"
       exit 1
     end
   end
@@ -65,12 +95,28 @@ if __FILE__ == $0
   OptionParser.new do |opts|
     opts.banner = "Usage: #{$0} [options]"
     
-    opts.on('-c', '--category CATEGORY', 'Test category to run (unit, integration, e2e, migration, external, tools, performance, speaker, all)') do |category|
+    opts.on('-c', '--category CATEGORY', 'Test category to run') do |category|
       options[:category] = category
     end
     
     opts.on('-h', '--help', 'Show help') do
       puts opts
+      puts
+      puts "Available test categories:"
+      puts "  unit        - Unit tests only"
+      puts "  integration - Integration tests only" 
+      puts "  e2e         - End-to-end tests only"
+      puts "  external    - External tests (excluding migration)"
+      puts "  tools       - Tool tests only"
+      puts "  performance - Performance tests only"
+      puts "  speaker     - Speaker configuration tests"
+      puts "  migration   - Migration tests (requires Google Drive API)"
+      puts "  all         - All tests except migration (default for most users)"
+      puts
+      puts "Examples:"
+      puts "  #{$0}                    # Run all non-migration tests"
+      puts "  #{$0} -c unit            # Run only unit tests"
+      puts "  #{$0} -c migration       # Run migration tests (needs Google API)"
       exit
     end
   end.parse!
