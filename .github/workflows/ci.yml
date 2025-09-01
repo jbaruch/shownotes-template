@@ -17,6 +17,7 @@ on:
       - 'Rakefile'
       - '*.rb'
       - 'utils/**'
+  workflow_dispatch:
 
 jobs:
   test:
