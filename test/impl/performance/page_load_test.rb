@@ -26,8 +26,19 @@ class PageLoadTest < Minitest::Test
     # Be more lenient in CI environments due to virtualization overhead
     # GitHub Actions can have high latency for Jekyll builds
     max_fcp = ENV['CI'] ? 8000 : 3000
+    
+    # Debug output in CI
+    if ENV['CI']
+      puts "DEBUG: performance_metrics = #{performance_metrics.inspect}"
+      puts "DEBUG: fcp_time = #{fcp_time.inspect} (#{fcp_time.class})"
+      puts "DEBUG: max_fcp = #{max_fcp}"
+      puts "DEBUG: ENV['CI'] = #{ENV['CI']}"
+    end
+    
+    assert fcp_time, "First Contentful Paint metrics should be available"
+    assert fcp_time.is_a?(Numeric), "First Contentful Paint should be a number, got #{fcp_time.class}: #{fcp_time}"
     assert fcp_time < max_fcp,
-           "First Contentful Paint should be under #{max_fcp/1000} seconds on 3G, got #{fcp_time}ms"
+           "First Contentful Paint should be under #{max_fcp/1000.0} seconds on 3G, got #{fcp_time}ms"
     
     # Verify FCP includes meaningful content
     assert_meaningful_first_paint(performance_metrics)
