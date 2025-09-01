@@ -94,7 +94,7 @@ layout: default
         </div>
     </header>
 
-    {% assign talks = site.talks %}
+    {% assign talks = site.talks | sort: 'extracted_date' | reverse %}
     {% if talks.size > 0 %}
         <!-- Recent/Featured Talks Section -->
         {% assign recent_talks = talks | limit: 3 %}

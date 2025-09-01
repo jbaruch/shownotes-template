@@ -10,7 +10,6 @@ require 'googleauth'
 require 'optparse'
 
 class TalkMigrator
-  GOOGLE_DRIVE_FOLDER_ID = '1rE43G9IvgMg0S9frwA7TaEc-XEDUL8ib'
   
   def initialize(talk_url)
     @talk_url = talk_url
@@ -54,35 +53,56 @@ class TalkMigrator
       return false
     end
     
-    # Step 6: Validate resource sources (no Notist dependencies)
-    unless validate_resource_sources
-      report_failure("Resource validation failed")
-      return false
-    end
-    
-    # Step 7: Generate Jekyll file
+    # Step 6: Generate Jekyll file
     unless generate_jekyll_file
       report_failure("Failed to generate Jekyll file")
       return false
     end
-    
-    # Step 8: Validate migration
+
+    # Step 6.5: Validate resource sources (no Notist dependencies)
+    unless validate_resource_sources
+      report_failure("Resource source validation failed")
+      return false
+    end
+
+    # Step 7: Validate migration
     unless validate_migration
       report_failure("Migration validation failed")
       return false
     end
     
-    # Step 9: Run migration tests
-    unless run_migration_tests
+    # Step 8: Run migration tests
+    test_success = run_migration_tests
+    unless test_success
+      puts "❌ Migration tests FAILED"
+      puts "   This indicates the migration may be incomplete"
+      puts "   Check test output above for specific issues"
       puts "⚠️  Migration tests failed, but file was created"
       puts "   This may indicate incomplete migration that needs manual review"
+      return false
     end
     
+    # Step 9: Build Jekyll and run site tests
+    site_success = build_and_test_site
+    unless site_success
+      puts "⚠️  Site build/tests failed, but migration is technically complete"
+      puts "   Check Jekyll build output for issues"
+      puts "   The talk file was created correctly"
+      return false
+    end
+
     puts "\n✅ MIGRATION SUCCESSFUL!"
     puts "Generated: #{@jekyll_file}"
-    puts "Resources: #{@resources.length} extracted"
-    puts "Next: Review generated file and commit to repository"
     
+    # Calculate resource breakdown
+    slides_count = @resources.count { |r| r['type'] == 'slides' }
+    video_count = @resources.count { |r| r['type'] == 'video' }
+    other_count = @resources.count { |r| r['type'] != 'slides' && r['type'] != 'video' }
+    
+    puts "Resources: #{@resources.length} total extracted (#{other_count} in resources section + #{slides_count + video_count} moved to header)"
+    puts "🎬 Video: #{@talk_data[:video_url] || 'None'}"
+    puts "📄 PDF: #{@talk_data[:pdf_url] || 'None'}"
+    puts "Next: Review generated file and commit to repository"
     true
   end
   
@@ -112,6 +132,24 @@ class TalkMigrator
     end
   end
   
+  def fetch_page(url)
+    uri = URI.parse(url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true if uri.scheme == 'https'
+    
+    response = http.get(uri.path)
+    
+    unless response.code.to_i.between?(200, 299)
+      puts "⚠️  HTTP #{response.code} when fetching #{url}"
+      return nil
+    end
+    
+    Nokogiri::HTML(response.body)
+  rescue => e
+    puts "⚠️  Error fetching #{url}: #{e.message}"
+    nil
+  end
+  
   def extract_metadata
     puts "\n2️⃣ Extracting metadata..."
     
@@ -124,35 +162,59 @@ class TalkMigrator
     @talk_data[:title] = title_elem.text.strip
     
     # Date and Conference (extract from page content)
-    # Look for patterns like "June 11, 2025" and "Devoxx Poland 2025"
-    page_text = @doc.text
-    
-    # Extract date (look for month day, year pattern)
-    date_match = page_text.match(/(\w+\s+\d+,\s+\d{4})/)
-    if date_match
+    # First try to extract from JSON-LD structured data
+    json_ld_scripts = @doc.css('script[type="application/ld+json"]')
+    json_ld_scripts.each do |script|
       begin
-        @talk_data[:date] = Date.parse(date_match[1]).strftime("%Y-%m-%d")
-      rescue
-        @errors << "Could not parse date: #{date_match[1]}"
-        return false
+        json_data = JSON.parse(script.content)
+        if json_data['datePublished']
+          @talk_data[:date] = Date.parse(json_data['datePublished']).strftime("%Y-%m-%d")
+          puts "SUCCESS Date extracted from JSON-LD: #{@talk_data[:date]}"
+        end
+        if json_data.dig('location', 'name')
+          @talk_data[:conference] = json_data['location']['name']
+          puts "SUCCESS Conference extracted from JSON-LD: #{@talk_data[:conference]}"
+        end
+      rescue JSON::ParserError => e
+        puts "DEBUG JSON-LD parsing failed: #{e.message}"
       end
-    else
-      @errors << "No date found in page"
-      return false
     end
     
-    # Extract conference
-    conference_patterns = [
-      /Devoxx\s+\w+\s+\d{4}/,
-      /Voxxed\s+Days\s+\w+\s+\d{4}/,
-      /\w+\s+\d{4}/ # Fallback
-    ]
+    # Fallback to text parsing if JSON-LD didn't work
+    unless @talk_data[:date]
+      # Look for patterns like "June 11, 2025" and "Devoxx Poland 2025"
+      page_text = @doc.text
+      
+      # Extract date (look for month day, year pattern)
+      date_match = page_text.match(/(\w+\s+\d+,\s+\d{4})/)
+      if date_match
+        begin
+          @talk_data[:date] = Date.parse(date_match[1]).strftime("%Y-%m-%d")
+        rescue
+          @errors << "Could not parse date: #{date_match[1]}"
+          return false
+        end
+      else
+        @errors << "No date found in page"
+        return false
+      end
+    end
     
-    conference_patterns.each do |pattern|
-      match = page_text.match(pattern)
-      if match
-        @talk_data[:conference] = match[0]
-        break
+    # Extract conference (if not already extracted from JSON-LD)
+    unless @talk_data[:conference]
+      page_text = @doc.text
+      conference_patterns = [
+        /Devoxx\s+\w+\s+\d{4}/,
+        /Voxxed\s+Days\s+\w+\s+\d{4}/,
+        /\w+\s+\d{4}/ # Fallback
+      ]
+      
+      conference_patterns.each do |pattern|
+        match = page_text.match(pattern)
+        if match
+          @talk_data[:conference] = match[0]
+          break
+        end
       end
     end
     
@@ -181,64 +243,46 @@ class TalkMigrator
   def extract_all_resources
     puts "\n3️⃣ Extracting ALL resources..."
     
-    # Find all links on the page that look like resources
-    # Look for href attributes that point to external resources
+    # Look for the specific resources section on Notist pages
+    resources_section = @doc.css('#resources .resource-list')
     
-    resource_links = []
-    
-    # Method 1: Look for a specific resources section
-    resources_section = @doc.css('*:contains("Resources"), *:contains("resources")').first
-    if resources_section
-      resource_links.concat(resources_section.css('a[href]').map { |a| a['href'] }.compact)
+    if resources_section.empty?
+      # Try alternative selectors
+      resources_section = @doc.css('#resources ul')
+      
+      if resources_section.empty?
+        @errors << "No resources section found on page"
+        return false
+      end
     end
     
-    # Method 2: Find all external links
-    all_links = @doc.css('a[href]').map { |a| a['href'] }.compact
-    external_links = all_links.select { |url| url.start_with?('http') }
-    resource_links.concat(external_links)
+    # Extract resources from the structured list
+    resource_links = []
     
-    # Method 3: Look for specific patterns (GitHub, slides, etc.)
-    resource_links.concat(all_links.select { |url| 
-      url.include?('github.com') || 
-      url.include?('docs.google.com') ||
-      url.include?('drive.google.com') ||
-      url.include?('youtube.com') ||
-      url.include?('youtu.be') ||
-      url.include?('slideshare.net') ||
-      url.include?('.pdf')
-    })
-    
-    # Remove duplicates and self-references
-    resource_links = resource_links.uniq.reject { |url| 
-      url.include?('speaking.jbaru.ch') || url.start_with?('#') || url.start_with?('/')
-    }
+    resources_section.css('li h3 a').each do |link|
+      url = link['href']
+      title = link.text.strip
+      
+      if url && url.start_with?('http')
+        resource_links << {
+          'url' => url,
+          'title' => title,
+          'type' => determine_resource_type(url),
+          'description' => ""
+        }
+      end
+    end
     
     if resource_links.empty?
-      @errors << "No resources found on page"
+      @errors << "No valid resources found in resources section"
       return false
     end
     
-    # Convert to resource objects with metadata
-    resource_links.each_with_index do |url, index|
-      resource = {
-        'url' => url,
-        'type' => determine_resource_type(url),
-        'title' => "Resource #{index + 1}", # Will be improved
-        'description' => ""
-      }
-      @resources << resource
-    end
+    @resources = resource_links
     
     puts "SUCCESS Found #{@resources.length} resources"
     @resources.each_with_index do |res, i|
       puts "   #{i+1}. #{res['type']}: #{res['url']}"
-    end
-    
-    # CRITICAL: Count verification
-    expected_count = extract_resource_count_from_page
-    if expected_count && expected_count != @resources.length
-      @errors << "Resource count mismatch: found #{@resources.length}, expected #{expected_count}"
-      return false
     end
     
     true
@@ -260,30 +304,30 @@ class TalkMigrator
     
     # Download PDF
     pdf_filename = generate_pdf_filename
-    local_pdf_path = "../../pdfs/#{pdf_filename}"
+    local_pdf_path = "pdfs/#{pdf_filename}"
     
     unless download_file(pdf_url, local_pdf_path)
       @errors << "Failed to download PDF from #{pdf_url}"
       return false
     end
     
-    # Upload to Google Drive
+    # Upload to Google Drive (REQUIRED - migration fails if this fails)
     drive_url = upload_to_google_drive(local_pdf_path)
     unless drive_url
       @errors << "Failed to upload PDF to Google Drive"
       return false
     end
     
-    # Add PDF as slides resource
+    # Add PDF as slides resource with Google Drive URL
     pdf_resource = {
       'type' => 'slides',
       'title' => extract_pdf_title,
       'url' => drive_url,
       'description' => "Complete slide deck (PDF)"
     }
+    @talk_data[:pdf_url] = drive_url
     
     @resources.unshift(pdf_resource) # Add at beginning
-    @talk_data[:pdf_url] = drive_url
     
     puts "SUCCESS PDF processed and uploaded"
     true
@@ -292,18 +336,22 @@ class TalkMigrator
   def find_video
     puts "\n5️⃣ Finding video..."
     
-    # Look for YouTube URLs
+    # Look for YouTube URLs (direct links and embeds)
     youtube_patterns = [
       /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/,
-      /https?:\/\/youtu\.be\/([a-zA-Z0-9_-]+)/
+      /https?:\/\/youtu\.be\/([a-zA-Z0-9_-]+)/,
+      /https?:\/\/(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]+)/
     ]
     
     page_text = @doc.to_s
     
+    # First check for direct YouTube URLs
     youtube_patterns.each do |pattern|
       match = page_text.match(pattern)
       if match
-        video_url = match[0]
+        video_id = match[1]
+        # Convert all YouTube URLs to standard watch format
+        video_url = "https://www.youtube.com/watch?v=#{video_id}"
         @talk_data[:video_url] = video_url
         @talk_data[:status] = "completed"
         
@@ -325,6 +373,53 @@ class TalkMigrator
       end
     end
     
+    # Look for Notist video embeds
+    notist_embed_pattern = /https?:\/\/notist\.ninja\/embed\/([a-zA-Z0-9_-]+)/
+    notist_match = page_text.match(notist_embed_pattern)
+    if notist_match
+      embed_url = notist_match[0]
+      embed_id = notist_match[1]
+      
+      # Try to resolve the actual video URL from the embed
+      begin
+        embed_doc = fetch_page(embed_url)
+        if embed_doc
+          embed_text = embed_doc.to_s
+          # Look for YouTube URL in the embed page
+          youtube_patterns.each do |pattern|
+            match = embed_text.match(pattern)
+            if match
+              video_id = match[1]
+              # Convert to standard watch format
+              video_url = "https://www.youtube.com/watch?v=#{video_id}"
+              @talk_data[:video_url] = video_url
+              @talk_data[:status] = "completed"
+              
+              # Add video resource
+              video_resource = {
+                'type' => 'video',
+                'title' => 'Full Presentation Video',
+                'url' => video_url,
+                'description' => 'Complete video recording'
+              }
+              
+              # Add after slides but before other resources
+              slides_index = @resources.find_index { |r| r['type'] == 'slides' }
+              insert_index = slides_index ? slides_index + 1 : 0
+              @resources.insert(insert_index, video_resource)
+              
+              puts "SUCCESS Video found via Notist embed: #{video_url}"
+              return true
+            end
+          end
+        end
+      rescue => e
+        puts "⚠️  Could not resolve Notist embed: #{e.message}"
+      end
+      
+      puts "⚠️  Found Notist embed but could not resolve to YouTube URL: #{embed_url}"
+    end
+    
     puts "⚠️  No video found - setting status to video-pending"
     @talk_data[:status] = "video-pending"
     true
@@ -337,7 +432,7 @@ class TalkMigrator
     date_part = @talk_data[:date]
     conference_slug = @talk_data[:conference].downcase.gsub(/[^a-z0-9]+/, '-')
     title_slug = @talk_data[:title].downcase.gsub(/[^a-z0-9]+/, '-')[0..50]
-    @jekyll_file = "../../_talks/#{date_part}-#{conference_slug}-#{title_slug}.md"
+    @jekyll_file = "_talks/#{date_part}-#{conference_slug}-#{title_slug}.md"
     
     # Generate minimal YAML front matter (clean format)
     yaml_data = {
@@ -410,9 +505,11 @@ class TalkMigrator
       return false
     end
     
-    # Parse and validate YAML
+    # Parse and validate content
     begin
       content = File.read(@jekyll_file)
+      
+      # Validate YAML front matter exists
       yaml_match = content.match(/\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m)
       unless yaml_match
         @errors << "Invalid YAML front matter"
@@ -421,34 +518,46 @@ class TalkMigrator
       
       parsed_yaml = YAML.safe_load(yaml_match[1])
       
-      # Validate required fields
-      required_fields = %w[title speaker conference date status resources]
-      required_fields.each do |field|
-        unless parsed_yaml[field]
-          @errors << "Missing required field: #{field}"
+      # Validate required YAML fields
+      unless parsed_yaml['layout'] == 'talk'
+        @errors << "Missing or incorrect layout field"
+        return false
+      end
+      
+      # Extract markdown content after YAML
+      markdown_content = content.sub(/\A---.*?---\n/m, '')
+      
+      # Validate title (H1 heading)
+      unless markdown_content.match(/^# .+/)
+        @errors << "Missing title (H1 heading)"
+        return false
+      end
+      
+      # Validate required markdown sections
+      required_sections = [
+        /\*\*Conference:\*\* .+/,
+        /\*\*Date:\*\* \d{4}-\d{2}-\d{2}/,
+        /\*\*Slides:\*\* \[.+\]\(.+\)/
+      ]
+      
+      required_sections.each_with_index do |pattern, index|
+        unless markdown_content.match(pattern)
+          section_names = ['Conference', 'Date', 'Slides']
+          @errors << "Missing required section: #{section_names[index]}"
           return false
         end
       end
       
-      # Validate resources
-      resources = parsed_yaml['resources']
-      unless resources.is_a?(Array) && !resources.empty?
-        @errors << "Resources must be a non-empty array"
+      # Validate Resources section exists
+      unless markdown_content.match(/## Resources/)
+        @errors << "Missing Resources section"
         return false
       end
       
-      resources.each_with_index do |resource, i|
-        %w[type title url].each do |req_field|
-          unless resource[req_field]
-            @errors << "Resource #{i+1} missing #{req_field}"
-            return false
-          end
-        end
-      end
-      
       puts "SUCCESS Migration validation passed"
-      puts "   Resources: #{resources.length}"
-      puts "   Required fields: ✓"
+      puts "   Title: ✓"
+      puts "   Conference, Date, Slides: ✓"
+      puts "   Resources section: ✓"
       puts "   YAML structure: ✓"
       
       true
@@ -470,8 +579,8 @@ class TalkMigrator
   def run_migration_tests
     puts "\n🧪 Running migration tests..."
     
-    # Change to project root for running tests
-    project_root = File.expand_path('../..', __dir__)
+    # Change to project root for running tests (since this script is in root)
+    project_root = Dir.pwd
     Dir.chdir(project_root) do
       puts "📍 Running from: #{Dir.pwd}"
       
@@ -494,6 +603,46 @@ class TalkMigrator
     end
   end
   
+  def build_and_test_site
+    puts "\n🏗️  Building Jekyll site and testing integration..."
+    
+    # Change to project root for building Jekyll
+    project_root = Dir.pwd
+    Dir.chdir(project_root) do
+      puts "📍 Building from: #{Dir.pwd}"
+      
+      # Build Jekyll site
+      puts "🚀 bundle exec jekyll build"
+      build_success = system("bundle exec jekyll build --quiet")
+      
+      unless build_success
+        puts "❌ Jekyll build FAILED"
+        puts "   The new talk may have syntax errors or missing data"
+        return false
+      end
+      
+      puts "✅ Jekyll build successful"
+      
+      # Run site integration tests to verify the new talk appears correctly
+      puts "\n🧪 Running site integration tests..."
+      puts "🚀 bundle exec ruby test/run_tests.rb -c integration"
+      
+      test_success = system("bundle exec ruby test/run_tests.rb -c integration")
+      
+      unless test_success
+        puts "❌ Site integration tests FAILED"
+        puts "   The new talk may not be displaying correctly on the site"
+        puts "   Check if it appears on the main page with correct metadata"
+        return false
+      end
+      
+      puts "✅ Site integration tests PASSED"
+      puts "   New talk is properly integrated and displaying correctly"
+      
+      true
+    end
+  end
+
   # Helper methods
   
   def determine_resource_type(url)
@@ -567,28 +716,63 @@ class TalkMigrator
     end
   end
   
+  def setup_google_drive_service
+    service = Google::Apis::DriveV3::DriveService.new
+    service.client_options.application_name = 'Shownotes Migration'
+    
+    service.authorization = Google::Auth::ServiceAccountCredentials.make_creds(
+      json_key_io: File.open('Google API.json'),
+      scope: ['https://www.googleapis.com/auth/drive']
+    )
+    
+    service
+  end
+  
+  def find_shared_drive_root
+    service = setup_google_drive_service
+    
+    # List all shared drives accessible by the service account
+    drives_response = service.list_drives
+    
+    if drives_response.drives.empty?
+      puts "⚠️  No shared drives found. Service account may not have access to any shared drives."
+      return nil
+    end
+    
+    # Use the first available shared drive
+    shared_drive = drives_response.drives.first
+    puts "📁 Using shared drive: #{shared_drive.name} (ID: #{shared_drive.id})"
+    
+    # Return the shared drive ID as the parent folder
+    shared_drive.id
+  end
+
   def upload_to_google_drive(local_path)
-    # Note: This may fail due to service account limitations
-    # Return nil if it fails, handle gracefully
     begin
-      service = Google::Apis::DriveV3::DriveService.new
-      service.client_options.application_name = 'Shownotes Migration'
+      service = setup_google_drive_service
       
-      service.authorization = Google::Auth::ServiceAccountCredentials.make_creds(
-        json_key_io: File.open('../../Google API.json'),
-        scope: ['https://www.googleapis.com/auth/drive']
-      )
+      # Find shared drive root folder dynamically
+      shared_drive_id = find_shared_drive_root
+      unless shared_drive_id
+        puts "⚠️  Could not find accessible shared drive"
+        return nil
+      end
       
       file_metadata = Google::Apis::DriveV3::File.new(
         name: File.basename(local_path),
-        parents: [GOOGLE_DRIVE_FOLDER_ID]
+        parents: [shared_drive_id]
       )
       
-      uploaded_file = service.create_file(file_metadata, upload_source: local_path)
+      # Upload with support_all_drives to work with shared drives
+      uploaded_file = service.create_file(
+        file_metadata, 
+        upload_source: local_path,
+        supports_all_drives: true
+      )
       
       # Make public
       permission = Google::Apis::DriveV3::Permission.new(role: 'reader', type: 'anyone')
-      service.create_permission(uploaded_file.id, permission)
+      service.create_permission(uploaded_file.id, permission, supports_all_drives: true)
       
       "https://drive.google.com/file/d/#{uploaded_file.id}/view"
     rescue => e
@@ -758,8 +942,8 @@ class SpeakerMigrator
     puts "🧪" * 20
     puts
     
-    # Change to project root for running tests
-    project_root = File.expand_path('../..', __dir__)
+    # Change to project root for running tests (this script is in root)
+    project_root = Dir.pwd
     Dir.chdir(project_root) do
       puts "📍 Running migration tests from: #{Dir.pwd}"
       

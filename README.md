@@ -199,7 +199,7 @@ You can create talk pages in two ways:
 
 1. Add talk files to `_talks/` directory:
 
-```yaml
+```markdown
 ---
 layout: talk
 ---

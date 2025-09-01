@@ -256,4 +256,65 @@ class TemplateRenderingTest < Minitest::Test
     # This is more of a visual test, but we can check for truncation classes
     assert_includes html, 'talk-description', 'Should have talk description section'
   end
+
+  # Test that talks are sorted by date (newest first) on homepage
+  def test_talks_sorted_by_date_newest_first
+    # This test gracefully handles sites with no talks or only one talk
+    if @site.talks.empty?
+      puts "ℹ️  No talks found - skipping sort test"
+      return
+    end
+    
+    if @site.talks.length == 1
+      puts "ℹ️  Only one talk found - skipping sort test"
+      return
+    end
+
+    # Find the rendered index page
+    index_page = @site.pages.find { |page| page.url == '/' }
+    skip 'Index page not found' unless index_page
+
+    html = index_page.output
+
+    # Get talks with dates sorted newest first (expected order)
+    talks_with_dates = []
+    @site.talks.each do |talk|
+      if talk.data['extracted_date']
+        talks_with_dates << {
+          title: talk.data['extracted_title'] || talk.data['title'],
+          date: Date.parse(talk.data['extracted_date']),
+          talk: talk
+        }
+      end
+    end
+    
+    skip 'No talks with valid dates found' if talks_with_dates.empty?
+    skip 'Need at least 2 talks to test sorting' if talks_with_dates.length < 2
+    
+    # Expected order (newest first)
+    expected_order = talks_with_dates.sort_by { |t| t[:date] }.reverse
+    
+    puts "ℹ️  Expected order: #{expected_order.map { |t| "#{t[:title]} (#{t[:date]})" }.join(', ')}"
+    
+    # Check the actual order in HTML by looking at the position of talk titles
+    talk_positions = []
+    expected_order.each do |talk|
+      position = html.index(talk[:title])
+      if position
+        talk_positions << { talk: talk, position: position }
+      end
+    end
+    
+    # Sort by position to get the actual order in HTML
+    actual_order_by_position = talk_positions.sort_by { |tp| tp[:position] }.map { |tp| tp[:talk] }
+    
+    puts "ℹ️  Actual order in HTML: #{actual_order_by_position.map { |t| "#{t[:title]} (#{t[:date]})" }.join(', ')}"
+    
+    # Compare the orders
+    expected_dates = expected_order.map { |t| t[:date] }
+    actual_dates = actual_order_by_position.map { |t| t[:date] }
+    
+    assert_equal expected_dates, actual_dates,
+      "Talks are not sorted in chronological order (newest first) in the rendered HTML. Expected: #{expected_dates}, but got: #{actual_dates}"
+  end
 end

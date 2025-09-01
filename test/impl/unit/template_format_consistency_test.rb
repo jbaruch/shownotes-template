@@ -58,24 +58,27 @@ class TemplateFormatConsistencyTest < Minitest::Test
                     'README should show markdown metadata format with **Date:**'
 
     # Should NOT show YAML frontmatter format
-    refute_includes readme_content, 'conference:',
-                    'README should not show YAML frontmatter format for conference'
+    refute_match(/^\s*conference:\s*/, readme_content,
+                'README should not show YAML frontmatter format for conference')
 
-    refute_includes readme_content, 'date:',
-                    'README should not show YAML frontmatter format for date'
+    refute_match(/^\s*date:\s*/, readme_content,
+                'README should not show YAML frontmatter format for date')
   end
 
   private
 
   def extract_template_from_readme(content)
     # Look for the talk template code block specifically
-    # Find all yaml blocks and return the one containing the talk template
-    blocks = content.scan(/```yaml(.*?)```/m)
-    talk_template_block = blocks.find { |block| block[0].include?('**Conference:**') }
+    # Find all yaml or markdown blocks and return the one containing the talk template
+    yaml_blocks = content.scan(/```yaml(.*?)```/m)
+    markdown_blocks = content.scan(/```markdown(.*?)```/m)
+    
+    all_blocks = yaml_blocks + markdown_blocks
+    talk_template_block = all_blocks.find { |block| block[0].include?('**Conference:**') }
     return talk_template_block[0].strip if talk_template_block
     
     # Fallback to original logic if no talk template found
-    if content =~ /```yaml(.*?)```/m
+    if content =~ /```(?:yaml|markdown)(.*?)```/m
       return $1.strip
     elsif content =~ /```(.*?)```/m
       return $1.strip

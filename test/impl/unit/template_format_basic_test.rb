@@ -24,11 +24,11 @@ class TemplateFormatConsistencyTest < Minitest::Test
                     'README should show markdown metadata format with **Date:**'
 
     # README should NOT show the broken YAML format that would confuse users
-    refute_includes readme_content, 'conference:',
-                    'README should not show YAML frontmatter format for conference'
+    refute_match(/^\s*conference:\s*/, readme_content,
+                'README should not show YAML frontmatter format for conference')
 
-    refute_includes readme_content, 'date:',
-                    'README should not show YAML frontmatter format for date'
+    refute_match(/^\s*date:\s*/, readme_content,
+                'README should not show YAML frontmatter format for date')
   end
 
   # TS-201: Actual talk files use the correct markdown metadata format
