@@ -29,6 +29,9 @@ jobs:
     
     - name: Run integration tests
       run: bundle exec rake test:integration
+    
+    - name: Run migration tests
+      run: bundle exec rake test:migration
 
   performance:
     runs-on: ubuntu-latest
@@ -75,9 +78,40 @@ jobs:
     - name: Run E2E tests
       run: bundle exec rake test:e2e
 
+  tools:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4.5'
+        bundler-cache: true
+    
+    - name: Run tool tests
+      run: bundle exec rake test:tools
+
+  external:
+    runs-on: ubuntu-latest
+    continue-on-error: true  # External tests may fail due to network/API issues
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4.5'
+        bundler-cache: true
+    
+    - name: Run external tests
+      run: bundle exec rake test:external
+
   build:
     runs-on: ubuntu-latest
-    needs: [test, security, performance, e2e]
+    needs: [test, security, performance, e2e, tools]  # Note: external tests not required for build
     
     steps:
     - uses: actions/checkout@v4
