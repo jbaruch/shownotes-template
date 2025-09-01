@@ -31,6 +31,8 @@ unless credentials_file
   puts "⚠️  SKIPPING Google Drive tests: No credentials available"
   puts "   - For CI: Set GOOGLE_API_CREDENTIALS as a GitHub secret"
   puts "   - For local: Ensure 'Google API.json' exists in project root"
+  puts "   - Note: These tests are only needed for migration workflows"
+  puts "   - Users without migration needs can safely skip these tests"
   puts "✅ External tests completed (skipped due to missing credentials)"
   exit 0
 end

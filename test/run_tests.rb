@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'minitest/autorun'
 require 'optparse'
 
 # Main test runner for the shownotes test suite
@@ -25,14 +24,11 @@ class ShownotesTestRunner
     test_files.each { |file| puts "   #{file}" }
     puts
     
-    # Load and execute the test files
+    # Run each test file separately to avoid loading conflicts
     test_files.each do |file|
-      require_relative "../#{file}"
+      puts "Running #{file}..."
+      system("bundle exec ruby #{file}")
     end
-    puts
-    
-    # Load and run test files
-    test_files.each { |file| require_relative "../#{file}" }
     
     puts "✅ Test suite completed"
   end

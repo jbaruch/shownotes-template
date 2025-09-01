@@ -264,15 +264,9 @@ class TemplateRenderingTest < Minitest::Test
   # Test that talks are sorted by date (newest first) on homepage
   def test_talks_sorted_by_date_newest_first
     # This test gracefully handles sites with no talks or only one talk
-    if @site.talks.empty?
-      puts "ℹ️  No talks found - skipping sort test"
-      return
-    end
+    skip 'No talks found - cannot test sorting without talk data' if @site.talks.empty?
     
-    if @site.talks.length == 1
-      puts "ℹ️  Only one talk found - skipping sort test"
-      return
-    end
+    skip 'Only one talk found - need multiple talks to test sorting' if @site.talks.length == 1
 
     # Find the rendered index page
     index_page = @site.pages.find { |page| page.url == '/' }

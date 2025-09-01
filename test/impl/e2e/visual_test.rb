@@ -8,7 +8,7 @@ class VisualTest < Minitest::Test
   JEKYLL_BASE_URL = 'http://localhost:4000'
   
   def setup
-    # Test if Jekyll server is running
+    # Test if Jekyll server is running, start it if not
     begin
       uri = URI.parse(JEKYLL_BASE_URL)
       http = Net::HTTP.new(uri.host, uri.port)
@@ -19,7 +19,43 @@ class VisualTest < Minitest::Test
       @server_running = false
     end
     
-    skip "Jekyll server not running on #{JEKYLL_BASE_URL}. Start with: bundle exec jekyll serve" unless @server_running
+    # Start Jekyll server if not running
+    unless @server_running
+      puts "Starting Jekyll server for visual tests..."
+      @jekyll_pid = spawn('bundle exec jekyll serve --detach')
+      
+      # Wait for server to start (up to 30 seconds)
+      30.times do
+        sleep 1
+        begin
+          uri = URI.parse(JEKYLL_BASE_URL)
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.read_timeout = 2
+          response = http.get('/')
+          if response.code.to_i.between?(200, 399)
+            @server_running = true
+            puts "Jekyll server started successfully"
+            break
+          end
+        rescue
+          # Continue waiting
+        end
+      end
+      
+      assert @server_running, "Failed to start Jekyll server after 30 seconds"
+    end
+  end
+  
+  def teardown
+    # Clean up Jekyll server if we started it
+    if @jekyll_pid
+      begin
+        Process.kill('TERM', @jekyll_pid)
+        Process.wait(@jekyll_pid)
+      rescue
+        # Process may have already exited
+      end
+    end
   end
 
   # ===========================================
@@ -44,7 +80,7 @@ class VisualTest < Minitest::Test
   end
   
   def test_luxembourg_talk_page_loads
-    uri = URI.parse("#{JEKYLL_BASE_URL}/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/")
+    uri = URI.parse("#{JEKYLL_BASE_URL}/talks/2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-/")
     http = Net::HTTP.new(uri.host, uri.port)
     response = http.get(uri.path)
     
@@ -83,7 +119,7 @@ class VisualTest < Minitest::Test
     test_pages = [
       '/',
       '/talks/',
-      '/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/',
+      '/talks/2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-/',
     ]
     
     test_pages.each do |page_path|
@@ -125,7 +161,7 @@ class VisualTest < Minitest::Test
   def test_no_liquid_template_errors_in_html
     test_pages = [
       '/',
-      '/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/',
+      '/talks/2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-/',
     ]
     
     test_pages.each do |page_path|
@@ -159,7 +195,7 @@ class VisualTest < Minitest::Test
     
     # If no thumbnails on homepage, check talk page
     if thumbnail_count == 0
-      uri = URI.parse("#{JEKYLL_BASE_URL}/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/")
+      uri = URI.parse("#{JEKYLL_BASE_URL}/talks/2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-/")
       response = http.get(uri.path)
       drive_thumbnails = response.body.scan(/https:\/\/drive\.google\.com\/thumbnail\?id=/)
       slides_thumbnails = response.body.scan(/https:\/\/lh3\.googleusercontent\.com\/d\//)

@@ -9,20 +9,20 @@ require 'yaml'
 class TemplateFormatConsistencyTest < Minitest::Test
   def setup
     @readme_path = File.join(Dir.pwd, 'README.md')
-    @talk_example_path = File.join(Dir.pwd, '_talks', '2025-06-20-voxxed-luxembourg-technical-enshittification.md')
+    @talk_example_path = File.join(Dir.pwd, '_talks', '2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-.md')
   end
 
   # TS-200: README template format matches actual talk file format
   def test_readme_template_matches_actual_format
-    skip 'README.md not found' unless File.exist?(@readme_path)
-    skip 'Example talk file not found' unless File.exist?(@talk_example_path)
+    assert File.exist?(@readme_path), "❌ FAILED: README.md not found at #{@readme_path}"
+    assert File.exist?(@talk_example_path), "❌ FAILED: Example talk file not found at #{@talk_example_path}"
 
     readme_content = File.read(@readme_path)
     talk_content = File.read(@talk_example_path)
 
     # Extract template examples from README
     readme_template = extract_template_from_readme(readme_content)
-    skip 'No template example found in README' if readme_template.nil?
+    assert !readme_template.nil?, "❌ FAILED: No template example found in README"
 
     # Check that README template structure matches actual talk file
     assert_template_format_consistency(readme_template, talk_content)
@@ -30,7 +30,7 @@ class TemplateFormatConsistencyTest < Minitest::Test
 
   # TS-201: README shows correct metadata fields that are actually extracted
   def test_readme_metadata_fields_match_extractor
-    skip 'README.md not found' unless File.exist?(@readme_path)
+    assert File.exist?(@readme_path), "❌ FAILED: README.md not found at #{@readme_path}"
 
     readme_content = File.read(@readme_path)
     readme_fields = extract_metadata_fields_from_readme(readme_content)
@@ -46,7 +46,7 @@ class TemplateFormatConsistencyTest < Minitest::Test
 
   # TS-202: README shows correct markdown metadata format (not YAML frontmatter)
   def test_readme_shows_markdown_metadata_format
-    skip 'README.md not found' unless File.exist?(@readme_path)
+    assert File.exist?(@readme_path), "❌ FAILED: README.md not found at #{@readme_path}"
 
     readme_content = File.read(@readme_path)
 

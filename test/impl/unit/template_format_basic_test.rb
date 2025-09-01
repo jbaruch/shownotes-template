@@ -7,7 +7,7 @@ require 'minitest/autorun'
 class TemplateFormatConsistencyTest < Minitest::Test
   def setup
     @readme_path = File.join(Dir.pwd, 'README.md')
-    @talk_example_path = File.join(Dir.pwd, '_talks', '2025-06-20-voxxed-luxembourg-technical-enshittification.md')
+    @talk_example_path = File.join(Dir.pwd, '_talks', '2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-everything-in-it-is-.md')
   end
 
   # TS-200: README shows correct metadata format (markdown, not YAML)

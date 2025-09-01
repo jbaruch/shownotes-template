@@ -1,4 +1,22 @@
 module Jekyll
+  # Hook to process markdown-only files by adding frontmatter during site initialization
+  Jekyll::Hooks.register :site, :after_init do |site|
+    # Process talks collection files that lack frontmatter
+    talks_dir = File.join(site.source, '_talks')
+    if Dir.exist?(talks_dir)
+      Dir.glob(File.join(talks_dir, '*.md')).each do |file_path|
+        content = File.read(file_path)
+        
+        # Check if file lacks YAML frontmatter
+        if !content.start_with?('---')
+          # Add minimal frontmatter
+          new_content = "---\nlayout: talk\n---\n\n#{content}"
+          File.write(file_path, new_content)
+        end
+      end
+    end
+  end
+
   class MarkdownTalkProcessor < Generator
     safe true
     priority :high
