@@ -488,7 +488,7 @@ class SimpleTalkRenderer
     <nav role="navigation" aria-label="Main navigation">
       <ul>
         <li><a href="/" tabindex="1">Home</a></li>
-        <li><a href="/talks" tabindex="2" class="current" aria-current="page">All Talks</a></li>
+        <li><a href="/" tabindex="2" class="current" aria-current="page">Home</a></li>
       </ul>
     </nav>
   </header>

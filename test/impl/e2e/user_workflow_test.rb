@@ -23,7 +23,7 @@ class UserWorkflowTest < Minitest::Test
   # Maps to Gherkin: QR code verification workflow during presentation
   def test_qr_code_verification_workflow_during_presentation
     # Simulate attendee scanning QR code during talk
-    visit '/talks/jsconf-2024/modern-javascript-patterns/'
+    visit '/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/'
     
     # Page should load within reasonable time (simulate conference Wi-Fi)
     page_load_time = measure_page_load_time
@@ -40,7 +40,7 @@ class UserWorkflowTest < Minitest::Test
     
     # Verify page is bookmarkable
     current_url = page.current_url
-    assert_match %r{/talks/jsconf-2024/modern-javascript-patterns/$}, current_url,
+    assert_match %r{/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/$}, current_url,
                  'URL should be clean and bookmarkable'
     
     # Verify URL is shareable (clean, meaningful)
@@ -51,7 +51,7 @@ class UserWorkflowTest < Minitest::Test
   # Maps to Gherkin: Post-talk resource access workflow
   def test_post_talk_resource_access_workflow
     # Simulate user returning to bookmarked page after talk
-    bookmark_url = '/talks/jsconf-2024/modern-javascript-patterns/'
+    bookmark_url = '/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/'
     
     # Return to bookmarked page
     visit bookmark_url
@@ -90,7 +90,7 @@ class UserWorkflowTest < Minitest::Test
     # Simulate mobile device viewport
     resize_window_to_mobile
     
-    visit '/talks/test-talk'
+    visit '/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/'
     
     if Capybara.current_driver == :selenium_chrome_headless
       # Content should fit within mobile viewport
@@ -124,7 +124,7 @@ class UserWorkflowTest < Minitest::Test
 
   # Test sharing workflow
   def test_sharing_workflow
-    visit '/talks/jsconf-2024/modern-javascript-patterns/'
+    visit '/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/'
     
     # Verify social media meta tags for proper sharing - work around rack_test limitations
     assert page.html.include?('og:title'), 'Should have og:title meta tag'
@@ -139,7 +139,7 @@ class UserWorkflowTest < Minitest::Test
 
   # Test accessibility during user workflow
   def test_accessibility_user_workflow
-    visit '/talks/test-talk'
+    visit '/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/'
     
     if Capybara.current_driver == :selenium_chrome_headless
       # Test keyboard navigation with JavaScript
@@ -302,12 +302,12 @@ class UserWorkflowTest < Minitest::Test
         <main>
           <h1>Welcome to Test Shownotes</h1>
           <nav>
-            <a href="/talks/test-talk">Test Talk</a>
+            <a href="/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/">Test Talk</a>
             <button onclick="window.print()">Print</button>
           </nav>
           <div id="talks-list">
             <article>
-              <h2><a href="/talks/test-talk">Test Talk Title</a></h2>
+              <h2><a href="/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/">Test Talk Title</a></h2>
               <p>Speaker: Test Expert</p>
             </article>
           </div>

@@ -7,7 +7,6 @@ on:
       - '_talks/**'
       - 'assets/**'
       - 'index.md'
-      - 'talks.html'
       - '_data/**'
       - 'pdfs/**'
   workflow_dispatch:
