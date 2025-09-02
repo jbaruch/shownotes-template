@@ -9,6 +9,7 @@ on:
       - 'index.md'
       - '_data/**'
       - 'pdfs/**'
+      - '*.html'
   workflow_dispatch:
 
 permissions:
