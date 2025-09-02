@@ -2,23 +2,17 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/PjlHKD/robocoders-judgment-day-ai-ides-face-off -->
 # RoboCoders: Judgment Day – AI IDEs Face Off
 
 **Conference:** Devoxx Poland 2025  
-**Date:** 2025-06-11  
-**Slides:** [View Slides](https://drive.google.com/file/d/1Gp0WeBWx3nddsK7JDHD0TniXR47qTGBq/view)  
+**Date:** 2025-06-12  
+**Slides:** [View Slides](https://drive.google.com/file/d/1r2dx00hIvh5vHfRCv-JJUBSNNxjt_Afw/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=u6dWLYQHpkg)  
 
-A presentation at Devoxx Poland 2025 in June 2025 in Kraków, Poland by Baruch Sadogursky
-
-## Description
-
-Can AI-powered IDEs take software development to the next level? Unlike traditional code assistants that provide suggestions or guidance, AI-driven IDEs like Cursor and Windsurf promise to act as full-fledged agents capable of handling entire workflows. In this live showdown, we're putting that promise to the test by challenging these tools to build a smart light bulb controller—something we've never developed before.
-
-From setting up the project and implementing features to testing, debugging, and optimizing, the AI will take the reins. This isn't about helping—it's about doing. The audience will decide the winner based on how well the tools perform and, of course, whether the demo actually works.
-
-Join us to see if AI IDEs can deliver on their bold promise of transforming development, or if they're just another stepping stone on the path to something bigger.
+A presentation at Devoxx Poland 2025  in
+                    June 2025 in
+                    Kraków, Poland by 
+                    Baruch Sadogursky
 
 ## Resources
 
@@ -40,3 +34,5 @@ Join us to see if AI IDEs can deliver on their bold promise of transforming deve
 - [GitHub MCP](https://github.com/github/github-mcp-server)
 - [Puppeteer MCP (Archived as of end of May 2025)](https://github.com/modelcontextprotocol/servers-archived/tree/main/src/puppeteer)
 - [Awesome MCP Servers](https://github.com/punkpeye/awesome-mcp-servers)
+
+<!-- Source: https://speaking.jbaru.ch/PjlHKD/robocoders-judgment-day-ai-ides-face-off -->

@@ -97,7 +97,7 @@ layout: default
     {% assign talks = site.talks | sort: 'extracted_date' | reverse %}
     {% if talks.size > 0 %}
         <!-- Recent/Featured Talks Section -->
-        {% assign recent_talks = talks | limit: 3 %}
+        {% assign recent_talks = talks | slice: 0, 3 %}
         {% if recent_talks.size > 0 %}
         <section class="featured-talks">
             <h2>Recent Presentations</h2>
@@ -192,15 +192,23 @@ layout: default
                     {% endif %}
 
                     <div class="talk-content">
-                        <h3>{{ talk.extracted_title | default: talk.title }}</h3>
-                        <div class="talk-meta-inline">
-                            {% if talk.extracted_conference %}
-                                <span class="conference">{{ talk.extracted_conference }}</span>
-                            {% endif %}
-                            {% if talk.extracted_date %}
-                                <time datetime="{{ talk.extracted_date | date_to_xmlschema }}">{{ talk.extracted_date | date: "%B %Y" }}</time>
-                            {% endif %}
-                        </div>
+                        <header class="talk-header">
+                            <h3>{{ talk.extracted_title | default: talk.title }}</h3>
+                            <div class="talk-meta">
+                                {% if talk.extracted_conference %}
+                                <span class="meta-item conference-name">
+                                    <span class="meta-icon conference" aria-hidden="true"></span>
+                                    {{ talk.extracted_conference }}
+                                </span>
+                                {% endif %}
+                                {% if talk.extracted_date %}
+                                <time class="meta-item" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
+                                    <span class="meta-icon date" aria-hidden="true"></span>
+                                    {{ talk.extracted_date | date: "%B %d, %Y" }}
+                                </time>
+                                {% endif %}
+                            </div>
+                        </header>
                         {% if talk.extracted_description %}
                             <p class="talk-summary">{{ talk.extracted_description | truncate: 120 }}</p>
                         {% endif %}

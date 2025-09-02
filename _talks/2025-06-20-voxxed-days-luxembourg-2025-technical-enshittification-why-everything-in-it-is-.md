@@ -2,12 +2,11 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/V8R94I/technical-enshittification-why-everything-in-it-is-horrible-right-now-and-how-to-fix-it -->
 # Technical Enshittification: Why Everything in IT is Horrible Right Now and How to Fix It
 
 **Conference:** Voxxed Days Luxembourg 2025  
 **Date:** 2025-06-20  
-**Slides:** [View Slides](https://drive.google.com/file/d/1h_b-OxUOVmPIqywLOUIweH0kKaL4etdp/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/13SpSjUbt07Q8ZWhr1uupy9RfLpsNiN_P/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=iFN1Y_8Cuik)  
 
 A presentation at Voxxed Days Luxembourg 2025  in
@@ -57,3 +56,5 @@ A presentation at Voxxed Days Luxembourg 2025  in
 - [Books by Mark Schwartz](https://www.amazon.com/stores/author/B01AHGEC2I)
 - [DevOps for Java Developers (or maybe against them?)](https://speaking.jbaru.ch/7y4wIa/devops-for-developers-or-maybe-against-them)
 - [Naboo.ai: IT-oriented context saving AI](https://www.naboo.ai/)
+
+<!-- Source: https://speaking.jbaru.ch/V8R94I/technical-enshittification-why-everything-in-it-is-horrible-right-now-and-how-to-fix-it -->

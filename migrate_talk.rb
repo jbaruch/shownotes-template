@@ -11,11 +11,12 @@ require 'optparse'
 
 class TalkMigrator
   
-  def initialize(talk_url)
+  def initialize(talk_url, skip_tests: false)
     @talk_url = talk_url
     @talk_data = {}
     @resources = []
     @errors = []
+    @skip_tests = skip_tests
   end
   
   def migrate
@@ -79,15 +80,19 @@ class TalkMigrator
       return false
     end
     
-    # Step 8: Run migration tests
-    test_success = run_migration_tests
-    unless test_success
-      puts "❌ Migration tests FAILED"
-      puts "   This indicates the migration may be incomplete"
-      puts "   Check test output above for specific issues"
-      puts "⚠️  Migration tests failed, but file was created"
-      puts "   This may indicate incomplete migration that needs manual review"
-      return false
+    # Step 8: Run migration tests (unless skipped for batch processing)
+    unless @skip_tests
+      test_success = run_migration_tests
+      unless test_success
+        puts "❌ Migration tests FAILED"
+        puts "   This indicates the migration may be incomplete"
+        puts "   Check test output above for specific issues"
+        puts "⚠️  Migration tests failed, but file was created"
+        puts "   This may indicate incomplete migration that needs manual review"
+        return false
+      end
+    else
+      puts "⏭️  Skipping individual migration tests (batch mode)"
     end
     
     # Step 9: Build Jekyll and run site tests
@@ -200,69 +205,62 @@ class TalkMigrator
   def extract_metadata
     puts "\n2️⃣ Extracting metadata..."
     
-    # Title (REQUIRED)
-    title_elem = @doc.css('h1').first
+    # Title (REQUIRED) - Use precise selector for Notist pages
+    title_elem = @doc.css('.presentation-header h1 a').first
     unless title_elem
-      @errors << "No title found (missing h1 element)"
+      @errors << "No title found (missing .presentation-header h1 a element)"
       return false
     end
     @talk_data[:title] = title_elem.text.strip
     
-    # Date and Conference (extract from page content)
-    # First try to extract from JSON-LD structured data
-    json_ld_scripts = @doc.css('script[type="application/ld+json"]')
-    json_ld_scripts.each do |script|
+    # Date and Conference - Use precise datetime attribute and subhead structure
+    # First extract from time[datetime] element which is most reliable
+    time_elem = @doc.css('time[datetime]').first
+    if time_elem && time_elem['datetime']
       begin
-        json_data = JSON.parse(script.content)
-        if json_data['datePublished']
-          @talk_data[:date] = Date.parse(json_data['datePublished']).strftime("%Y-%m-%d")
-          puts "SUCCESS Date extracted from JSON-LD: #{@talk_data[:date]}"
-        end
-        if json_data.dig('location', 'name')
-          @talk_data[:conference] = json_data['location']['name']
-          puts "SUCCESS Conference extracted from JSON-LD: #{@talk_data[:conference]}"
-        end
-      rescue JSON::ParserError => e
-        puts "DEBUG JSON-LD parsing failed: #{e.message}"
+        @talk_data[:date] = Date.parse(time_elem['datetime']).strftime("%Y-%m-%d")
+        puts "SUCCESS Date extracted from datetime attribute: #{@talk_data[:date]}"
+      rescue => e
+        puts "DEBUG Failed to parse datetime attribute: #{e.message}"
       end
     end
     
-    # Fallback to text parsing if JSON-LD didn't work
-    unless @talk_data[:date]
-      # Look for patterns like "June 11, 2025" and "Devoxx Poland 2025"
-      page_text = @doc.text
-      
-      # Extract date (look for month day, year pattern)
-      date_match = page_text.match(/(\w+\s+\d+,\s+\d{4})/)
-      if date_match
+    # Extract conference from subhead structure
+    subhead = @doc.css('.presentation-header .subhead').first
+    if subhead
+      # Look for "A presentation at [Conference Name]" pattern
+      conf_link = subhead.css('a').first
+      if conf_link && conf_link.text.strip.length > 0
+        @talk_data[:conference] = conf_link.text.strip
+        puts "SUCCESS Conference extracted from subhead: #{@talk_data[:conference]}"
+      end
+    end
+    
+    # Fallback to JSON-LD if direct extraction didn't work
+    unless @talk_data[:date] && @talk_data[:conference]
+      json_ld_scripts = @doc.css('script[type="application/ld+json"]')
+      json_ld_scripts.each do |script|
         begin
-          @talk_data[:date] = Date.parse(date_match[1]).strftime("%Y-%m-%d")
-        rescue
-          @errors << "Could not parse date: #{date_match[1]}"
-          return false
+          json_data = JSON.parse(script.content)
+          if json_data['datePublished'] && !@talk_data[:date]
+            @talk_data[:date] = Date.parse(json_data['datePublished']).strftime("%Y-%m-%d")
+            puts "SUCCESS Date extracted from JSON-LD: #{@talk_data[:date]}"
+          end
+          if json_data.dig('publication', 'name') && !@talk_data[:conference]
+            @talk_data[:conference] = json_data['publication']['name']
+            puts "SUCCESS Conference extracted from JSON-LD: #{@talk_data[:conference]}"
+          end
+        rescue JSON::ParserError => e
+          puts "DEBUG JSON-LD parsing failed: #{e.message}"
         end
-      else
-        @errors << "No date found in page"
-        return false
       end
     end
     
-    # Extract conference (if not already extracted from JSON-LD)
-    unless @talk_data[:conference]
-      page_text = @doc.text
-      conference_patterns = [
-        /Devoxx\s+\w+\s+\d{4}/,
-        /Voxxed\s+Days\s+\w+\s+\d{4}/,
-        /\w+\s+\d{4}/ # Fallback
-      ]
-      
-      conference_patterns.each do |pattern|
-        match = page_text.match(pattern)
-        if match
-          @talk_data[:conference] = match[0]
-          break
-        end
-      end
+    
+    # Fallback to text parsing if structured extraction didn't work
+    unless @talk_data[:date]
+      @errors << "No date found in page"
+      return false
     end
     
     unless @talk_data[:conference]
@@ -274,9 +272,19 @@ class TalkMigrator
     # This is a simplification - may need refinement
     @talk_data[:speaker] = extract_speakers_from_url
     
-    # Extract abstract/description
-    abstract_elem = @doc.css('p').find { |p| p.text.length > 100 }
-    @talk_data[:abstract] = abstract_elem ? abstract_elem.text.strip : ""
+    # Extract abstract/description using precise selector
+    desc_section = @doc.css('#desc .presentation-description')
+    if desc_section.any?
+      # Get all paragraph text from the description section
+      description_parts = desc_section.css('p').map { |p| p.text.strip }.reject(&:empty?)
+      @talk_data[:abstract] = description_parts.join("\n\n")
+      puts "SUCCESS Description extracted from #desc section (#{@talk_data[:abstract].length} chars)"
+    else
+      # Fallback to finding long paragraphs
+      abstract_elem = @doc.css('p').find { |p| p.text.length > 100 }
+      @talk_data[:abstract] = abstract_elem ? abstract_elem.text.strip : ""
+      puts "SUCCESS Description extracted from fallback method"
+    end
     
     puts "SUCCESS Metadata extracted:"
     puts "   Title: #{@talk_data[:title]}"
@@ -290,20 +298,15 @@ class TalkMigrator
   def extract_all_resources
     puts "\n3️⃣ Extracting ALL resources..."
     
-    # Look for the specific resources section on Notist pages
+    # Use precise selector for Notist resources section
     resources_section = @doc.css('#resources .resource-list')
     
     if resources_section.empty?
-      # Try alternative selectors
-      resources_section = @doc.css('#resources ul')
-      
-      if resources_section.empty?
-        @errors << "No resources section found on page"
-        return false
-      end
+      @errors << "No resources section found (#resources .resource-list)"
+      return false
     end
     
-    # Extract resources from the structured list
+    # Extract resources from the structured list - use precise selector
     resource_links = []
     
     resources_section.css('li h3 a').each do |link|
@@ -337,6 +340,14 @@ class TalkMigrator
   
   def handle_pdf
     puts "\n4️⃣ Handling PDF..."
+    
+    # First check if slides exist but aren't downloadable
+    if slides_exist_but_not_downloadable?
+      @errors << "❌ SLIDES EXIST BUT NOT DOWNLOADABLE: Slides are embedded but download is not enabled on Notist"
+      @errors << "   📝 ACTION REQUIRED: Go to #{@talk_url} and enable 'Allow download' in slide settings"
+      @errors << "   🔧 This prevents incomplete migrations - fix the source and re-run migration"
+      return false
+    end
     
     # Look for PDF links in the page or resources
     pdf_urls = find_pdf_urls
@@ -383,7 +394,49 @@ class TalkMigrator
   def find_video
     puts "\n5️⃣ Finding video..."
     
-    # Look for YouTube URLs (direct links and embeds)
+    # Use precise selector for Notist video section
+    video_iframe = @doc.css('#video iframe[src*="notist.ninja"]').first
+    if video_iframe
+      notist_video_url = video_iframe['src']
+      puts "📹 Found Notist embedded video: #{notist_video_url}"
+      
+      # Extract the actual YouTube/Vimeo URL from the Notist embed
+      actual_video_url = extract_actual_video_url(notist_video_url)
+      if actual_video_url
+        puts "SUCCESS Extracted actual video URL: #{actual_video_url}"
+        
+        # Add video resource with actual video URL
+        video_resource = {
+          'type' => 'video',
+          'title' => 'Presentation Video',
+          'url' => actual_video_url,
+          'description' => 'Video recording of the talk'
+        }
+        @resources << video_resource
+        @talk_data[:video_url] = actual_video_url
+        @talk_data[:status] = "completed"
+        
+        puts "SUCCESS Video found and added to resources"
+        return true
+      else
+        puts "⚠️  Could not extract actual video URL from Notist embed, using Notist URL"
+        # Fallback to Notist URL
+        video_resource = {
+          'type' => 'video',
+          'title' => 'Presentation Video',
+          'url' => notist_video_url,
+          'description' => 'Video recording of the talk'
+        }
+        @resources << video_resource
+        @talk_data[:video_url] = notist_video_url
+        @talk_data[:status] = "completed"
+        
+        puts "SUCCESS Video found and added to resources"
+        return true
+      end
+    end
+    
+    # Fallback: Look for YouTube URLs (direct links and embeds)
     youtube_patterns = [
       /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/,
       /https?:\/\/youtu\.be\/([a-zA-Z0-9_-]+)/,
@@ -392,7 +445,7 @@ class TalkMigrator
     
     page_text = @doc.to_s
     
-    # First check for direct YouTube URLs
+    # Check for direct YouTube URLs
     youtube_patterns.each do |pattern|
       match = page_text.match(pattern)
       if match
@@ -539,15 +592,18 @@ class TalkMigrator
         end
         
       when 'video'
-        # Videos MUST be from YouTube, not Notist
-        unless url.include?('youtube.com') || url.include?('youtu.be')
-          if url.include?('notist.cloud') || url.include?('speaking.jbaru.ch')
-            @errors << "VIDEO FROM NOTIST: Resource #{index + 1} '#{resource['title']}' uses Notist video: #{url}. Videos must be on YouTube."
-            return false
-          else
-            @errors << "INVALID VIDEO SOURCE: Resource #{index + 1} '#{resource['title']}' video not from YouTube: #{url}"
-            return false
-          end
+        # Videos can be from YouTube or Notist embedded videos
+        if url.include?('youtube.com') || url.include?('youtu.be')
+          # YouTube videos are preferred
+        elsif url.include?('notist.ninja/embed/')
+          # Notist embedded videos are acceptable
+          puts "   ℹ️  Notist embedded video: #{url}"
+        elsif url.include?('notist.cloud') || url.include?('speaking.jbaru.ch')
+          @errors << "VIDEO FROM NOTIST: Resource #{index + 1} '#{resource['title']}' uses Notist video: #{url}. Videos must be on YouTube."
+          return false
+        else
+          @errors << "INVALID VIDEO SOURCE: Resource #{index + 1} '#{resource['title']}' video not from accepted sources: #{url}"
+          return false
         end
         
       when 'link'
@@ -742,10 +798,26 @@ class TalkMigrator
     match ? match[1].to_i : nil
   end
   
+  def slides_exist_but_not_downloadable?
+    # Check if slides are embedded (slide images present)
+    slides_present = @doc.css('.slide-image, .deck .slide').any?
+    
+    # Check if download links are available
+    pdf_urls = find_pdf_urls
+    download_available = !pdf_urls.empty?
+    
+    slides_present && !download_available
+  end
+  
   def find_pdf_urls
     pdf_urls = []
     
-    # Look for direct PDF links
+    # Use precise selector for Notist download links
+    @doc.css('a[download*=".pdf"]').each do |link|
+      pdf_urls << link['href'] if link['href']
+    end
+    
+    # Fallback: Look for direct PDF links
     @doc.css('a[href$=".pdf"]').each do |link|
       pdf_urls << link['href']
     end
@@ -758,6 +830,59 @@ class TalkMigrator
     pdf_urls.uniq
   end
   
+  def extract_actual_video_url(notist_embed_url)
+    begin
+      puts "   🔍 Fetching Notist embed to extract actual video URL..."
+      
+      uri = URI.parse(notist_embed_url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true if uri.scheme == 'https'
+      
+      response = http.get(uri.path)
+      
+      unless response.code.to_i.between?(200, 299)
+        puts "   ⚠️  Failed to fetch Notist embed: HTTP #{response.code}"
+        return nil
+      end
+      
+      embed_html = response.body
+      
+      # Look for YouTube URLs in the embed
+      youtube_patterns = [
+        /https?:\/\/(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]+)/,
+        /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/,
+        /https?:\/\/youtu\.be\/([a-zA-Z0-9_-]+)/
+      ]
+      
+      youtube_patterns.each do |pattern|
+        match = embed_html.match(pattern)
+        if match
+          video_id = match[1]
+          actual_url = "https://www.youtube.com/watch?v=#{video_id}"
+          puts "   ✅ Extracted YouTube video: #{actual_url}"
+          return actual_url
+        end
+      end
+      
+      # Look for Vimeo URLs
+      vimeo_pattern = /https?:\/\/(?:www\.)?vimeo\.com\/(?:video\/)?(\d+)/
+      vimeo_match = embed_html.match(vimeo_pattern)
+      if vimeo_match
+        video_id = vimeo_match[1]
+        actual_url = "https://vimeo.com/#{video_id}"
+        puts "   ✅ Extracted Vimeo video: #{actual_url}"
+        return actual_url
+      end
+      
+      puts "   ⚠️  No YouTube or Vimeo URL found in Notist embed"
+      return nil
+      
+    rescue => e
+      puts "   ⚠️  Error extracting video URL: #{e.message}"
+      return nil
+    end
+  end
+
   def generate_pdf_filename
     date_part = @talk_data[:date]
     conference_slug = @talk_data[:conference].downcase.gsub(/[^a-z0-9]+/, '-')
@@ -953,6 +1078,7 @@ class SpeakerMigrator
     @speaker_url = speaker_url
     @migrated_talks = []
     @failed_talks = []
+    @failed_talk_details = {} # Store failure details for reporting
   end
   
   def migrate_all_talks
@@ -973,26 +1099,32 @@ class SpeakerMigrator
     end
     puts
     
-    # Step 2: Migrate each talk
+    # Step 2: Migrate each talk (skip individual tests for batch efficiency)
     talk_urls.each_with_index do |talk_url, index|
       puts "\n" + "🎯" * 20
       puts "MIGRATING TALK #{index + 1}/#{talk_urls.length}"
       puts "🎯" * 20
       
-      migrator = TalkMigrator.new(talk_url)
+      migrator = TalkMigrator.new(talk_url, skip_tests: true)
       if migrator.migrate
         @migrated_talks << talk_url
         puts "✅ SUCCESS: #{talk_url}"
       else
         @failed_talks << talk_url
+        @failed_talk_details[talk_url] = migrator.instance_variable_get(:@errors)
         puts "❌ FAILED: #{talk_url}"
+        puts "   Error: #{migrator.instance_variable_get(:@errors).first}" if migrator.instance_variable_get(:@errors).any?
       end
       
       # Brief pause between migrations
       sleep(1)
     end
     
-    # Step 3: Run migration tests
+    # Step 3: Run comprehensive migration tests for all imported talks
+    puts "\n" + "🧪" * 40
+    puts "RUNNING COMPREHENSIVE TESTS FOR ALL MIGRATIONS"
+    puts "🧪" * 40
+    puts "📝 Testing all #{@migrated_talks.length} successfully migrated talks..."
     run_migration_tests
     
     # Step 4: Report summary
@@ -1011,7 +1143,8 @@ class SpeakerMigrator
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true if uri.scheme == 'https'
       
-      response = http.get(uri.path)
+      path = uri.path.empty? ? '/' : uri.path
+      response = http.get(path)
       unless response.code.to_i.between?(200, 299)
         puts "❌ Failed to fetch speaker page: HTTP #{response.code}"
         return []
@@ -1020,39 +1153,133 @@ class SpeakerMigrator
       doc = Nokogiri::HTML(response.body)
       talk_urls = []
       
-      # Find all talk links on the speaker's page
-      # Look for links that match the pattern of individual talks
-      doc.css('a[href]').each do |link|
-        href = link['href']
-        next unless href
-        
-        # Convert relative URLs to absolute
-        if href.start_with?('/')
-          href = "#{uri.scheme}://#{uri.host}#{href}"
-        end
-        
-        # Skip if not the same domain
-        next unless href.include?(uri.host)
-        
-        # Skip if it's the speaker profile itself or general pages
-        next if href == @speaker_url
-        next if href.match?(/\/(about|contact|speaking)$/i)
-        
-        # Look for talk-specific URL patterns
-        # Notist.io uses patterns like /abcDEF/talk-title-slug
-        if href.match?(/\/[a-zA-Z0-9]{6}\/[\w-]+$/)
-          talk_urls << href
-        end
+      # Detect platform and use appropriate discovery strategy
+      if uri.host.include?('speaking.jbaru.ch')
+        talk_urls = discover_speaking_jbaru_ch_talks(doc, uri)
+      elsif uri.host.include?('noti.st')
+        talk_urls = discover_notist_talks(doc, uri)
+      else
+        # Generic discovery for other platforms
+        talk_urls = discover_generic_talks(doc, uri)
       end
       
+      # Remove duplicates and filter out already migrated talks
       talk_urls.uniq!
-      puts "✅ Found #{talk_urls.length} talks"
+      
+      # Filter out talks that already exist (using source URL check)
+      original_count = talk_urls.length
+      talk_urls = talk_urls.reject do |talk_url|
+        TalkMigrator.new(talk_url).send(:talk_already_exists?)
+      end
+      
+      skipped_count = original_count - talk_urls.length
+      puts "✅ Found #{original_count} talks total"
+      puts "⏭️  Skipping #{skipped_count} already migrated talks" if skipped_count > 0
+      puts "🆕 #{talk_urls.length} new talks to migrate"
       
       talk_urls
     rescue => e
       puts "❌ Error discovering talks: #{e.message}"
+      puts e.backtrace.first(3).map { |line| "   #{line}" }
       []
     end
+  end
+  
+  def discover_speaking_jbaru_ch_talks(doc, uri)
+    puts "🎯 Detected speaking.jbaru.ch platform"
+    talk_urls = []
+    
+    # Look for talk links - speaking.jbaru.ch uses /XXXXXX/ patterns
+    doc.css('a[href]').each do |link|
+      href = link['href']
+      next unless href
+      
+      # Convert relative URLs to absolute
+      if href.start_with?('/')
+        href = "#{uri.scheme}://#{uri.host}#{href}"
+      end
+      
+      # Skip if not the same domain
+      next unless href.include?(uri.host)
+      
+      # Skip if it's the home page or speaker profile itself
+      next if href == @speaker_url
+      next if href.match?(/^#{Regexp.escape(uri.to_s)}\/?$/)
+      
+      # Look for talk-specific URL patterns (6-character IDs followed by slug)
+      # Pattern: /XXXXXX/talk-title-slug
+      if href.match?(/\/[a-zA-Z0-9]{6}\/[\w-]+$/i)
+        talk_urls << href
+        puts "   📝 Found talk: #{href}"
+      end
+    end
+    
+    talk_urls
+  end
+  
+  def discover_notist_talks(doc, uri)
+    puts "🎯 Detected Noti.st platform"
+    talk_urls = []
+    
+    # Notist.io uses patterns like /abcDEF/talk-title-slug
+    doc.css('a[href]').each do |link|
+      href = link['href']
+      next unless href
+      
+      # Convert relative URLs to absolute
+      if href.start_with?('/')
+        href = "#{uri.scheme}://#{uri.host}#{href}"
+      end
+      
+      # Skip if not the same domain
+      next unless href.include?(uri.host)
+      
+      # Skip if it's the speaker profile itself or general pages
+      next if href == @speaker_url
+      next if href.match?(/\/(about|contact|speaking)$/i)
+      
+      # Look for talk-specific URL patterns
+      # Notist.io uses patterns like /abcDEF/talk-title-slug
+      if href.match?(/\/[a-zA-Z0-9]{6}\/[\w-]+$/)
+        talk_urls << href
+        puts "   📝 Found talk: #{href}"
+      end
+    end
+    
+    talk_urls
+  end
+  
+  def discover_generic_talks(doc, uri)
+    puts "🎯 Using generic discovery strategy"
+    talk_urls = []
+    
+    # Generic approach: look for links that might be talks
+    # This is a best-effort approach for unknown platforms
+    doc.css('a[href]').each do |link|
+      href = link['href']
+      next unless href
+      
+      # Convert relative URLs to absolute
+      if href.start_with?('/')
+        href = "#{uri.scheme}://#{uri.host}#{href}"
+      end
+      
+      # Skip if not the same domain
+      next unless href.include?(uri.host)
+      
+      # Skip obvious non-talk pages
+      next if href == @speaker_url
+      next if href.match?(/\/(about|contact|speaking|home|index)$/i)
+      next if href.match?(/\.(pdf|jpg|png|gif|css|js)$/i)
+      
+      # Look for URLs that might be talks (contain meaningful paths)
+      if href.match?(/\/[\w-]{3,}/) && !href.match?(/\.(html?|php)$/)
+        talk_urls << href
+        puts "   📝 Found potential talk: #{href}"
+      end
+    end
+    
+    talk_urls
   end
   
   def run_migration_tests
@@ -1106,7 +1333,35 @@ class SpeakerMigrator
       puts "\n💥 Failed to migrate:"
       @failed_talks.each_with_index do |url, i|
         puts "   #{i+1}. #{url}"
+        if @failed_talk_details[url]
+          @failed_talk_details[url].each do |error|
+            puts "       #{error}"
+          end
+        end
       end
+      
+      # Special section for slides download issues
+      slides_issues = @failed_talk_details.select do |url, errors|
+        errors.any? { |error| error.include?("SLIDES EXIST BUT NOT DOWNLOADABLE") }
+      end
+      
+      if slides_issues.any?
+        puts "\n" + "🔧" * 40
+        puts "ACTION REQUIRED: FIX NOTIST SLIDE SETTINGS"
+        puts "🔧" * 40
+        puts "The following talks have slides but download is not enabled:"
+        puts
+        slides_issues.each do |url, errors|
+          puts "🎯 #{url}"
+          puts "   1. Go to the Notist page"
+          puts "   2. Edit the presentation"
+          puts "   3. Enable 'Allow download' in slide settings"
+          puts "   4. Save changes"
+          puts "   5. Re-run migration"
+          puts
+        end
+      end
+      
       puts "\n🔧 Re-run individual talk migrations to debug specific failures"
     end
     

@@ -21,8 +21,16 @@ class VisualTest < Minitest::Test
     
     # Start Jekyll server if not running
     unless @server_running
-      puts "Starting Jekyll server for visual tests..."
-      @jekyll_pid = spawn('bundle exec jekyll serve --detach')
+      puts "Building and starting Jekyll server for visual tests..."
+      
+      # First, build the site to ensure all content is generated
+      puts "Building Jekyll site..."
+      build_result = system('bundle exec jekyll build --quiet')
+      assert build_result, "Failed to build Jekyll site"
+      
+      # Then start the server
+      puts "Starting Jekyll server..."
+      @jekyll_pid = spawn('bundle exec jekyll serve --detach --skip-initial-build')
       
       # Wait for server to start (up to 30 seconds)
       30.times do
