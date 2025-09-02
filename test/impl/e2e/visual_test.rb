@@ -289,24 +289,26 @@ class VisualTest < Minitest::Test
 private
 
   def find_any_talk_url
-    # Get the talks listing page to find any available talk
-    uri = URI.parse("#{JEKYLL_BASE_URL}/talks/")
+    # /talks/ now has a meta redirect to homepage where talks are properly formatted
+    # Look for talk links on the homepage since /talks/ redirects there
+    uri = URI.parse("#{JEKYLL_BASE_URL}/")
     http = Net::HTTP.new(uri.host, uri.port)
-    talks_response = http.get(uri.path)
+    response = http.get(uri.path)
     
-    # Look for talk links in the HTML
-    talk_links = talks_response.body.scan(/href="(\/talks\/[^"]+)"/).flatten
+    # Look for talk links in the homepage HTML
+    talk_links = response.body.scan(/href="(\/talks\/[^"]+)"/).flatten
     talk_links.first # Return the first talk URL found, or nil if none
   end
 
   def find_all_talk_urls
-    # Get the talks listing page to find all available talks
-    uri = URI.parse("#{JEKYLL_BASE_URL}/talks/")
+    # /talks/ now has a meta redirect to homepage where talks are properly formatted
+    # Look for talk links on the homepage since /talks/ redirects there
+    uri = URI.parse("#{JEKYLL_BASE_URL}/")
     http = Net::HTTP.new(uri.host, uri.port)
-    talks_response = http.get(uri.path)
+    response = http.get(uri.path)
     
-    # Look for talk links in the HTML
-    talk_links = talks_response.body.scan(/href="(\/talks\/[^"]+)"/).flatten
+    # Look for talk links in the homepage HTML
+    talk_links = response.body.scan(/href="(\/talks\/[^"]+)"/).flatten
     talk_links.uniq # Return all unique talk URLs found
   end
 end
