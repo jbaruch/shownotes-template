@@ -59,12 +59,12 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
           {% if include.talk_url %}
           <a href="{{ include.talk_url }}" class="preview-link">
             <div class="slides-thumbnail-preview thumbnail-container">
-                            <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                            <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
             </div>
           </a>
           {% else %}
           <div class="slides-thumbnail-preview thumbnail-container">
-                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
           </div>
           {% endif %}
         </div>
@@ -91,12 +91,12 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
         {% if include.talk_url %}
         <a href="{{ include.talk_url }}" class="preview-link">
           <div class="pdf-thumbnail-preview thumbnail-container">
-                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
           </div>
         </a>
         {% else %}
         <div class="pdf-thumbnail-preview thumbnail-container">
-                        <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                        <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
         </div>
         {% endif %}
         </div>
@@ -127,13 +127,13 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
           {% if include.talk_url %}
           <a href="{{ include.talk_url }}" class="preview-link">
             <div class="video-thumbnail-preview thumbnail-container">
-                            <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                            <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
               <div class="play-overlay"><svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
             </div>
           </a>
           {% else %}
           <div class="video-thumbnail-preview thumbnail-container">
-                          <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                          <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
             <div class="play-overlay"><svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
           </div>
           {% endif %}

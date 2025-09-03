@@ -61,6 +61,12 @@ layout: default
 
     <!-- Talk content -->
     <section class="talk-content">
+        {% if page.extracted_presentation_context %}
+            <div class="talk-presentation-context">
+                {{ page.extracted_presentation_context }}
+            </div>
+        {% endif %}
+        
         {% if page.extracted_description %}
             <div class="talk-description">
                 {{ page.extracted_description | markdownify }}

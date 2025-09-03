@@ -1,6 +1,3 @@
-require 'net/http'
-require 'uri'
-
 module Jekyll
   class GoogleDriveThumbnailGenerator < Generator
     safe true
@@ -10,10 +7,7 @@ module Jekyll
     THUMBNAIL_HEIGHT = 300
 
     def generate(site)
-      # Cache for extracted thumbnail URLs
-      @thumbnail_cache = {}
-      
-      # Process all talks and extract Google Drive viewer URLs
+      # Process all talks and extract Google Drive thumbnail URLs
       talks_collection = site.collections['talks']
       return unless talks_collection && talks_collection.docs
       
@@ -27,11 +21,10 @@ module Jekyll
             drive_url = drive_match[1]
             file_id = extract_file_id(drive_url)
             if file_id
-              viewer_url = extract_viewer_url(file_id)
-              if viewer_url
-                talk.data['thumbnail_url'] = viewer_url
-                Jekyll.logger.info "Google Drive Thumbnail:", "Set thumbnail for #{talk.data['title'] || talk.basename}"
-              end
+              # Generate direct Google Drive thumbnail API URL
+              thumbnail_url = "https://lh3.googleusercontent.com/d/#{file_id}=w#{THUMBNAIL_WIDTH}-h#{THUMBNAIL_HEIGHT}"
+              talk.data['thumbnail_url'] = thumbnail_url
+              Jekyll.logger.info "Google Drive Thumbnail:", "Set thumbnail for #{talk.data['title'] || talk.basename}"
             end
           end
         end
@@ -43,57 +36,6 @@ module Jekyll
     def extract_file_id(url)
       match = url.match(/\/d\/([a-zA-Z0-9_-]+)/)
       match ? match[1] : nil
-    end
-
-    def extract_viewer_url(file_id)
-      return @thumbnail_cache[file_id] if @thumbnail_cache[file_id]
-
-      local_thumbnail_dir = File.join('assets', 'images', 'thumbnails')
-      Dir.mkdir(local_thumbnail_dir) unless Dir.exist?(local_thumbnail_dir)
-      local_thumbnail_path = File.join(local_thumbnail_dir, "#{file_id}.jpg")
-
-      if File.exist?(local_thumbnail_path)
-        Jekyll.logger.info 'Google Drive Thumbnail:', "Using cached thumbnail for #{file_id}"
-        return "/#{local_thumbnail_path}"
-      end
-
-      viewer_url = "https://lh3.googleusercontent.com/d/#{file_id}=w#{THUMBNAIL_WIDTH}-h#{THUMBNAIL_HEIGHT}"
-      
-      begin
-        uri = URI.parse(viewer_url)
-        response = nil
-        limit = 5 # Max 5 redirects
-
-        while limit > 0
-          response = Net::HTTP.get_response(uri)
-          
-          if response.is_a?(Net::HTTPRedirection)
-            # The 'location' header contains the new URL
-            location = response['location']
-            # Create a new URI object from the location header
-            uri = URI.parse(location)
-            limit -= 1
-          else
-            # Not a redirect, break the loop
-            break
-          end
-        end
-
-        if response.is_a?(Net::HTTPSuccess)
-          File.open(local_thumbnail_path, 'wb') do |file|
-            file.write(response.body)
-          end
-          Jekyll.logger.info 'Google Drive Thumbnail:', "Downloaded thumbnail for #{file_id}"
-          @thumbnail_cache[file_id] = "/#{local_thumbnail_path}"
-          return "/#{local_thumbnail_path}"
-        else
-          Jekyll.logger.warn 'Google Drive Thumbnail:', "Failed to download thumbnail for #{file_id} after following redirects. Final status: #{response.code}"
-          return nil # Or a fallback image path
-        end
-      rescue StandardError => e
-        Jekyll.logger.error 'Google Drive Thumbnail:', "Error downloading thumbnail for #{file_id}: #{e.message}"
-        return nil # Or a fallback image path
-      end
     end
   end
 end

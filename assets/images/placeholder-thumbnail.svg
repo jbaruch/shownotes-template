@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#f3f4f6"/>
+  <rect x="50" y="50" width="300" height="200" fill="#e5e7eb" rx="8"/>
+  <circle cx="120" cy="120" r="20" fill="#d1d5db"/>
+  <polygon points="160,180 240,120 320,180 320,200 160,200" fill="#d1d5db"/>
+  <text x="200" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6b7280">
+    Presentation Thumbnail
+  </text>
+</svg>

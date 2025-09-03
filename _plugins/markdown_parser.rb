@@ -35,6 +35,7 @@ module Jekyll
           doc.data['extracted_video'] = extract_metadata_from_content(content, 'video')
           doc.data['extracted_description'] = extract_description_from_content(content)
           doc.data['extracted_resources'] = extract_resources_from_content(content)
+          doc.data['extracted_presentation_context'] = extract_and_process_presentation_context(content, site)
         end
       end
 
@@ -124,6 +125,47 @@ module Jekyll
       
       resource_lines = lines[(resources_start + 1)..-1] || []
       resource_lines.join("\n").strip
+    end
+    
+    def extract_and_process_presentation_context(content, site)
+      return '' unless content
+      
+      lines = content.to_s.split("\n")
+      
+      # Find the "A presentation at..." section
+      presentation_start = lines.find_index { |line| line.strip.start_with?('A presentation at') }
+      return '' unless presentation_start
+      
+      # Extract the presentation context (usually spans multiple lines)
+      context_lines = []
+      (presentation_start..lines.length-1).each do |i|
+        line = lines[i].strip
+        
+        # Stop at next section (usually ## Resources)
+        break if line.start_with?('##') || line.start_with?('# ')
+        
+        # Include non-empty lines
+        if !line.empty?
+          context_lines << line
+        elsif !context_lines.empty?
+          # Stop at first empty line after we've collected content
+          break
+        end
+      end
+      
+      # Join the context and process liquid variables
+      raw_context = context_lines.join(' ')
+      
+      # Process liquid variables using Jekyll's liquid renderer
+      begin
+        liquid_template = Liquid::Template.parse(raw_context)
+        processed_context = liquid_template.render('site' => site.site_payload['site'])
+        return processed_context
+      rescue => e
+        # Fallback to raw context if liquid processing fails
+        puts "DEBUG: Liquid processing failed for presentation context: #{e.message}"
+        return raw_context
+      end
     end
   end
 end

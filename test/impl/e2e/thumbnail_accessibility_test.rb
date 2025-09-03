@@ -130,7 +130,7 @@ class ThumbnailAccessibilityTest < Minitest::Test
         
         # Check for onerror handler
         assert img.has_attribute?('onerror'), "Thumbnail images should have onerror fallback"
-        assert img['onerror'].include?('thumbnail-fallback'), "onerror should activate fallback"
+        assert img['onerror'].include?('placeholder-thumbnail.svg'), "onerror should activate fallback"
       end
       
       # Check that fallback structure exists
@@ -142,6 +142,7 @@ class ThumbnailAccessibilityTest < Minitest::Test
     end
     
     puts "SUCCESS Thumbnail fallback structure is properly configured"
+    fallback_elements = doc.css('.thumbnail-fallback')
     puts "         - Found #{fallback_elements.size} fallback elements"
     puts "         - All images have proper onerror handlers"
   end

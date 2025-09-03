@@ -749,6 +749,19 @@ a:hover {
 
 .talk-list-item .talk-content {
     flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+}
+
+.talk-list-item .talk-preview-small {
+    flex-shrink: 0;
+    width: 120px;
+}
+
+.talk-list-item .talk-text-content {
+    flex: 1;
+    min-width: 0; /* Prevent overflow */
 }
 
 .talk-list-item h3 {

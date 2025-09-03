@@ -172,41 +172,43 @@ layout: default
                         {% assign preview_type = 'pdf' %}
                     {% endif %}
 
-                    {% if preview_resource %}
-                    <div class="talk-preview-small">
-                        {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='small' title=talk.extracted_title talk=talk %}
-                    </div>
-                    {% endif %}
-
                     <div class="talk-content">
-                        <header class="talk-header">
-                            <h3>{{ talk.extracted_title | default: talk.title }}</h3>
-                            <div class="talk-meta">
-                                {% if talk.extracted_conference %}
-                                <span class="meta-item conference-name">
-                                    <span class="meta-icon conference" aria-hidden="true"></span>
-                                    {{ talk.extracted_conference }}
-                                </span>
-                                {% endif %}
-                                {% if talk.extracted_date %}
-                                <time class="meta-item" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
-                                    <span class="meta-icon date" aria-hidden="true"></span>
-                                    {{ talk.extracted_date | date: "%B %d, %Y" }}
-                                </time>
-                                {% endif %}
-                            </div>
-                        </header>
-                        {% if talk.extracted_description %}
-                            <p class="talk-summary">{{ talk.extracted_description | truncate: 120 }}</p>
+                        {% if preview_resource %}
+                        <div class="talk-preview-small">
+                            {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='small' title=talk.extracted_title talk=talk %}
+                        </div>
                         {% endif %}
                         
-                        {% comment %} Video publication status {% endcomment %}
-                        <div class="video-status">
-                            {% if talk.extracted_video %}
-                                <span class="status-badge video-published">Video Available</span>
-                            {% else %}
-                                <span class="status-badge video-pending">Video Coming Soon</span>
+                        <div class="talk-text-content">
+                            <header class="talk-header">
+                                <h3>{{ talk.extracted_title | default: talk.title }}</h3>
+                                <div class="talk-meta">
+                                    {% if talk.extracted_conference %}
+                                    <span class="meta-item conference-name">
+                                        <span class="meta-icon conference" aria-hidden="true"></span>
+                                        {{ talk.extracted_conference }}
+                                    </span>
+                                    {% endif %}
+                                    {% if talk.extracted_date %}
+                                    <time class="meta-item" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
+                                        <span class="meta-icon date" aria-hidden="true"></span>
+                                        {{ talk.extracted_date | date: "%B %d, %Y" }}
+                                    </time>
+                                    {% endif %}
+                                </div>
+                            </header>
+                            {% if talk.extracted_description %}
+                                <p class="talk-summary">{{ talk.extracted_description | truncate: 120 }}</p>
                             {% endif %}
+                            
+                            {% comment %} Video publication status {% endcomment %}
+                            <div class="video-status">
+                                {% if talk.extracted_video %}
+                                    <span class="status-badge video-published">Video Available</span>
+                                {% else %}
+                                    <span class="status-badge video-pending">Video Coming Soon</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     </a>

@@ -5,6 +5,7 @@ require 'uri'
 require 'nokogiri'
 require 'yaml'
 require 'json'
+require 'date'
 require 'google/apis/drive_v3'
 require 'googleauth'
 require 'optparse'
@@ -271,6 +272,9 @@ class TalkMigrator
     # Extract speakers (look for author/speaker information)
     # This is a simplification - may need refinement
     @talk_data[:speaker] = extract_speakers_from_url
+    
+    # Extract location from subhead or other sources
+    extract_location_from_page
     
     # Extract abstract/description using precise selector
     desc_section = @doc.css('#desc .presentation-description')
@@ -792,6 +796,47 @@ class TalkMigrator
     end
   end
   
+  def extract_location_from_page
+    # Try to extract location from various sources
+    
+    # Method 1: Look for location in subhead text
+    subhead = @doc.css('.presentation-header .subhead').first
+    if subhead
+      subhead_text = subhead.text
+      # Pattern: "A presentation at Conference in Month Year in Location"
+      location_match = subhead_text.match(/in\s+\w+\s+\d{4}\s+in\s+(.+)/i)
+      if location_match
+        @talk_data[:location] = location_match[1].strip
+        puts "SUCCESS Location extracted from subhead: #{@talk_data[:location]}"
+        return
+      end
+    end
+    
+    # Method 2: Look in JSON-LD structured data
+    json_ld_scripts = @doc.css('script[type="application/ld+json"]')
+    json_ld_scripts.each do |script|
+      begin
+        json_data = JSON.parse(script.content)
+        if json_data.dig('location', 'name')
+          @talk_data[:location] = json_data['location']['name']
+          puts "SUCCESS Location extracted from JSON-LD: #{@talk_data[:location]}"
+          return
+        elsif json_data.dig('location', 'address', 'addressLocality')
+          locality = json_data['location']['address']['addressLocality']
+          country = json_data.dig('location', 'address', 'addressCountry')
+          @talk_data[:location] = country ? "#{locality}, #{country}" : locality
+          puts "SUCCESS Location extracted from JSON-LD address: #{@talk_data[:location]}"
+          return
+        end
+      rescue JSON::ParserError => e
+        puts "DEBUG JSON-LD parsing failed for location: #{e.message}"
+      end
+    end
+    
+    puts "DEBUG No location found in page"
+    @talk_data[:location] = ""
+  end
+  
   def extract_resource_count_from_page
     # Look for "X Resources" text pattern
     match = @doc.text.match(/(\d+)\s+Resources?/i)
@@ -1002,6 +1047,9 @@ class TalkMigrator
     
     content += "\n"
     
+    # Presentation context with dynamic speaker reference
+    content += generate_presentation_context
+    
     # Abstract/description
     if @talk_data[:abstract] && !@talk_data[:abstract].empty?
       content += "#{@talk_data[:abstract]}\n\n"
@@ -1018,6 +1066,37 @@ class TalkMigrator
     end
     
     content
+  end
+
+  def generate_presentation_context
+    # Generate presentation context with dynamic speaker reference
+    context = "A presentation at #{@talk_data[:conference]}"
+    
+    # Add location and date information if available
+    if @talk_data[:location] && !@talk_data[:location].empty?
+      # Extract date parts for readable format
+      begin
+        date_obj = Date.parse(@talk_data[:date])
+        month_year = date_obj.strftime("%B %Y")
+        
+        context += " in\n"
+        context += "                    #{month_year} in\n"
+        context += "                    #{@talk_data[:location]} by \n"
+        context += "                    {{ site.speaker.display_name | default: site.speaker.name }}\n\n"
+      rescue => e
+        puts "DEBUG Date parsing failed for presentation context: #{e.message}"
+        # Fallback without date formatting
+        context += " in\n"
+        context += "                    #{@talk_data[:location]} by \n"
+        context += "                    {{ site.speaker.display_name | default: site.speaker.name }}\n\n"
+      end
+    else
+      # Fallback if no location info
+      context += " by \n"
+      context += "                    {{ site.speaker.display_name | default: site.speaker.name }}\n\n"
+    end
+    
+    context
   end
 
   def generate_smart_conference_slug(conference)
