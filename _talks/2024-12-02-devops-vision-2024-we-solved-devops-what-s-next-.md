@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DevOps Vision 2024  
 **Date:** 2024-12-02  
-**Slides:** [View Slides](https://drive.google.com/file/d/1HOA2RKG7OIdPXMtqASABch-PNNi8KJlB/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1IPStFrTEL_lrKqB6JePlagB_jJ4k97c7/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=MYV2mPd0PCY)  
 
 A presentation at DevOps Vision 2024  in

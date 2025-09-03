@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** API:World 2024  
 **Date:** 2024-11-06  
-**Slides:** [View Slides](https://drive.google.com/file/d/1NAHu_A4o3JII6KzQJ8WiS6FrV1Uo6erO/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1BMiYHHKxamsw2-0Ij9ScOXloyV7ucCl-/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=gln87zHktA8)  
 
 A presentation at API:World 2024  in

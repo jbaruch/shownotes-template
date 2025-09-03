@@ -1,0 +1,15 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  <g transform="translate(200,150)">
+    <!-- Document icon -->
+    <rect x="-30" y="-40" width="60" height="80" fill="#6c757d" rx="4"/>
+    <rect x="-25" y="-35" width="50" height="5" fill="#fff" rx="2"/>
+    <rect x="-25" y="-25" width="50" height="3" fill="#fff" rx="1"/>
+    <rect x="-25" y="-18" width="35" height="3" fill="#fff" rx="1"/>
+    <rect x="-25" y="-11" width="40" height="3" fill="#fff" rx="1"/>
+    <rect x="-25" y="-4" width="30" height="3" fill="#fff" rx="1"/>
+  </g>
+  <text x="200" y="220" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="#6c757d">
+    Presentation Slides
+  </text>
+</svg>

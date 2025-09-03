@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DevIgnition 2024  
 **Date:** 2024-11-07  
-**Slides:** [View Slides](https://drive.google.com/file/d/19rW5VAem8Bocf8Dmn1dFewloQmmfRu_u/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/18GFSNNRDYM_tx0wxP-iAo7a0Qca9qhnM/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=uTEL8Ff1Zvk)  
 
 A presentation at DevIgnition 2024  in

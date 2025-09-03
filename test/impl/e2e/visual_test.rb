@@ -3,6 +3,8 @@
 require 'minitest/autorun'
 require 'net/http'
 require 'uri'
+require 'playwright'
+require 'fileutils'
 
 class VisualTest < Minitest::Test
   JEKYLL_BASE_URL = 'http://localhost:4000'
@@ -244,6 +246,113 @@ class VisualTest < Minitest::Test
     puts "SUCCESS Found #{thumbnail_count} thumbnail URLs in generated HTML"
   end
 
+  def test_no_corb_blocked_thumbnail_urls
+    # This test ensures we don't regress to using CORB-blocked URLs
+    uri = URI.parse("#{JEKYLL_BASE_URL}/")
+    http = Net::HTTP.new(uri.host, uri.port)
+    response = http.get('/')
+    
+    # Check for the problematic drive.google.com/thumbnail URLs that trigger CORB
+    corb_blocked_urls = response.body.scan(/https:\/\/drive\.google\.com\/thumbnail\?id=/)
+    
+    # Also check any talk page if one exists
+    talk_url = find_any_talk_url
+    if talk_url
+      uri = URI.parse("#{JEKYLL_BASE_URL}#{talk_url}")
+      talk_response = http.get(uri.path)
+      corb_blocked_urls += talk_response.body.scan(/https:\/\/drive\.google\.com\/thumbnail\?id=/)
+    end
+    
+    assert_equal 0, corb_blocked_urls.length,
+      "❌ CORB REGRESSION: Found #{corb_blocked_urls.length} blocked drive.google.com/thumbnail URLs. Use lh3.googleusercontent.com URLs instead!"
+    
+    # Verify we're using the correct lh3.googleusercontent.com URLs
+    correct_urls = response.body.scan(/https:\/\/lh3\.googleusercontent\.com\/d\//)
+    if talk_url
+      correct_urls += talk_response.body.scan(/https:\/\/lh3\.googleusercontent\.com\/d\//)
+    end
+    
+    if correct_urls.length > 0
+      puts "SUCCESS Using #{correct_urls.length} CORB-safe lh3.googleusercontent.com thumbnail URLs"
+    else
+      # If no thumbnails at all, that's also acceptable (no talks exist)
+      puts "INFO No thumbnail URLs found (no talks with Google Drive slides)"
+    end
+  end
+
+  def test_thumbnail_structure_and_accessibility
+    # Check homepage for proper thumbnail structure
+    uri = URI.parse("#{JEKYLL_BASE_URL}/")
+    http = Net::HTTP.new(uri.host, uri.port)
+    response = http.get('/')
+    html = response.body
+    
+    # Count talk items that should have thumbnails
+    talk_items = html.scan(/<article class="talk-list-item">/).length
+    
+    # Skip if no talks
+    if talk_items == 0
+      skip "❌ SKIPPED: No talks found - cannot test thumbnail structure"
+      return
+    end
+    
+    # Count actual thumbnail images
+    thumbnail_images = html.scan(/<img[^>]+class="[^"]*preview-image[^"]*"/).length
+    pdf_thumbnails = html.scan(/<div class="pdf-thumbnail-preview">/).length
+    
+    # Each talk should have either a thumbnail image or a placeholder
+    assert thumbnail_images > 0 || pdf_thumbnails > 0,
+      "❌ THUMBNAIL STRUCTURE MISSING: Found #{talk_items} talks but no thumbnail images or containers"
+    
+    # Check for proper thumbnail container structure
+    preview_containers = html.scan(/<div class="talk-preview-small">/).length
+    assert preview_containers >= talk_items * 0.8, # Allow some talks without previews
+      "❌ PREVIEW CONTAINERS MISSING: Expected ~#{talk_items} preview containers, found #{preview_containers}"
+    
+    # Check for accessible thumbnail images (alt attributes)
+    thumbnail_imgs_with_alt = html.scan(/<img[^>]+alt="[^"]*"[^>]*class="[^"]*preview-image[^"]*"/).length +
+                              html.scan(/<img[^>]+class="[^"]*preview-image[^"]*"[^>]+alt="[^"]*"/).length
+    if thumbnail_images > 0
+      assert thumbnail_imgs_with_alt >= thumbnail_images * 0.9, # Allow some missing alt tags
+        "❌ ACCESSIBILITY ISSUE: #{thumbnail_images} thumbnails found but only #{thumbnail_imgs_with_alt} have alt attributes"
+    end
+    
+    puts "SUCCESS Thumbnail structure validated: #{thumbnail_images} images, #{pdf_thumbnails} PDF containers, #{preview_containers} preview containers"
+  end
+
+  def test_featured_talks_have_thumbnails
+    # Check that featured talks section specifically has thumbnails
+    uri = URI.parse("#{JEKYLL_BASE_URL}/")
+    http = Net::HTTP.new(uri.host, uri.port)
+    response = http.get('/')
+    html = response.body
+    
+    # Look for featured talks section
+    featured_section_match = html.match(/<section[^>]*featured-talks[^>]*>(.*?)<\/section>/m)
+    
+    if featured_section_match
+      featured_html = featured_section_match[1]
+      
+      # Count featured talk cards
+      featured_cards = featured_html.scan(/<article class="talk-card featured">/).length
+      
+      if featured_cards > 0
+        # Count thumbnails in featured section
+        featured_thumbnails = featured_html.scan(/drive\.google\.com\/thumbnail/).length
+        featured_images = featured_html.scan(/<img[^>]+class="[^"]*preview-image[^"]*"/).length
+        
+        assert featured_thumbnails > 0 || featured_images > 0,
+          "❌ FEATURED TALKS MISSING THUMBNAILS: Found #{featured_cards} featured talks but no thumbnails"
+        
+        puts "SUCCESS Featured talks have thumbnails: #{featured_cards} cards, #{featured_thumbnails} Drive thumbnails, #{featured_images} images"
+      else
+        puts "INFO No featured talk cards found - may be using different layout"
+      end
+    else
+      puts "INFO No featured talks section found - checking regular talk list"
+    end
+  end
+
   # ===========================================
   # Performance and Basic Quality
   # ===========================================
@@ -292,6 +401,50 @@ class VisualTest < Minitest::Test
     end
     
     puts "SUCCESS No common broken link patterns found"
+  end
+
+  def test_capture_thumbnail_screenshots
+    # Ensure screenshot directory exists
+    screenshots_dir = "test/screenshots/thumbnails"
+    FileUtils.mkdir_p(screenshots_dir)
+
+    # Define the path to the playwright executable within the bundle
+    # This is necessary because the test runner may not have the bundle path in its PATH
+    playwright_executable_path = File.expand_path('../../vendor/bundle/ruby/3.4.0/bin/playwright', __dir__)
+
+    unless File.exist?(playwright_executable_path)
+      skip "Playwright executable not found at #{playwright_executable_path}. Run 'bundle install' and ensure the path is correct."
+      return
+    end
+
+    # Run install command manually to ensure browsers are downloaded.
+    system("#{playwright_executable_path} install")
+
+    playwright_cli_executable_path = playwright_executable_path
+
+    Playwright.create(playwright_cli_executable_path: playwright_cli_executable_path) do |playwright|
+      playwright.chromium.launch(headless: true) do |browser|
+        page = browser.new_page
+        page.goto(JEKYLL_BASE_URL)
+
+        # Wait for thumbnails to be potentially loaded
+        page.wait_for_selector('.talk-preview-small, .talk-preview-normal', timeout: 10000)
+
+        # Find all thumbnail preview containers
+        thumbnails = page.query_selector_all('.talk-preview-small, .talk-preview-normal')
+
+        assert_operator thumbnails.length, :>, 0, "No thumbnails found to screenshot"
+
+        thumbnails.each_with_index do |thumbnail, i|
+          # Create a unique filename for each screenshot
+          screenshot_path = File.join(screenshots_dir, "thumbnail_#{i + 1}.png")
+          thumbnail.screenshot(path: screenshot_path)
+          puts "  SUCCESS Captured screenshot: #{screenshot_path}"
+        end
+        
+        puts "SUCCESS Captured #{thumbnails.length} thumbnail screenshots."
+      end
+    end
   end
 
 private

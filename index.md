@@ -8,7 +8,7 @@ layout: default
         {% if site.speaker %}
         {% assign avatar_url = "" %}
         {% if site.speaker.social.github and site.speaker.social.github != "" %}
-            {% assign avatar_url = "https://github.com/" | append: site.speaker.social.github | append: ".png?size=200" %}
+            {% assign avatar_url = "https://avatars.githubusercontent.com/" | append: site.speaker.social.github %}
         {% elsif site.speaker.avatar_url and site.speaker.avatar_url != "" %}
             {% assign avatar_url = site.speaker.avatar_url %}
         {% endif %}
@@ -94,85 +94,69 @@ layout: default
         </div>
     </header>
 
-    {% assign talks = site.talks | sort: 'extracted_date' | reverse %}
+    {% assign talks = site.talks | default: empty %}
+    {% unless talks == empty %}
+      {% assign talks = talks | sort: 'extracted_date' | reverse %}
+    {% endunless %}
     {% if talks.size > 0 %}
-        <!-- Recent/Featured Talks Section -->
-        {% assign recent_talks = talks | slice: 0, 3 %}
+        {% comment %} Filter for talks with preview resources to feature them {% endcomment %}
+        {% assign talks_with_previews = '' | split: '' %}
+        {% for talk in talks %}
+            {% if talk.extracted_slides or talk.extracted_video or talk.thumbnail_url %}
+                {% assign talks_with_previews = talks_with_previews | push: talk %}
+            {% endif %}
+        {% endfor %}
+
+        {% assign recent_talks = talks_with_previews | slice: 0, 3 %}
+
         {% if recent_talks.size > 0 %}
         <section class="featured-talks">
-            <h2>Recent Presentations</h2>
+            <h2>Highlighted Presentations</h2>
             <div class="featured-talks-grid">
                 {% for talk in recent_talks %}
-                <a href="{{ talk.url | relative_url }}" class="featured-talk-card-link">
-                <article class="featured-talk-card">
-                    {% comment %} Extract slides resource for preview (prioritize slides over video) {% endcomment %}
+                  <article class="featured-talk-card">
+                    <a href="{{ talk.url | relative_url }}" class="featured-talk-card-link">
                     {% assign preview_resource = null %}
-                    
-                    {% comment %} Check for extracted slides/video URLs {% endcomment %}
                     {% if talk.extracted_slides %}
                         {% assign preview_resource = talk.extracted_slides %}
                         {% assign preview_type = 'slides' %}
                     {% elsif talk.extracted_video %}
                         {% assign preview_resource = talk.extracted_video %}
                         {% assign preview_type = 'video' %}
+                    {% elsif talk.source.type == 'pdf' %}
+                        {% assign preview_resource = talk.source.url %}
+                        {% assign preview_type = 'pdf' %}
                     {% endif %}
 
                     {% if preview_resource %}
                     <div class="talk-preview-large">
-                        {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='large' %}
+                        {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='large' title=talk.extracted_title talk=talk talk_url=talk.url %}
                     </div>
                     {% endif %}
 
                     <div class="talk-content">
                         <header class="talk-header">
                             <h3>{{ talk.extracted_title | default: talk.title }}</h3>
-                            <div class="talk-meta">
-                                {% if talk.extracted_conference %}
-                                <span class="meta-item conference-name">
-                                    <span class="meta-icon conference" aria-hidden="true"></span>
-                                    {{ talk.extracted_conference }}
-                                </span>
-                                {% endif %}
-                                {% if talk.extracted_date %}
-                                <time class="meta-item" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
-                                    <span class="meta-icon date" aria-hidden="true"></span>
-                                    {{ talk.extracted_date | date: "%B %d, %Y" }}
-                                </time>
-                                {% endif %}
-                            </div>
                         </header>
-
                         {% if talk.extracted_description %}
-                            <p class="talk-description">{{ talk.extracted_description }}</p>
+                            <p class="talk-summary">{{ talk.extracted_description | truncate: 100 }}</p>
                         {% endif %}
-
-                        {% comment %} Video publication status {% endcomment %}
-                        <div class="video-status">
-                            {% if talk.extracted_video %}
-                                <span class="status-badge video-published">Video Available</span>
-                            {% else %}
-                                <span class="status-badge video-pending">Video Coming Soon</span>
-                            {% endif %}
-                        </div>
-
-
                     </div>
-                </article>
-                </a>
+                    </a>
+                  </article>
                 {% endfor %}
             </div>
         </section>
         {% endif %}
 
-        <!-- All Other Talks Section -->
-        {% assign older_talks = talks | offset: 3 %}
-        {% if older_talks.size > 0 %}
+        <!-- All Talks Section -->
+        {% if talks.size > 0 %}
         <section class="all-talks">
             <h2>All Presentations</h2>
             <div class="talks-list">
-                {% for talk in older_talks %}
-                <a href="{{ talk.url | relative_url }}" class="talk-list-item-link">
+                {% for talk in talks %}
                 <article class="talk-list-item">
+                    <a href="{{ talk.url | relative_url }}" class="talk-list-item-link">
                     {% comment %} Extract slides resource for preview (prioritize slides over video) {% endcomment %}
                     {% assign preview_resource = null %}
                     
@@ -183,11 +167,14 @@ layout: default
                     {% elsif talk.extracted_video %}
                         {% assign preview_resource = talk.extracted_video %}
                         {% assign preview_type = 'video' %}
+                    {% elsif talk.source.type == 'pdf' %}
+                        {% assign preview_resource = talk.source.url %}
+                        {% assign preview_type = 'pdf' %}
                     {% endif %}
 
                     {% if preview_resource %}
                     <div class="talk-preview-small">
-                        {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='small' %}
+                        {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='small' title=talk.extracted_title talk=talk %}
                     </div>
                     {% endif %}
 
@@ -222,8 +209,8 @@ layout: default
                             {% endif %}
                         </div>
                     </div>
+                    </a>
                 </article>
-                </a>
                 {% endfor %}
             </div>
         </section>

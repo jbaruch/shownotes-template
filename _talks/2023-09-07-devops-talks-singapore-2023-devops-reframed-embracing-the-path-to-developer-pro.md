@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DevOps Talks Singapore 2023  
 **Date:** 2023-09-07  
-**Slides:** [View Slides](https://drive.google.com/file/d/1Jw4MbGqUrbKhbe7f5Vf8p1t22sAH9KWS/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/16-rPvDmflUOoJL6Hj7Iz8Cmg4DD90nh6/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=uTEL8Ff1Zvk)  
 
 A presentation at DevOps Talks Singapore 2023  in

@@ -4,12 +4,15 @@ require 'minitest/autorun'
 require 'net/http'
 require 'uri'
 require 'nokogiri'
+require 'yaml'
 
 class FeaturedTalksLimitTest < Minitest::Test
   JEKYLL_BASE_URL = 'http://localhost:4000'
-  EXPECTED_FEATURED_LIMIT = 4
   
   def setup
+    # Load expected count from config
+    config = YAML.load_file('_config.yml')
+    @expected_featured_limit = config['featured_talks_count'] || 4
     # Test if Jekyll server is running, start it if not
     begin
       uri = URI.parse(JEKYLL_BASE_URL)
@@ -82,10 +85,10 @@ class FeaturedTalksLimitTest < Minitest::Test
     featured_cards = featured_section.css('article.featured-talk-card')
     featured_count = featured_cards.length
     
-    puts "🔍 Found #{featured_count} featured talk cards (expected: #{EXPECTED_FEATURED_LIMIT})"
+    puts "🔍 Found #{featured_count} featured talk cards (expected: #{@expected_featured_limit})"
     
-    assert_equal EXPECTED_FEATURED_LIMIT, featured_count,
-                 "Featured talks should be limited to #{EXPECTED_FEATURED_LIMIT}, but found #{featured_count}"
+    assert_equal @expected_featured_limit, featured_count,
+                 "Featured talks should be limited to #{@expected_featured_limit}, but found #{featured_count}"
   end
 
   def test_remaining_talks_in_compact_list
@@ -113,8 +116,8 @@ class FeaturedTalksLimitTest < Minitest::Test
     
     # Verify the compact list has significantly more items than featured
     # (since we have 30+ talks total)
-    assert compact_count > EXPECTED_FEATURED_LIMIT, 
-           "Compact list should have more talks (#{compact_count}) than featured section (#{EXPECTED_FEATURED_LIMIT})"
+    assert compact_count > @expected_featured_limit, 
+           "Compact list should have more talks (#{compact_count}) than featured section (#{@expected_featured_limit})"
   end
 
   def test_homepage_structure_makes_sense

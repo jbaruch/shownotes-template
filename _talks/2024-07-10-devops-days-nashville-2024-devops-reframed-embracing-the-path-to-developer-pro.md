@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DevOps Days Nashville 2024  
 **Date:** 2024-07-10  
-**Slides:** [View Slides](https://drive.google.com/file/d/1S_iXA-lA767vFXSoYwidl7Hzl2P-VlH9/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/18_hpbiXIpDCQPl3EZLIP1DaR9mxjSLsp/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=uTEL8Ff1Zvk)  
 
 A presentation at DevOps Days Nashville 2024  in

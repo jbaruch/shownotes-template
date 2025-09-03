@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DevOps Vision 2023  
 **Date:** 2023-12-04  
-**Slides:** [View Slides](https://drive.google.com/file/d/1gKBWUCHgotHN4p4WyXF0_uUN3JiMV48R/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1vE3jlKGinzjMwbato5QuMiCOTwzyPB_m/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=2uuaFMkg_QY)  
 
 A presentation at DevOps Vision 2023  in

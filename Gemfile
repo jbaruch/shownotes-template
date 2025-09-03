@@ -23,4 +23,5 @@ group :test do
   gem 'capybara', '~> 3.40'
   gem 'nokogiri', '~> 1.18.0'  # Latest with security patches
   gem 'selenium-webdriver', '~> 4.35'
+  gem 'playwright-ruby-client', '~> 1.5'
 end

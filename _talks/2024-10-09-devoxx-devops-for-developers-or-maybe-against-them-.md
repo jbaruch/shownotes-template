@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Devoxx  
 **Date:** 2024-10-09  
-**Slides:** [View Slides](https://drive.google.com/file/d/1vj45g6fKb8YTk8mycpFj3V5019Urnj1E/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1nvPWye7x26MND6hcbNnuUaCVh_ZgjNoT/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=SNMrlOxbI7k)  
 
 A presentation at Devoxx  in

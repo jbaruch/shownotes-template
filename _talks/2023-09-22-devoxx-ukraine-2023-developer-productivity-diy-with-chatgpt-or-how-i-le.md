@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Devoxx Ukraine 2023  
 **Date:** 2023-09-22  
-**Slides:** [View Slides](https://drive.google.com/file/d/1oHPDgZoKeG-Pvoaa9D2AxU2qKgKPPMTx/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1S57qjfq4lH6fVVfFWLMXzGlLgxF-vGpN/view)  
 
 A presentation at Devoxx Ukraine 2023  in
                     September 2023 in
@@ -29,7 +29,6 @@ A presentation at Devoxx Ukraine 2023  in
 - [Failure Analytics (Flaky Tests Mitigation)](https://gradle.com/gradle-enterprise-solutions/failure-analytics/)
 - [Trends, Reporting and Insights](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [Mantium AI (adding your KB to Chat-GPT easly!)](https://mantiumai.com/)
-- [Speed Challenge (Win Prizes!)](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [DPE Summit (watch out for the recordings!)](https://dpesummit.com/)
 
 <!-- Source: https://speaking.jbaru.ch/xZvzKQ/developer-productivity-diy-with-chatgpt-or-how-i-learned-to-stop-worrying-and-love-the-ai -->

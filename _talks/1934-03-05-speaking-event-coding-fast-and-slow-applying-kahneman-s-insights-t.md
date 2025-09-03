@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Speaking Event  
 **Date:** 1934-03-05  
-**Slides:** [View Slides](https://drive.google.com/file/d/1TdJ0aj0mSqEnbi8O2SRC_j_-Uv-qowLX/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1jqC3aI_cMJvWvx9K80IFGTdN-q-7KxMc/view)  
 
 A presentation at NFJS Webinar April 2024  by 
                     Baruch Sadogursky
@@ -28,11 +28,9 @@ A presentation at NFJS Webinar April 2024  by
 - [Trends, Reporting and Insights](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [Failure Analytics (Flaky Tests Mitigation)](https://gradle.com/gradle-enterprise-solutions/failure-analytics/)
 - [Predictive Test Selection Feature in Develocity](https://gradle.com/gradle-enterprise-solutions/predictive-test-selection/)
-- [Speed Challenge (Win Prizes!)](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [Try DPE today and win prizes: Gradle and Maven Build Speed Challenge](https://gradle.com/gradle-and-maven-build-speed-challenge/)
 - [Developer Productivity Engineering (DPE) Handbook](https://gradle.com/developer-productivity-engineering/handbook/)
 - [DPE Summit](https://dpesummit.com/)
-- [The Developer Productivity Engineering Handbook](https://gradle.com/developer-productivity-engineering/handbook/)
 - [Predictive Test Selection Paper from Meta](https://research.facebook.com/publications/predictive-test-selection/)
 
 <!-- Source: https://speaking.jbaru.ch/pqGGv6/coding-fast-and-slow-applying-kahnemans-insights-to-improve-development-practices-and-efficiency -->

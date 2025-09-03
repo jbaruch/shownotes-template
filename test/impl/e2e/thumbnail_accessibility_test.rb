@@ -102,9 +102,20 @@ class ThumbnailAccessibilityTest < Minitest::Test
     preview_containers = doc.css('.talk-preview-large, .talk-preview-small')
     assert preview_containers.size > 0, "Should have preview containers"
     
-    # Check for fallback elements
-    fallback_elements = doc.css('.thumbnail-fallback')
-    assert fallback_elements.size > 0, "Should have thumbnail fallback elements"
+    # Check that each preview container has fallback elements for when images fail
+    preview_containers.each do |container|
+      # Should have either an image with onerror fallback or a fallback element
+      img = container.css('.preview-image').first
+      fallback = container.css('.thumbnail-fallback').first
+      
+      assert img || fallback, "Preview container should have either image or fallback element"
+      
+      if img
+        # Image should have onerror attribute for fallback handling
+        assert img.has_attribute?('onerror') || fallback, 
+               "Image should have onerror fallback or container should have fallback element"
+      end
+    end
     
     preview_containers.each do |container|
       # Check for alternative content when thumbnails fail

@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Dev2Next 2024  
 **Date:** 2024-09-30  
-**Slides:** [View Slides](https://drive.google.com/file/d/1MGunAzIl6aQHOon3rRYGQIM5nWgR_X9P/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/12sxtWNyHKksM7V1v1t6k2SLLTAhSLi6E/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=OeTtYIjcxpc)  
 
 A presentation at Dev2Next 2024  in

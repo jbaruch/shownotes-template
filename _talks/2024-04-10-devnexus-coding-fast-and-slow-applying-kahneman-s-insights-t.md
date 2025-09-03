@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DEVNEXUS  
 **Date:** 2024-04-10  
-**Slides:** [View Slides](https://drive.google.com/file/d/1KNcMMBuVIgIOAR25W5CHD-v5XXOqgSo5/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1ud0CHjDC6ZE0tJCmNnZNa-AaeUcvQWXB/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=UsP0hbjuDAg)  
 
 A presentation at DEVNEXUS  in
@@ -30,7 +30,6 @@ A presentation at DEVNEXUS  in
 - [Trends, Reporting and Insights](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [Failure Analytics (Flaky Tests Mitigation)](https://gradle.com/gradle-enterprise-solutions/failure-analytics/)
 - [Predictive Test Selection Feature in Develocity](https://gradle.com/gradle-enterprise-solutions/predictive-test-selection/)
-- [Speed Challenge (Win Prizes!)](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [Developer Productivity Engineering (DPE) Handbook](https://gradle.com/developer-productivity-engineering/handbook/)
 - [DPE Summit](https://dpesummit.com/)
 

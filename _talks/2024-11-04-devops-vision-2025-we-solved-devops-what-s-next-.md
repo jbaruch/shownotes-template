@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DevOps Vision 2025  
 **Date:** 2024-11-04  
-**Slides:** [View Slides](https://drive.google.com/file/d/1wHHDT-VR1D2fwsJVKjQMwUXUsI7k2msn/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/10SBW2s_Id1tSPtMZSdPe4guXi_Ckv52r/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=oYBVkPhZKRU)  
 
 A presentation at NJFS Webinar November 2024  by 

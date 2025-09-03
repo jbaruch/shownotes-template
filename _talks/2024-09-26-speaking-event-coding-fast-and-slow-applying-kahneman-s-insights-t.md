@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Speaking Event  
 **Date:** 2024-09-26  
-**Slides:** [View Slides](https://drive.google.com/file/d/1JongR5YuxXYOeTu9RQcP_u6AcysVl0wr/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1DDyxsujUIPgU62odZ8cSFq5P3OlX4Dzz/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=oWETFPBgXxM)  
 
 A presentation at JConf.Dev  in

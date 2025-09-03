@@ -62,6 +62,9 @@ speaker:
 title: "Speaker Presentations"
 description: "Conference talk show notes and resources"
 
+# Featured talks configuration
+featured_talks_count: 3
+
 # SEO settings (will use speaker info dynamically)
 # No need for redundant author or twitter config since speaker section provides this
 

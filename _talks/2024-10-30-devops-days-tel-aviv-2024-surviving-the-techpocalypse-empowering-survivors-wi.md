@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DevOps Days Tel Aviv 2024  
 **Date:** 2024-10-30  
-**Slides:** [View Slides](https://drive.google.com/file/d/1j-Pt_SVgVv6PDbSJYgHFF55LjA9re1ta/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1mpy8Fz-GShWNjvLJeWQ8khEub3SFt1Vq/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=r1ql1RNYa94)  
 
 A presentation at DevOps Days Tel Aviv 2024  in
@@ -31,7 +31,6 @@ A presentation at DevOps Days Tel Aviv 2024  in
 - [Gradle Build Cache (Local and Remote)](https://docs.gradle.org/current/userguide/build_cache.html)
 - [Parallel local tests execution](https://docs.gradle.org/current/userguide/performance.html#parallel_execution)
 - [Test Distribution (Parallel cloud test execution)](https://gradle.com/gradle-enterprise-solutions/test-distribution/)
-- [Trends, Reporting and Insights](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [Failure Analytics (Flaky Tests Mitigation)](https://gradle.com/gradle-enterprise-solutions/failure-analytics/)
 - [Predictive Test Selection Feature in Develocity](https://gradle.com/gradle-enterprise-solutions/predictive-test-selection/)
 - [Spring Framework Project PDT Simulations](https://ge.spring.io/scans/test-selection?predictive-test-selection.view=simulator&search.timeZoneId=America%2FToronto#)

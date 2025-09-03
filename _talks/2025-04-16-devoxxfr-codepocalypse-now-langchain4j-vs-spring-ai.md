@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DevoxxFR  
 **Date:** 2025-04-16  
-**Slides:** [View Slides](https://drive.google.com/file/d/1JmvYuxTV_syjAC2Tz5Y1jyoEkuK8REjx/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1FazS1MNNPJQAbz6ECAb-kGrH8_OtCfJb/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=lkMhqEyjfXs)  
 
 A presentation at DevoxxFR  in

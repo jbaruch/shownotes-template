@@ -36,7 +36,7 @@ class HomepageThumbnailsTest < Minitest::Test
     featured_thumbnails.each do |img|
       src = img['src']
       assert src && !src.empty?, "Thumbnail image should have src attribute"
-      assert src.include?('thumbnail') || src.include?('img') || src.include?('drive.google.com') || src.start_with?('data:'), 
+      assert src.include?('thumbnail') || src.include?('img') || src.include?('drive.google.com') || src.include?('googleusercontent.com') || src.start_with?('data:'), 
              "Thumbnail src should be a valid image URL: #{src}"
     end
     
@@ -62,7 +62,7 @@ class HomepageThumbnailsTest < Minitest::Test
     all_talks_thumbnails.each do |img|
       src = img['src']
       assert src && !src.empty?, "Thumbnail image should have src attribute"
-      assert src.include?('thumbnail') || src.include?('img') || src.include?('drive.google.com') || src.start_with?('data:'), 
+      assert src.include?('thumbnail') || src.include?('img') || src.include?('drive.google.com') || src.include?('googleusercontent.com') || src.start_with?('data:'), 
              "Thumbnail src should be a valid image URL: #{src}"
     end
     

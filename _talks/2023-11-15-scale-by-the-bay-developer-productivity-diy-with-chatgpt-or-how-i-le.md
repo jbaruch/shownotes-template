@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Scale By The Bay  
 **Date:** 2023-11-15  
-**Slides:** [View Slides](https://drive.google.com/file/d/12KYyVVfiZVwLJRNj2hFTcyE9RQcuTl1Z/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1moEItR0Mq0TnU0OMUccY_ftaPLQqD-rC/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=-2m1TzY1CjA)  
 
 A presentation at Scale By The Bay  in
@@ -29,7 +29,6 @@ A presentation at Scale By The Bay  in
 - [Predictive Test Selection Paper from Meta](https://engineering.fb.com/2018/11/21/developer-tools/predictive-test-selection/)
 - [Failure Analytics (Flaky Tests Mitigation)](https://gradle.com/gradle-enterprise-solutions/failure-analytics/)
 - [Trends, Reporting and Insights](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
-- [Speed Challenge (Win Prizes!)](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [DPE Summit (watch out for the recordings!)](https://dpesummit.com/)
 
 <!-- Source: https://speaking.jbaru.ch/T22OVF/developer-productivity-diy-with-chatgpt-or-how-i-learned-to-stop-worrying-and-love-the-ai -->

@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** SonarSouce Brown Bag  
 **Date:** 2023-10-18  
-**Slides:** [View Slides](https://drive.google.com/file/d/1g7c0_TbJAo7hM5x7ksW_SjfwrmdWqPtn/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1zCXXjqqb4mwWg2b-E481F7RHmVMq9u2D/view)  
 
 A presentation at SonarSouce Brown Bag  in
                     October 2023 in

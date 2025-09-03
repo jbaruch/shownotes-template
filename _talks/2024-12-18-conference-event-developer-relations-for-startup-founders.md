@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Conference Event  
 **Date:** 2024-12-18  
-**Slides:** [View Slides](https://drive.google.com/file/d/1ABS4bEwBloB6QlZ5NMP4fC-JSz03NMZS/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1XG1vaYjlC-CI9i_NQmk_RoUiM7PRil2u/view)  
 **Video:** [Watch Video](https://youtu.be/95ILNUaUAO4)  
 
 A presentation at The Developer Facing Startup Founders Academy - DevRel Session  by 

@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Developer Week 2024  
 **Date:** 2024-02-23  
-**Slides:** [View Slides](https://drive.google.com/file/d/1_HZSPVNoHB2cSoxZW8pEzVmMdIVdDVj0/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1ahSDqYzuPeB0ZZ52RV8oQQKy405RBFtD/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=Z5gsL-v1MsM)  
 
 A presentation at Developer Week 2024  in

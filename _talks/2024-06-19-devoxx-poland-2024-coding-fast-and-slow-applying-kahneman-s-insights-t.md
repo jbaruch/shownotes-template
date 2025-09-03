@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Devoxx Poland 2024  
 **Date:** 2024-06-19  
-**Slides:** [View Slides](https://drive.google.com/file/d/1bfSqi0NgL-f7Ob1XEHcU-RHbxrOfkNna/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1MoJ_Cwv3ljE3mKMHx0zzgs_03XHOEpJ6/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=ZxJuJOombHg)  
 
 A presentation at Devoxx Poland 2024  in

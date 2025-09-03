@@ -655,6 +655,21 @@ class TalkMigrator
       
       if test_success
         puts "\n✅ Migration tests PASSED"
+        
+        # Rebuild Jekyll site to include new migrated content
+        puts "\n🏗️  Rebuilding Jekyll site to include migrated content..."
+        rebuild_command = "bundle exec jekyll build --quiet"
+        puts "🚀 #{rebuild_command}"
+        
+        system(rebuild_command)
+        rebuild_success = $?.success?
+        
+        if rebuild_success
+          puts "✅ Jekyll site rebuilt successfully"
+          puts "🌐 Site is ready at http://localhost:4000"
+        else
+          puts "⚠️  Jekyll rebuild failed - you may need to rebuild manually"
+        end
       else
         puts "\n❌ Migration tests FAILED"
         puts "   This indicates the migration may be incomplete"
@@ -987,6 +1002,21 @@ class SpeakerMigrator
       
       if test_success
         puts "\n✅ Migration tests PASSED"
+        
+        # Rebuild Jekyll site to include new migrated content
+        puts "\n🏗️  Rebuilding Jekyll site to include migrated content..."
+        rebuild_command = "bundle exec jekyll build --quiet"
+        puts "🚀 #{rebuild_command}"
+        
+        system(rebuild_command)
+        rebuild_success = $?.success?
+        
+        if rebuild_success
+          puts "✅ Jekyll site rebuilt successfully"
+          puts "🌐 Site is ready at http://localhost:4000"
+        else
+          puts "⚠️  Jekyll rebuild failed - you may need to rebuild manually"
+        end
       else
         puts "\n❌ Migration tests FAILED"
         puts "   Check the test output above for specific failures"

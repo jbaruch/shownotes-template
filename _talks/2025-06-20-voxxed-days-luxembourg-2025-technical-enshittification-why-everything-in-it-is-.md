@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Voxxed Days Luxembourg 2025  
 **Date:** 2025-06-20  
-**Slides:** [View Slides](https://drive.google.com/file/d/13SpSjUbt07Q8ZWhr1uupy9RfLpsNiN_P/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1j6zGFgkd-G1YsDiHLPra085nVsD8mw2m/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=iFN1Y_8Cuik)  
 
 A presentation at Voxxed Days Luxembourg 2025  in

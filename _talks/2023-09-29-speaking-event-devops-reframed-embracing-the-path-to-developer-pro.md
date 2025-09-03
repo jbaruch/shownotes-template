@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Speaking Event  
 **Date:** 2023-09-29  
-**Slides:** [View Slides](https://drive.google.com/file/d/1emddgGzonlNNvlvIjQ-JXTMPU7OcMNS4/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1rGgWGbAJACaNSV702ZyRnolSh7K28pn0/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=uTEL8Ff1Zvk)  
 
 A presentation at NFJS Webinar September 2023  by 

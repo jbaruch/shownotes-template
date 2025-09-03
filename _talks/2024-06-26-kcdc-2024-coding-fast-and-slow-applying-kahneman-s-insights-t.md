@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** KCDC 2024  
 **Date:** 2024-06-26  
-**Slides:** [View Slides](https://drive.google.com/file/d/12wywmw9oemEUjTaZvM1bBbDh0zgqxoG1/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1xGekQuH93GTYhcXrjT_svECFZQIkAxt-/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=ZxJuJOombHg)  
 
 A presentation at KCDC 2024  in

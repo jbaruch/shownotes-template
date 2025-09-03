@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Toronto Java User Group Meeting October  
 **Date:** 2023-10-26  
-**Slides:** [View Slides](https://drive.google.com/file/d/1WS9uPSpUpC1TP6MJK7m_OI-NyONA0CVT/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1x-Qclf0qQCK47spPoePYfCy68ctcsKYp/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=0jd9OxpFSWk)  
 
 A presentation at Toronto Java User Group Meeting October 2023  in

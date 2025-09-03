@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DevNexus  
 **Date:** 2025-03-06  
-**Slides:** [View Slides](https://drive.google.com/file/d/10taXFQipDN_8gM7hRHnUhEHa9A8Zibc8/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/15-vdUv7yrhwDN-Y6tf9HMMczZqlND_5N/view)  
 
 A presentation at DevNexus  in
                     March 2025 in

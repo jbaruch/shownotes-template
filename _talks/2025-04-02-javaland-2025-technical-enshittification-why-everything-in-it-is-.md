@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Javaland 2025  
 **Date:** 2025-04-02  
-**Slides:** [View Slides](https://drive.google.com/file/d/1gMic4pZ752yZ9lYanX7V4sdWaRz3AQC3/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1NklUSgGTgJTbj1MzdMPgSVf-smbpRksD/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=eu331fG2P78)  
 
 A presentation at Javaland 2025  in

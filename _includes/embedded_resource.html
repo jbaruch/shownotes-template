@@ -8,6 +8,10 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
 {% assign type = include.type %}
 {% assign preview_mode = include.preview_mode | default: false %}
 {% assign size = include.size | default: 'normal' %}
+{% assign title = include.title | default: "Presentation slides" %}
+
+{% comment %} Set thumbnail height based on size {% endcomment %}
+
 
 {% comment %} Check if URL is Google Slides {% endcomment %}
 {% assign is_google_slides = false %}
@@ -33,207 +37,115 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
   {% if url_parts.size > 1 %}
     {% assign id_with_path = url_parts[1] %}
     {% assign id_part = id_with_path | split: "/edit" | first | split: "/present" | first | split: "/pub" | first | split: "?" | first %}
-    {% comment %} Handle both publication IDs (2PACX-*) and document IDs {% endcomment %}
     {% if id_part contains "2PACX-" %}
-      {% comment %} Remove leading 'e/' from publication URLs {% endcomment %}
       {% assign clean_id = id_part | remove_first: "e/" %}
       {% if preview_mode %}
         {% assign embed_url = "https://docs.google.com/presentation/d/e/" | append: clean_id | append: "/embed?start=false&loop=false&delayms=3000&rm=minimal&chrome=false" %}
       {% else %}
         {% assign embed_url = "https://docs.google.com/presentation/d/e/" | append: clean_id | append: "/pubembed?start=false&loop=false&delayms=3000" %}
       {% endif %}
-      {% comment %} For published presentations, use Google Drive thumbnail URL {% endcomment %}
-      {% assign thumb_url = "https://lh3.googleusercontent.com/d/" | append: clean_id | append: "=s400" %}
     {% else %}
-      {% comment %} For document IDs, try direct embed format first {% endcomment %}
       {% if preview_mode %}
         {% assign embed_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/embed?start=false&loop=false&delayms=3000&rm=minimal&chrome=false" %}
       {% else %}
         {% assign embed_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/embed?start=false&loop=false&delayms=3000" %}
       {% endif %}
-      {% comment %} For document IDs, use Google Drive thumbnail URL {% endcomment %}
-      {% assign thumb_url = "https://lh3.googleusercontent.com/d/" | append: id_part | append: "=s400" %}
     {% endif %}
+    {% assign thumb_url = include.talk.thumbnail_url | default: "/assets/images/placeholder-thumbnail.svg" %}
     
     {% if preview_mode %}
-      <div class="preview-thumbnail preview-{{ size }}">
-        {% if include.talk_url %}
-        <a href="{{ include.talk_url }}" class="preview-link">
-          <div class="slides-thumbnail-preview">
-            <img src="{{ thumb_url }}" 
-                 alt="{{ title | escape }}" 
-                 class="preview-image slides-thumb"
-                 loading="lazy">
+      <div class="preview-thumbnail-wrapper">
+                <div class="talk-preview-{{ size }}">
+          {% if include.talk_url %}
+          <a href="{{ include.talk_url }}" class="preview-link">
+            <div class="slides-thumbnail-preview thumbnail-container">
+                            <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+            </div>
+          </a>
+          {% else %}
+          <div class="slides-thumbnail-preview thumbnail-container">
+                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
           </div>
-        </a>
-        {% else %}
-        <div class="slides-thumbnail-preview">
-          <img src="{{ thumb_url }}" 
-               alt="{{ title | escape }}" 
-               class="preview-image slides-thumb"
-               loading="lazy">
+          {% endif %}
         </div>
-        {% endif %}
       </div>
     {% else %}
       <div class="embed-container slides-embed">
-        <iframe src="{{ embed_url }}" 
-                frameborder="0" 
-                allowfullscreen
-                loading="lazy"
-                title="{{ title | escape }}"
-                class="responsive-iframe"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                sandbox="allow-scripts allow-same-origin allow-presentation">
-        </iframe>
+        <iframe src="{{ embed_url }}" frameborder="0" allowfullscreen loading="lazy" title="{{ title | escape }}" class="responsive-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
       </div>
     {% endif %}
   {% else %}
-    {% comment %} Fallback to link if URL parsing fails {% endcomment %}
-    {% if not preview_mode %}
-      <div class="resource-fallback">
-        <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-          {{ title }}
-          {% if include.resource.description %}<span class="resource-description">{{ include.resource.description }}</span>{% endif %}
-        </a>
-      </div>
-    {% endif %}
+    {% if not preview_mode %}<div class="resource-fallback"><a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">{{ title }}</a></div>{% endif %}
   {% endif %}
 
 {% elsif is_google_drive_pdf %}
-  {% comment %} Extract file ID from Google Drive URL {% endcomment %}
   {% assign url_parts = url | split: "/d/" %}
   {% if url_parts.size > 1 %}
-    {% assign id_with_path = url_parts[1] %}
-    {% assign file_id = id_with_path | split: "/" | first | split: "?" | first %}
-    {% comment %} Use direct Google Drive embed URL {% endcomment %}
+    {% assign file_id = url_parts[1] | split: "/" | first | split: "?" | first %}
     {% assign embed_url = "https://drive.google.com/file/d/" | append: file_id | append: "/preview" %}
-    
+    {% assign thumb_url = include.talk.thumbnail_url | default: "/assets/images/placeholder-thumbnail.svg" %}
+
     {% if preview_mode %}
-      <div class="preview-thumbnail preview-{{ size }}">
+      <div class="preview-thumbnail-wrapper">
+                <div class="talk-preview-{{ size }}">
         {% if include.talk_url %}
         <a href="{{ include.talk_url }}" class="preview-link">
-          <div class="pdf-thumbnail-preview">
-            <img src="https://drive.google.com/thumbnail?id={{ file_id }}&sz=w400-h300" 
-                 alt="{{ title | escape }}" 
-                 class="preview-image pdf-thumb"
-                 loading="lazy">
+          <div class="pdf-thumbnail-preview thumbnail-container">
+                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
           </div>
         </a>
         {% else %}
-        <div class="pdf-thumbnail-preview">
-          <img src="https://drive.google.com/thumbnail?id={{ file_id }}&sz=w400-h300" 
-               alt="{{ title | escape }}" 
-               class="preview-image pdf-thumb"
-               loading="lazy">
+        <div class="pdf-thumbnail-preview thumbnail-container">
+                        <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
         </div>
         {% endif %}
+        </div>
       </div>
     {% else %}
       <div class="embed-container pdf-embed">
-        <div class="pdf-embed-attempt">
-          <iframe src="https://drive.google.com/file/d/{{ file_id }}/preview" 
-                  frameborder="0" 
-                  loading="lazy"
-                  title="{{ title | escape }}"
-                  class="responsive-iframe pdf-iframe"
-                  width="100%" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerpolicy="strict-origin-when-cross-origin">
-          </iframe>
-        </div>
-        <div class="pdf-fallback" style="margin-top: var(--space-4);">
-          <div class="fallback-content">
-            <h4>Alternative Access:</h4>
-            <div class="pdf-actions">
-              <a href="https://drive.google.com/file/d/{{ file_id }}/view" target="_blank" rel="noopener noreferrer" class="btn-primary">
-                Open in Google Drive
-              </a>
-              <a href="https://drive.google.com/uc?id={{ file_id }}" target="_blank" rel="noopener noreferrer" class="btn-secondary">
-                Download PDF
-              </a>
-            </div>
-          </div>
-        </div>
+        <div class="pdf-embed-attempt"><iframe src="{{ embed_url }}" frameborder="0" loading="lazy" title="{{ title | escape }}" class="responsive-iframe pdf-iframe" width="100%" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+        <div class="pdf-fallback" style="margin-top: var(--space-4);"><div class="fallback-content"><h4>Alternative Access:</h4><div class="pdf-actions"><a href="https://drive.google.com/file/d/{{ file_id }}/view" target="_blank" rel="noopener noreferrer" class="btn-primary">Open in Google Drive</a><a href="https://drive.google.com/uc?id={{ file_id }}" target="_blank" rel="noopener noreferrer" class="btn-secondary">Download PDF</a></div></div></div>
       </div>
     {% endif %}
   {% else %}
-    {% comment %} Fallback to link if URL parsing fails {% endcomment %}
-    {% if not preview_mode %}
-      <div class="resource-fallback">
-        <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-          {{ title }}
-          {% if include.resource.description %}<span class="resource-description">{{ include.resource.description }}</span>{% endif %}
-        </a>
-      </div>
-    {% endif %}
+    {% if not preview_mode %}<div class="resource-fallback"><a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">{{ title }}</a></div>{% endif %}
   {% endif %}
 
 {% elsif is_youtube %}
-  {% comment %} Extract video ID from YouTube URL {% endcomment %}
   {% assign video_id = "" %}
-  
   {% if url contains "youtube.com/watch?v=" or url contains "m.youtube.com/watch?v=" %}
-    {% comment %} Extract from youtube.com/watch?v=ID format {% endcomment %}
-    {% assign url_parts = url | split: "v=" %}
-    {% if url_parts.size > 1 %}
-      {% assign video_id = url_parts[1] | split: "&" | first %}
-    {% endif %}
+    {% assign video_id = url | split: "v=" | last | split: "&" | first %}
   {% elsif url contains "youtu.be/" %}
-    {% comment %} Extract from youtu.be/ID format {% endcomment %}
-    {% assign url_parts = url | split: "youtu.be/" %}
-    {% if url_parts.size > 1 %}
-      {% assign video_id = url_parts[1] | split: "?" | first | split: "&" | first %}
-    {% endif %}
+    {% assign video_id = url | split: "youtu.be/" | last | split: "?" | first %}
   {% endif %}
-  
+
   {% if video_id != "" %}
     {% assign embed_url = "https://www.youtube.com/embed/" | append: video_id %}
-    
     {% if preview_mode %}
-      <div class="preview-thumbnail preview-{{ size }}">
-        <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" 
-             alt="{{ title | escape }}" 
-             class="preview-image">
-        <div class="play-overlay">
-          <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
+      <div class="preview-thumbnail-wrapper">
+                <div class="talk-preview-{{ size }}">
+          {% if include.talk_url %}
+          <a href="{{ include.talk_url }}" class="preview-link">
+            <div class="video-thumbnail-preview thumbnail-container">
+                            <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+              <div class="play-overlay"><svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+            </div>
+          </a>
+          {% else %}
+          <div class="video-thumbnail-preview thumbnail-container">
+                          <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+            <div class="play-overlay"><svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          {% endif %}
         </div>
       </div>
     {% else %}
-      <div class="embed-container video-embed">
-        <iframe src="{{ embed_url }}" 
-                frameborder="0"
-                allowfullscreen
-                loading="lazy"
-                title="{{ title | escape }}"
-                class="responsive-iframe"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                sandbox="allow-scripts allow-same-origin allow-presentation">
-        </iframe>
-      </div>
+      <div class="embed-container video-embed"><iframe src="{{ embed_url }}" frameborder="0" allowfullscreen loading="lazy" title="{{ title | escape }}" class="responsive-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe></div>
     {% endif %}
   {% else %}
-    {% comment %} Fallback to link if video ID extraction fails {% endcomment %}
-    {% if not preview_mode %}
-      <div class="resource-fallback">
-        <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-          {{ title }}
-          {% if include.resource.description %}<span class="resource-description">{{ include.resource.description }}</span>{% endif %}
-        </a>
-      </div>
-    {% endif %}
+    {% if not preview_mode %}<div class="resource-fallback"><a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">{{ title }}</a></div>{% endif %}
   {% endif %}
 
 {% else %}
-  {% comment %} Non-embeddable URL - show as regular link {% endcomment %}
-  <div class="resource-fallback">
-    <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">
-      {{ title }}
-      {% if include.resource.description %}<span class="resource-description">{{ include.resource.description }}</span>{% endif %}
-    </a>
-  </div>
+  <div class="resource-fallback"><a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">{{ title }}</a></div>
 {% endif %}

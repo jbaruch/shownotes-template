@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** BaselOne  
 **Date:** 2023-10-19  
-**Slides:** [View Slides](https://drive.google.com/file/d/14czrxWfajSSh0Na-cSX4jfDxuewzvdOx/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1-0v4JwOjjNL_LmA3OREMk6f_L8I5gspR/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=q0v28sUQ888)  
 
 A presentation at BaselOne  in
@@ -29,7 +29,6 @@ A presentation at BaselOne  in
 - [Predictive Test Selection Paper from Meta](https://engineering.fb.com/2018/11/21/developer-tools/predictive-test-selection/)
 - [Failure Analytics (Flaky Tests Mitigation)](https://gradle.com/gradle-enterprise-solutions/failure-analytics/)
 - [Trends, Reporting and Insights](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
-- [Speed Challenge (Win Prizes!)](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [DPE Summit (watch out for the recordings!)](https://dpesummit.com/)
 
 <!-- Source: https://speaking.jbaru.ch/DxtkCb/developer-productivity-diy-with-chatgpt-or-how-i-learned-to-stop-worrying-and-love-the-ai -->

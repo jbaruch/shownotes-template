@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Open Conf 2023  
 **Date:** 2023-11-10  
-**Slides:** [View Slides](https://drive.google.com/file/d/1jFwR04evENYQ0TGh7S5O_OJt1csoalQK/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1W3qYOgGajDd2f9yNkyOsusLISRa3-Efe/view)  
 
 A presentation at Open Conf 2023  in
                     November 2023 in

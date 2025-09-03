@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** AI Fokus  
 **Date:** 2025-06-10  
-**Slides:** [View Slides](https://drive.google.com/file/d/11kvTwRLI_cd9Osrr0uW37RfeuLnev1h2/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/17o14sePtlKZ17O41gNEdBA88wAUK5bIn/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=5q_LQNMIvqY)  
 
 A presentation at AI Fokus  in

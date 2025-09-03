@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** DevOps Days Indianapolis 2023  
 **Date:** 2023-10-06  
-**Slides:** [View Slides](https://drive.google.com/file/d/1uezLnSDKiERuogYR_fUlZhEbXqBwNxV6/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1kJMRZffYQYw35AytppAS93JoKtA31pI0/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=uTEL8Ff1Zvk)  
 
 A presentation at DevOps Days Indianapolis 2023  in

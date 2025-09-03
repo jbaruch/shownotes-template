@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** InfoBip Shift 2023  
 **Date:** 2023-09-18  
-**Slides:** [View Slides](https://drive.google.com/file/d/1qc2c5cNIO5vS-QElbVPEkmr2002MCk3G/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1FaOlwL2x2b2ob-0mbtFYNc_YeuoalL0K/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=McohNfG7RXg)  
 
 A presentation at InfoBip Shift 2023  in
@@ -29,7 +29,6 @@ A presentation at InfoBip Shift 2023  in
 - [Failure Analytics (Flaky Tests Mitigation)](https://gradle.com/gradle-enterprise-solutions/failure-analytics/)
 - [Trends, Reporting and Insights](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [Mantium AI (adding your KB to Chat-GPT easly!)](https://mantiumai.com/)
-- [Speed Challenge (Win Prizes!)](https://gradle.com/gradle-enterprise-solutions/management-reporting-and-insights/)
 - [DPE Summit (watch out for the recordings!)](https://dpesummit.com/)
 
 <!-- Source: https://speaking.jbaru.ch/YGW5XP/developer-productivity-diy-with-chatgpt-or-how-i-learned-to-stop-worrying-and-love-the-ai -->

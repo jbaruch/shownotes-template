@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Geecon  
 **Date:** 2025-05-15  
-**Slides:** [View Slides](https://drive.google.com/file/d/1eqDJzySTepOodknO92pG2vD4cWW0BAcJ/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1UirRWGWx3HEVR9jctA38xScgbVFdjLWq/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=jMkMUQSeok0)  
 
 A presentation at Geecon  in

@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Java User Group Québec Meeting October  
 **Date:** 2023-10-23  
-**Slides:** [View Slides](https://drive.google.com/file/d/1BjNw6GsTlh_0XGNGIfca7CecpjOvcqvd/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1Vm1gMpYa42py2nAXqtivZcylTDUr4OMk/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=H8fgcxGD1A8)  
 
 A presentation at Java User Group Québec Meeting October 2023  in

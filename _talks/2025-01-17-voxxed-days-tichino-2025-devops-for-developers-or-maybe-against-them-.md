@@ -6,7 +6,7 @@ layout: talk
 
 **Conference:** Voxxed Days Tichino 2025  
 **Date:** 2025-01-17  
-**Slides:** [View Slides](https://drive.google.com/file/d/1tEq3nDK7Gx00nZ1yYrZkN-o6AFkBFY7M/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1nPHPpZtLaf6wYHa7a21HstvXo-lyTh8b/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=uTEL8Ff1Zvk)  
 
 A presentation at Voxxed Days Tichino 2025  in

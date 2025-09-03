@@ -4,6 +4,7 @@ require 'minitest/autorun'
 require 'jekyll'
 require 'nokogiri'
 require 'ostruct'
+require 'set'
 
 # Unit tests for Template Rendering (TS-236 through TS-250)
 # Maps to Gherkin: "Templates render correctly with extracted data"
@@ -294,25 +295,70 @@ class TemplateRenderingTest < Minitest::Test
     
     puts "ℹ️  Expected order: #{expected_order.map { |t| "#{t[:title]} (#{t[:date]})" }.join(', ')}"
     
-    # Check the actual order in HTML by looking at the position of talk titles
-    talk_positions = []
-    expected_order.each do |talk|
-      position = html.index(talk[:title])
-      if position
-        talk_positions << { talk: talk, position: position }
+    # Parse HTML to get actual order using structured elements
+    doc = Nokogiri::HTML(html)
+    
+    # Test 1: Featured talks section should show newest talks first
+    featured_articles = doc.css('section.featured-talks article.featured-talk-card')
+    if featured_articles.length > 1
+      featured_titles = []
+      featured_articles.each do |article|
+        main_h3 = article.css('h3').first
+        featured_titles << main_h3.text.strip if main_h3
       end
+      
+      # Match featured titles to dates
+      featured_with_dates = []
+      featured_titles.each do |title|
+        matching_talk = talks_with_dates.find { |t| t[:title] == title }
+        featured_with_dates << matching_talk if matching_talk
+      end
+      
+      puts "ℹ️  Featured talks order: #{featured_with_dates.map { |t| "#{t[:title]} (#{t[:date]})" }.join(', ')}"
+      
+      # Check featured talks are sorted newest first
+      featured_dates = featured_with_dates.map { |t| t[:date] }
+      expected_featured_dates = featured_with_dates.sort_by { |t| t[:date] }.reverse.map { |t| t[:date] }
+      
+      assert_equal expected_featured_dates, featured_dates,
+        "Featured talks are not sorted newest first. Expected: #{expected_featured_dates}, got: #{featured_dates}"
     end
     
-    # Sort by position to get the actual order in HTML
-    actual_order_by_position = talk_positions.sort_by { |tp| tp[:position] }.map { |tp| tp[:talk] }
-    
-    puts "ℹ️  Actual order in HTML: #{actual_order_by_position.map { |t| "#{t[:title]} (#{t[:date]})" }.join(', ')}"
-    
-    # Compare the orders
-    expected_dates = expected_order.map { |t| t[:date] }
-    actual_dates = actual_order_by_position.map { |t| t[:date] }
-    
-    assert_equal expected_dates, actual_dates,
-      "Talks are not sorted in chronological order (newest first) in the rendered HTML. Expected: #{expected_dates}, but got: #{actual_dates}"
+    # Test 2: All talks section should continue chronological order
+    all_talks_articles = doc.css('section.all-talks article.talk-list-item')
+    if all_talks_articles.length > 1
+      all_talks_titles = []
+      all_talks_articles.each do |article|
+        main_h3 = article.css('h3').first
+        all_talks_titles << main_h3.text.strip if main_h3
+      end
+      
+      # Remove duplicates while preserving order
+      seen_titles = Set.new
+      unique_all_talks_titles = all_talks_titles.select do |title|
+        if seen_titles.include?(title)
+          false
+        else
+          seen_titles.add(title)
+          true
+        end
+      end
+      
+      # Match all talks titles to dates
+      all_talks_with_dates = []
+      unique_all_talks_titles.each do |title|
+        matching_talk = talks_with_dates.find { |t| t[:title] == title }
+        all_talks_with_dates << matching_talk if matching_talk
+      end
+      
+      puts "ℹ️  All talks order (first 10): #{all_talks_with_dates.first(10).map { |t| "#{t[:title]} (#{t[:date]})" }.join(', ')}"
+      
+      # Check all talks are sorted newest first
+      all_talks_dates = all_talks_with_dates.map { |t| t[:date] }
+      expected_all_talks_dates = all_talks_with_dates.sort_by { |t| t[:date] }.reverse.map { |t| t[:date] }
+      
+      assert_equal expected_all_talks_dates, all_talks_dates,
+        "All talks section is not sorted newest first. Expected first 5: #{expected_all_talks_dates.first(5)}, got first 5: #{all_talks_dates.first(5)}"
+    end
   end
 end
