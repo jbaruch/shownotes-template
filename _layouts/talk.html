@@ -30,9 +30,6 @@ layout: default
                         {% endif %}
         </div>
         
-        {% if page.extracted_description %}
-        <p class="talk-description" itemprop="description">{{ page.extracted_description }}</p>
-        {% endif %}
     </header>
 
 
@@ -67,9 +64,10 @@ layout: default
             </div>
         {% endif %}
         
-        {% if page.extracted_description %}
-            <div class="talk-description">
-                {{ page.extracted_description | markdownify }}
+        {% if page.extracted_abstract %}
+            <div class="talk-abstract">
+                <h2>Abstract</h2>
+                {{ page.extracted_abstract | markdownify }}
             </div>
         {% endif %}
         
@@ -100,7 +98,7 @@ layout: default
     "name": "{{ page.extracted_conference | escape }}"
   },
   "datePublished": "{{ page.extracted_date }}",
-  {% if page.extracted_description %}"description": "{{ page.extracted_description | escape }}",{% endif %}
+  {% if page.extracted_abstract %}"description": "{{ page.extracted_abstract | escape }}",{% endif %}
   "url": "{{ page.url | absolute_url }}"
 }
 </script>

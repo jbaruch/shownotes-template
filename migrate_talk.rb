@@ -284,10 +284,27 @@ class TalkMigrator
       @talk_data[:abstract] = description_parts.join("\n\n")
       puts "SUCCESS Description extracted from #desc section (#{@talk_data[:abstract].length} chars)"
     else
-      # Fallback to finding long paragraphs
-      abstract_elem = @doc.css('p').find { |p| p.text.length > 100 }
-      @talk_data[:abstract] = abstract_elem ? abstract_elem.text.strip : ""
-      puts "SUCCESS Description extracted from fallback method"
+      # Try the main #desc element directly as mentioned by user
+      desc_element = @doc.css('#desc')
+      if desc_element.any?
+        # Get text content directly from #desc, excluding child elements we don't want
+        desc_text = desc_element.first.text.strip
+        # Try to extract meaningful content (longer than presentation context)
+        if desc_text.length > 200  # Longer than typical presentation context
+          @talk_data[:abstract] = desc_text
+          puts "SUCCESS Description extracted from #desc element directly (#{@talk_data[:abstract].length} chars)"
+        else
+          # Fallback to finding long paragraphs
+          abstract_elem = @doc.css('p').find { |p| p.text.length > 100 }
+          @talk_data[:abstract] = abstract_elem ? abstract_elem.text.strip : ""
+          puts "SUCCESS Description extracted from fallback method"
+        end
+      else
+        # Fallback to finding long paragraphs
+        abstract_elem = @doc.css('p').find { |p| p.text.length > 100 }
+        @talk_data[:abstract] = abstract_elem ? abstract_elem.text.strip : ""
+        puts "SUCCESS Description extracted from fallback method"
+      end
     end
     
     puts "SUCCESS Metadata extracted:"
@@ -562,6 +579,11 @@ class TalkMigrator
     yaml_data = {
       'layout' => 'talk'
     }
+    
+    # Add extracted_abstract if we have one
+    if @talk_data[:abstract] && !@talk_data[:abstract].empty?
+      yaml_data['extracted_abstract'] = @talk_data[:abstract]
+    end
     
     # Generate clean markdown content with source tracking
     content = "---\n#{yaml_data.to_yaml.gsub(/^---\n/, '')}---\n\n"
