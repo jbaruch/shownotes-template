@@ -33,6 +33,9 @@ _site-fixed.html
 .vuepress/dist/
 _test_site/
 
+# Temporary storage (PDFs uploaded to Google Drive)
+pdfs/
+
 # IDE and editors
 .vscode/
 .idea/
