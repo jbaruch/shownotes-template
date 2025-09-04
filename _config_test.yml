@@ -1,0 +1,82 @@
+url: ""
+baseurl: ""
+hero_background: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920"
+
+# Jekyll configuration
+markdown: kramdown
+highlighter: rouge
+permalink: /:categories/:title/
+encoding: utf-8
+timezone: UTC
+
+# Kramdown configuration
+kramdown:
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  input: GFM
+  hard_wrap: false
+
+# Collection configuration
+collections:
+  talks:
+    output: true
+    permalink: /:collection/:name/
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Default values for frontmatter
+defaults:
+  - scope:
+      path: ""
+      type: "talks"
+    values:
+      layout: "talk"
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+
+# Exclude from processing
+exclude:
+  - test
+  - .bundle
+  - docs
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - .git
+  - .jekyll-cache
+  - vendor
+  - "*.gemspec"
+  - google_api.json
+  - utils
+
+# GitHub configuration
+github:
+  repository_url: "https://github.com/jbaruch/shownotes"
+  show_downloads: false
+
+# Site metadata
+title: "AI-Generated Show Notes"
+description: "AI-powered podcast show notes with automated content generation and visual summaries."
+email: "jbaruch@sadogursky.com"
+author: "jbaruch"
+
+# RSS feed configuration
+feed:
+  collections:
+    - talks
+
+# SEO plugin configuration
+webmaster_verifications:
+  google: false
+  
+# Talk limit for homepage
+featured_talks_limit: 10

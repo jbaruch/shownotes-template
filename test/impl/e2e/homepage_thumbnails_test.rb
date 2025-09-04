@@ -85,11 +85,11 @@ class HomepageThumbnailsTest < Minitest::Test
 
     # Build and start server
     puts "Building Jekyll site for tests..."
-    build_result = system('bundle exec jekyll build --quiet')
+    build_result = system('bundle exec jekyll build --config _config_test.yml --quiet')
     raise "Failed to build Jekyll site" unless build_result
     
     puts "Starting Jekyll server for tests..."
-    @server_pid = spawn("bundle exec jekyll serve --port #{URI.parse(JEKYLL_BASE_URL).port} --detach --skip-initial-build", 
+    @server_pid = spawn("bundle exec jekyll serve --config _config_test.yml --port #{URI.parse(JEKYLL_BASE_URL).port} --detach --skip-initial-build", 
                        :out => '/dev/null', :err => '/dev/null')
     sleep 3  # Give server time to start
   end

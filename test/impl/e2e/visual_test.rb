@@ -27,12 +27,14 @@ class VisualTest < Minitest::Test
       
       # First, build the site to ensure all content is generated
       puts "Building Jekyll site..."
-      build_result = system('bundle exec jekyll build --quiet')
+      build_result = system('bundle exec jekyll build --config _config_test.yml --quiet')
       assert build_result, "Failed to build Jekyll site"
       
       # Then start the server
       puts "Starting Jekyll server..."
-      @jekyll_pid = spawn('bundle exec jekyll serve --detach --skip-initial-build')
+      port = URI.parse(JEKYLL_BASE_URL).port
+      @jekyll_pid = spawn("bundle exec jekyll serve --config _config_test.yml --port #{port} --detach --skip-initial-build", 
+                         :out => '/dev/null', :err => '/dev/null')
       
       # Wait for server to start (up to 30 seconds)
       30.times do
