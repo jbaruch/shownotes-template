@@ -11,8 +11,99 @@ The migration process automatically extracts content from Notist talks and creat
 Before migrating talks, ensure you have:
 
 1. **Jekyll site configured** - See [Setup Guide](SETUP.md)
-2. **Google Drive API setup** - Required for slide hosting
+2. **Google Drive API setup** - Required for slide hosting (see detailed setup below)
 3. **Internet connection** - For downloading content and thumbnails
+
+## Google Drive API Setup
+
+The migration system requires Google Drive API access to upload and host PDF slides. Follow these steps:
+
+### 1. Create Google Cloud Project
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the Google Drive API for your project:
+   - Navigate to "APIs & Services" > "Library"
+   - Search for "Google Drive API"
+   - Click "Enable"
+
+### 2. Create Service Account
+
+1. Go to "APIs & Services" > "Credentials"
+2. Click "Create Credentials" > "Service Account"
+3. Fill in the service account details:
+   - **Name**: `shownotes-migration` (or your preferred name)
+   - **Description**: `Service account for automated talk migration`
+4. Click "Create and Continue"
+5. Skip role assignment (we'll handle permissions via Drive sharing)
+6. Click "Done"
+
+### 3. Generate API Key File
+
+1. Click on your newly created service account
+2. Go to the "Keys" tab
+3. Click "Add Key" > "Create new key"
+4. Select "JSON" format
+5. Click "Create" - this downloads the JSON file
+6. **Important**: Rename the downloaded file to `Google API.json`
+7. Place it in your project root directory: `/Users/jbaruch/Projects/shownotes/Google API.json`
+
+### 4. Create Shared Drive (Important!)
+
+**Critical**: You must use a **Shared Drive**, not a regular folder with sharing permissions.
+
+1. Go to [Google Drive](https://drive.google.com/)
+2. Click "New" > "More" > "Shared drive"
+3. Name it `Presentations` (or your preferred name)
+4. Click "Create"
+
+### 5. Grant Service Account Access
+
+1. In your newly created Shared Drive
+2. Right-click and select "Manage members"
+3. Click "Add members"
+4. Enter the service account email from your `Google API.json` file:
+   - Look for the `client_email` field in the JSON
+   - It looks like: `shownotes-migration@your-project.iam.gserviceaccount.com`
+5. Set permission level to "Manager" or "Content manager"
+6. **Uncheck** "Notify people" (the service account doesn't need notifications)
+7. Click "Send"
+
+### 6. Configure Migration Script
+
+The migration script will automatically:
+
+- Use the `Google API.json` file for authentication
+- Look for a Shared Drive named "Presentations"
+- Upload PDF files with public viewing permissions
+- Generate shareable Google Drive links
+
+### Why Shared Drive vs Regular Folder?
+
+- **Shared Drive**: Files belong to the organization, not individual users
+- **Regular Folder**: Files belong to the service account, harder to manage permissions
+- **API Access**: Shared Drives provide better programmatic access and permission management
+- **Reliability**: Shared Drives are designed for automated access patterns
+
+### Troubleshooting Google API Setup
+
+**"Insufficient permissions" error:**
+
+- Verify the service account email is added to the Shared Drive
+- Check that permissions are set to "Manager" or "Content manager"
+- Ensure you're using a Shared Drive, not a regular shared folder
+
+**"Shared drive not found" error:**
+
+- Verify the Shared Drive name matches exactly (case-sensitive)
+- Ensure the service account has access to the Shared Drive
+- Check that the Shared Drive exists and is accessible
+
+**"Invalid credentials" error:**
+
+- Verify `Google API.json` file is in the project root
+- Check that the file is valid JSON (not corrupted during download)
+- Ensure Google Drive API is enabled in your project
 
 ## Quick Migration
 
