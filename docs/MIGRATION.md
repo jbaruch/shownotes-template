@@ -119,7 +119,7 @@ For automated testing and CI/CD workflows, you need to add the Google API creden
    - Go to your GitHub repository
    - Navigate to "Settings" > "Secrets and variables" > "Actions"
    - Click "New repository secret"
-   - **Name**: `GOOGLE_API_JSON`
+   - **Name**: `GOOGLE_API_CREDENTIALS`
    - **Value**: Paste the entire JSON content from your `Google API.json` file
    - Click "Add secret"
 
@@ -128,9 +128,7 @@ For automated testing and CI/CD workflows, you need to add the Google API creden
    - It creates a temporary `Google API.json` file during test execution
    - Migration tests will fail without this secret properly configured
 
-> **Important**: Without the `GOOGLE_API_JSON` secret, GitHub Actions workflows will fail on migration tests that require Google Drive access.
-
-## Quick Migration
+ > **Important**: Without the `GOOGLE_API_CREDENTIALS` secret, GitHub Actions workflows will fail on migration tests that require Google Drive access.## Quick Migration
 
 ### Single Talk Migration
 
