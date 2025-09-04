@@ -580,8 +580,9 @@ class TalkMigrator
       'layout' => 'talk'
     }
     
-    # Add extracted_description if we have one
+    # Add extracted_abstract and extracted_description if we have one
     if @talk_data[:abstract] && !@talk_data[:abstract].empty?
+      yaml_data['extracted_abstract'] = @talk_data[:abstract]
       yaml_data['extracted_description'] = @talk_data[:abstract]
     end
     
