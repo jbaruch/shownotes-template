@@ -79,12 +79,12 @@ class MigrationTest < Minitest::Test
       # Extract migrated resources from markdown content
       migrated_resources = extract_migrated_resources(talk_data[:raw_content])
       
-      # CRITICAL: Resource count must match exactly (after deduplication)
+      # CRITICAL: Resource count must match exactly
       assert_equal source_resources.length, migrated_resources.length,
         "❌ RESOURCE COUNT MISMATCH for #{talk_name}:\n" \
-        "Source has #{source_resources.length} unique resources (after deduplication)\n" \
+        "Source has #{source_resources.length} resources\n" \
         "Migrated has #{migrated_resources.length} resources\n" \
-        "EVERY unique resource from source must be migrated!"
+        "EVERY resource from source must be migrated!"
       
       # CRITICAL: Compare URLs and titles for each resource
       source_resources.each_with_index do |source_resource, index|
@@ -535,19 +535,8 @@ class MigrationTest < Minitest::Test
       end
     end
     
-    # Deduplicate resources by URL (same logic as migration script)
-    unique_resources = []
-    seen_urls = Set.new
-    
-    resource_links.each do |resource|
-      url = resource[:url]
-      unless seen_urls.include?(url)
-        seen_urls.add(url)
-        unique_resources << resource
-      end
-    end
-    
-    unique_resources
+    # Return all resources without deduplication - preserve author's intentional content structure
+    resource_links
   end
   
   def source_page_has_video?(source_url)
