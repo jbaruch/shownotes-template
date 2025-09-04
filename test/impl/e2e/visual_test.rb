@@ -9,9 +9,6 @@ require 'fileutils'
 class VisualTest < Minitest::Test
   JEKYLL_BASE_URL = 'http://localhost:4000/shownotes'
   
-class VisualTest < Minitest::Test
-  JEKYLL_BASE_URL = 'http://localhost:4000/shownotes'
-  
   @@jekyll_pid = nil
   @@server_running = false
 
@@ -124,7 +121,7 @@ class VisualTest < Minitest::Test
   def test_homepage_loads_successfully
     uri = URI.parse(JEKYLL_BASE_URL)
     http = Net::HTTP.new(uri.host, uri.port)
-    response = http.get('/')
+    response = http.get(uri.path + '/')
     
     assert response.code.to_i.between?(200, 399), 
       "Homepage failed to load: HTTP #{response.code}"
@@ -221,7 +218,7 @@ class VisualTest < Minitest::Test
   def test_html_structure_validity
     uri = URI.parse(JEKYLL_BASE_URL)
     http = Net::HTTP.new(uri.host, uri.port)
-    response = http.get('/')
+    response = http.get(uri.path + '/')
     
     # Basic HTML structure checks
     assert response.body.include?('<!DOCTYPE html>'), 
@@ -746,7 +743,7 @@ class VisualTest < Minitest::Test
         puts "  SUCCESS Captured #{size[:name]} layout (#{size[:width]}x#{size[:height]}): #{screenshot_path}"
 
         # Validate layout elements are still visible
-        thumbnails = driver.find_elements(css: '.talk-preview-small, .talk-preview-normal')
+        thumbnails = driver.find_elements(css: '.featured-talk-card, .talk-list-item')
         visible_thumbnails = thumbnails.select(&:displayed?)
         
         assert_operator visible_thumbnails.length, :>, 0, "No visible thumbnails in #{size[:name]} layout"
@@ -1094,4 +1091,3 @@ VisualTest.startup
 
 # Hook into Minitest lifecycle for class-level teardown
 Minitest.after_run { VisualTest.shutdown }
-end
