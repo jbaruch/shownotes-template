@@ -52,13 +52,14 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
       {% endif %}
     {% endif %}
     {% comment %} Generate local thumbnail path based on talk filename {% endcomment %}
+    {% assign placeholder_url = "/assets/images/placeholder-thumbnail.svg" | relative_url %}
     {% if include.talk %}
       {% assign talk_slug = include.talk.path | split: "/" | last | remove: ".md" %}
       {% assign local_thumbnail_path = "/assets/images/thumbnails/" | append: talk_slug | append: "-thumbnail.png" %}
       {% comment %} Use local thumbnail if it exists, otherwise use placeholder {% endcomment %}
-      {% assign thumb_url = local_thumbnail_path %}
+      {% assign thumb_url = local_thumbnail_path | relative_url %}
     {% else %}
-      {% assign thumb_url = "/assets/images/placeholder-thumbnail.svg" %}
+      {% assign thumb_url = placeholder_url %}
     {% endif %}
     
     {% if preview_mode %}
@@ -67,12 +68,12 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
           {% if include.talk_url %}
           <a href="{{ include.talk_url }}" class="preview-link">
             <div class="slides-thumbnail-preview thumbnail-container">
-                            <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                            <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
             </div>
           </a>
           {% else %}
           <div class="slides-thumbnail-preview thumbnail-container">
-                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
           </div>
           {% endif %}
         </div>
@@ -96,9 +97,9 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
       {% assign talk_slug = include.talk.path | split: "/" | last | remove: ".md" %}
       {% assign local_thumbnail_path = "/assets/images/thumbnails/" | append: talk_slug | append: "-thumbnail.png" %}
       {% comment %} Use local thumbnail if it exists, otherwise use placeholder {% endcomment %}
-      {% assign thumb_url = local_thumbnail_path %}
+      {% assign thumb_url = local_thumbnail_path | relative_url %}
     {% else %}
-      {% assign thumb_url = "/assets/images/placeholder-thumbnail.svg" %}
+      {% assign thumb_url = placeholder_url %}
     {% endif %}
 
     {% if preview_mode %}
@@ -107,12 +108,12 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
         {% if include.talk_url %}
         <a href="{{ include.talk_url }}" class="preview-link">
           <div class="pdf-thumbnail-preview thumbnail-container">
-                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
           </div>
         </a>
         {% else %}
         <div class="pdf-thumbnail-preview thumbnail-container">
-                        <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                        <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
         </div>
         {% endif %}
         </div>
@@ -143,13 +144,13 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
           {% if include.talk_url %}
           <a href="{{ include.talk_url }}" class="preview-link">
             <div class="video-thumbnail-preview thumbnail-container">
-                            <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                            <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
               <div class="play-overlay"><svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
             </div>
           </a>
           {% else %}
           <div class="video-thumbnail-preview thumbnail-container">
-                          <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/placeholder-thumbnail.svg';">
+                          <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
             <div class="play-overlay"><svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
           </div>
           {% endif %}
