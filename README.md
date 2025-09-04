@@ -111,7 +111,7 @@ Create `_talks/YYYY-MM-DD-conference-talk-title.md`:
 layout: talk
 ---
 
-# Your Talk Title
+# Talk Title Here
 
 **Conference:** Conference Name  
 **Date:** 2024-06-12  
