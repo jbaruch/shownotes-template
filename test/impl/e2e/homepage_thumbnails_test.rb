@@ -6,15 +6,79 @@ require 'uri'
 require 'nokogiri'
 
 class HomepageThumbnailsTest < Minitest::Test
-  JEKYLL_BASE_URL = ENV['TEST_BASE_URL'] || 'http://localhost:4000'
+  JEKYLL_BASE_URL = ENV['TEST_BASE_URL'] || 'http://localhost:4000/shownotes'
+  
+  @@server_pid = nil
+  @@server_running = false
 
-  def setup
-    # We need a site running
-    start_test_server
+  def self.startup
+    # Check if server is already running
+    begin
+      uri = URI.parse("#{JEKYLL_BASE_URL}/")
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.read_timeout = 5
+      response = http.get(uri.path)
+      @@server_running = response.code.to_i.between?(200, 399)
+    rescue
+      @@server_running = false
+    end
+
+    # Start server if not running
+    unless @@server_running
+      # Clean up any existing Jekyll processes first
+      system('pkill -f jekyll 2>/dev/null')
+      sleep 2
+      
+      puts "Building Jekyll site for homepage thumbnails test..."
+      build_result = system('bundle exec jekyll build --quiet')
+      raise "Failed to build Jekyll site" unless build_result
+      
+      puts "Starting Jekyll server for homepage thumbnails test..."
+      @@server_pid = spawn('bundle exec jekyll serve --detach --skip-initial-build')
+      
+      # Wait for server to start (up to 30 seconds)
+      30.times do
+        sleep 1
+        begin
+          uri = URI.parse("#{JEKYLL_BASE_URL}/")
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.read_timeout = 2
+          response = http.get(uri.path)
+          if response.code.to_i.between?(200, 399)
+            @@server_running = true
+            puts "Jekyll server started successfully"
+            break
+          end
+        rescue
+          # Continue waiting
+        end
+      end
+      
+      raise "Failed to start Jekyll server after 30 seconds" unless @@server_running
+    end
+  end
+  
+  def self.shutdown
+    if @@server_pid
+      begin
+        Process.kill('TERM', @@server_pid)
+        Process.wait(@@server_pid)
+      rescue
+        # Process may have already exited
+      end
+      @@server_pid = nil
+    end
+    
+    # Ensure all Jekyll processes are cleaned up
+    system('pkill -f jekyll 2>/dev/null')
+    @@server_running = false
   end
 
-  def teardown
-    stop_test_server
+  def setup
+    # Ensure server is still running
+    unless @@server_running
+      skip "Jekyll server not available"
+    end
   end
 
   def test_homepage_has_thumbnails_when_talks_exist
@@ -71,36 +135,6 @@ class HomepageThumbnailsTest < Minitest::Test
 
   private
 
-  def start_test_server
-    # Check if server is already running
-    begin
-      uri = URI.parse(JEKYLL_BASE_URL)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.read_timeout = 1
-      response = http.get('/')
-      return if response.code.to_i.between?(200, 399)
-    rescue
-      # Server not running, we'll start it
-    end
-
-    # Build and start server
-    puts "Building Jekyll site for tests..."
-    build_result = system('bundle exec jekyll build --config _config_test.yml --quiet')
-    raise "Failed to build Jekyll site" unless build_result
-    
-    puts "Starting Jekyll server for tests..."
-    @server_pid = spawn("bundle exec jekyll serve --config _config_test.yml --port #{URI.parse(JEKYLL_BASE_URL).port} --detach --skip-initial-build", 
-                       :out => '/dev/null', :err => '/dev/null')
-    sleep 3  # Give server time to start
-  end
-
-  def stop_test_server
-    if @server_pid
-      Process.kill('TERM', @server_pid) rescue nil
-      Process.wait(@server_pid) rescue nil
-    end
-  end
-
   def site_talks_count
     # Count talks by checking if _talks directory has any .md files
     talks_dir = File.join(File.dirname(__FILE__), '..', '..', '..', '_talks')
@@ -109,3 +143,9 @@ class HomepageThumbnailsTest < Minitest::Test
     Dir.glob(File.join(talks_dir, '*.md')).size
   end
 end
+
+# Start the Jekyll server when the test class is loaded
+HomepageThumbnailsTest.startup
+
+# Hook into Minitest lifecycle for class-level teardown
+Minitest.after_run { HomepageThumbnailsTest.shutdown }

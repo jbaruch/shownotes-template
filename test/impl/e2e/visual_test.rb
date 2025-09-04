@@ -7,45 +7,49 @@ require 'selenium-webdriver'
 require 'fileutils'
 
 class VisualTest < Minitest::Test
-  JEKYLL_BASE_URL = 'http://localhost:4000'
+  JEKYLL_BASE_URL = 'http://localhost:4000/shownotes'
   
-  def setup
+class VisualTest < Minitest::Test
+  JEKYLL_BASE_URL = 'http://localhost:4000/shownotes'
+  
+  @@jekyll_pid = nil
+  @@server_running = false
+
+  def self.startup
+    # Clean up any existing Jekyll processes first
+    system('pkill -f jekyll 2>/dev/null')
+    sleep 2
+    
     # Test if Jekyll server is running, start it if not
     begin
-      uri = URI.parse(JEKYLL_BASE_URL)
+      uri = URI.parse("#{JEKYLL_BASE_URL}/")
       http = Net::HTTP.new(uri.host, uri.port)
       http.read_timeout = 5
-      response = http.get('/')
-      @server_running = response.code.to_i.between?(200, 399)
+      response = http.get(uri.path)
+      @@server_running = response.code.to_i.between?(200, 399)
     rescue
-      @server_running = false
+      @@server_running = false
     end
     
     # Start Jekyll server if not running
-    unless @server_running
-      puts "Building and starting Jekyll server for visual tests..."
+    unless @@server_running
+      puts "Building Jekyll site for visual tests..."
+      build_result = system('bundle exec jekyll build --quiet')
+      raise "Failed to build Jekyll site" unless build_result
       
-      # First, build the site to ensure all content is generated
-      puts "Building Jekyll site..."
-      build_result = system('bundle exec jekyll build --config _config_test.yml --quiet')
-      assert build_result, "Failed to build Jekyll site"
-      
-      # Then start the server
-      puts "Starting Jekyll server..."
-      port = URI.parse(JEKYLL_BASE_URL).port
-      @jekyll_pid = spawn("bundle exec jekyll serve --config _config_test.yml --port #{port} --detach --skip-initial-build", 
-                         :out => '/dev/null', :err => '/dev/null')
+      puts "Starting Jekyll server for visual tests..."
+      @@jekyll_pid = spawn('bundle exec jekyll serve --detach --skip-initial-build')
       
       # Wait for server to start (up to 30 seconds)
       30.times do
         sleep 1
         begin
-          uri = URI.parse(JEKYLL_BASE_URL)
+          uri = URI.parse("#{JEKYLL_BASE_URL}/")
           http = Net::HTTP.new(uri.host, uri.port)
           http.read_timeout = 2
-          response = http.get('/')
+          response = http.get(uri.path)
           if response.code.to_i.between?(200, 399)
-            @server_running = true
+            @@server_running = true
             puts "Jekyll server started successfully"
             break
           end
@@ -54,21 +58,34 @@ class VisualTest < Minitest::Test
         end
       end
       
-      assert @server_running, "Failed to start Jekyll server after 30 seconds"
+      raise "Failed to start Jekyll server after 30 seconds" unless @@server_running
+    end
+  end
+  
+  def self.shutdown
+    if @@jekyll_pid
+      begin
+        Process.kill('TERM', @@jekyll_pid)
+        Process.wait(@@jekyll_pid)
+      rescue
+        # Process may have already exited
+      end
+      @@jekyll_pid = nil
+    end
+    
+    # Ensure all Jekyll processes are cleaned up
+    system('pkill -f jekyll 2>/dev/null')
+    @@server_running = false
+  end
+  
+  def setup
+    # Ensure server is still running
+    unless @@server_running
+      skip "Jekyll server not available"
     end
   end
   
   def teardown
-    # Clean up Jekyll server if we started it
-    if @jekyll_pid
-      begin
-        Process.kill('TERM', @jekyll_pid)
-        Process.wait(@jekyll_pid)
-      rescue
-        # Process may have already exited
-      end
-    end
-    
     # Clean up test screenshots
     cleanup_screenshots
   end
@@ -1071,3 +1088,9 @@ private
     talk_links.uniq # Return all unique talk URLs found
   end
 end
+
+# Start the Jekyll server when the test class is loaded
+VisualTest.startup
+
+# Hook into Minitest lifecycle for class-level teardown
+Minitest.after_run { VisualTest.shutdown }
