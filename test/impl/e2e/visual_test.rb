@@ -128,7 +128,11 @@ class VisualTest < Minitest::Test
     assert response.code.to_i.between?(200, 399), 
       "Talks list page failed to load: HTTP #{response.code}"
       
-    puts "SUCCESS Talks list page loads successfully (HTTP #{response.code})"
+    # Verify that the page contains redirect content
+    assert response.body.include?('window.location.replace'), 
+      "Talks page should contain JavaScript redirect"
+      
+    puts "SUCCESS Talks list page loads and redirects (HTTP #{response.code})"
   end
 
   # ===========================================
@@ -139,7 +143,7 @@ class VisualTest < Minitest::Test
     # Base pages that should always exist
     base_test_pages = [
       '/',
-      '/talks/',
+      '/talks/',  # Now always exists with redirect
     ]
     
     # Add any specific talk pages that exist
