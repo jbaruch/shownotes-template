@@ -99,3 +99,11 @@ vendor/
 
 # PDFs (will be uploaded to Google Drive)
 pdfs/*.pdf
+
+# Test screenshots (temporary files, not for version control)
+test/screenshots/
+test/**/screenshots/
+
+# Test downloads (temporary test files)
+test_downloads/
+**/test_downloads/

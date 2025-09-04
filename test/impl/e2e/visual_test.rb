@@ -68,6 +68,36 @@ class VisualTest < Minitest::Test
         # Process may have already exited
       end
     end
+    
+    # Clean up test screenshots
+    cleanup_screenshots
+  end
+
+  def cleanup_screenshots
+    screenshot_dirs = [
+      "test/screenshots/thumbnails",
+      "test/screenshots/layout", 
+      "test/screenshots/responsive",
+      "test/screenshots/talk_pages",
+      "test/screenshots/metadata",
+      "test/screenshots/accessibility"
+    ]
+    
+    screenshot_dirs.each do |dir|
+      if Dir.exist?(dir)
+        Dir.glob(File.join(dir, "*.png")).each do |file|
+          File.delete(file)
+          puts "  Cleaned up screenshot: #{file}" if ENV['VERBOSE_CLEANUP']
+        end
+        # Remove empty directory
+        Dir.rmdir(dir) if Dir.empty?(dir)
+      end
+    end
+    
+    # Remove parent screenshots directory if empty
+    if Dir.exist?("test/screenshots") && Dir.empty?("test/screenshots")
+      Dir.rmdir("test/screenshots")
+    end
   end
 
   # ===========================================
