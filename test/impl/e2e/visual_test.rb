@@ -211,17 +211,17 @@ class VisualTest < Minitest::Test
     puts "SUCCESS No liquid template errors in generated HTML"
   end
   
-  def test_google_drive_thumbnail_urls_present
-    # Check homepage for thumbnails (where previews are shown)
+  def test_local_thumbnails_are_displayed
+    # Check homepage for local thumbnails (where previews are shown)
     uri = URI.parse("#{JEKYLL_BASE_URL}/")
     http = Net::HTTP.new(uri.host, uri.port)
     response = http.get('/')
     
-    # Look for Google Drive thumbnail URLs in the HTML
-    drive_thumbnails = response.body.scan(/https:\/\/drive\.google\.com\/thumbnail\?id=/)
-    slides_thumbnails = response.body.scan(/https:\/\/lh3\.googleusercontent\.com\/d\//)
+    # Look for local thumbnail URLs in the HTML
+    local_thumbnails = response.body.scan(/\/assets\/images\/thumbnails\/[^"]+\.png/)
+    placeholder_thumbnails = response.body.scan(/\/assets\/images\/placeholder-thumbnail\.svg/)
     
-    thumbnail_count = drive_thumbnails.length + slides_thumbnails.length
+    thumbnail_count = local_thumbnails.length + placeholder_thumbnails.length
     
     # If no thumbnails on homepage, check if any talk page exists and check it
     if thumbnail_count == 0
@@ -230,54 +230,50 @@ class VisualTest < Minitest::Test
       if talk_url
         uri = URI.parse("#{JEKYLL_BASE_URL}#{talk_url}")
         response = http.get(uri.path)
-        drive_thumbnails = response.body.scan(/https:\/\/drive\.google\.com\/thumbnail\?id=/)
-        slides_thumbnails = response.body.scan(/https:\/\/lh3\.googleusercontent\.com\/d\//)
-        thumbnail_count = drive_thumbnails.length + slides_thumbnails.length
+        local_thumbnails = response.body.scan(/\/assets\/images\/thumbnails\/[^"]+\.png/)
+        placeholder_thumbnails = response.body.scan(/\/assets\/images\/placeholder-thumbnail\.svg/)
+        thumbnail_count = local_thumbnails.length + placeholder_thumbnails.length
       else
         # No talks exist, skip the test
-        skip "❌ SKIPPED: No talks found - cannot test Google Drive thumbnails without content"
+        skip "❌ SKIPPED: No talks found - cannot test thumbnails without content"
         return
       end
     end
     
     assert thumbnail_count > 0, 
-      "No Google Drive/Slides thumbnail URLs found in homepage or talk page HTML"
+      "No local thumbnail or placeholder URLs found in homepage or talk page HTML"
       
-    puts "SUCCESS Found #{thumbnail_count} thumbnail URLs in generated HTML"
+    puts "SUCCESS Found #{local_thumbnails.length} local thumbnails and #{placeholder_thumbnails.length} placeholders in generated HTML"
   end
 
-  def test_no_corb_blocked_thumbnail_urls
-    # This test ensures we don't regress to using CORB-blocked URLs
+  def test_no_remote_thumbnail_urls
+    # This test ensures we're using local thumbnails only (no remote dependencies)
     uri = URI.parse("#{JEKYLL_BASE_URL}/")
     http = Net::HTTP.new(uri.host, uri.port)
     response = http.get('/')
     
-    # Check for the problematic drive.google.com/thumbnail URLs that trigger CORB
-    corb_blocked_urls = response.body.scan(/https:\/\/drive\.google\.com\/thumbnail\?id=/)
+    # Check for any remote thumbnail URLs that could cause CORS/loading issues
+    remote_thumbnails = response.body.scan(/https:\/\/[^\/]+\/.*\.(png|jpg|jpeg|gif|webp)/)
     
     # Also check any talk page if one exists
     talk_url = find_any_talk_url
     if talk_url
       uri = URI.parse("#{JEKYLL_BASE_URL}#{talk_url}")
       talk_response = http.get(uri.path)
-      corb_blocked_urls += talk_response.body.scan(/https:\/\/drive\.google\.com\/thumbnail\?id=/)
+      remote_thumbnails += talk_response.body.scan(/https:\/\/[^\/]+\/.*\.(png|jpg|jpeg|gif|webp)/)
     end
     
-    assert_equal 0, corb_blocked_urls.length,
-      "❌ CORB REGRESSION: Found #{corb_blocked_urls.length} blocked drive.google.com/thumbnail URLs. Use lh3.googleusercontent.com URLs instead!"
-    
-    # Verify we're using the correct lh3.googleusercontent.com URLs
-    correct_urls = response.body.scan(/https:\/\/lh3\.googleusercontent\.com\/d\//)
-    if talk_url
-      correct_urls += talk_response.body.scan(/https:\/\/lh3\.googleusercontent\.com\/d\//)
+    # Filter out known safe external images (not thumbnails)
+    problematic_remotes = remote_thumbnails.reject do |url|
+      url.include?('gravatar.com') || # Profile images
+      url.include?('github.com/') ||  # GitHub assets
+      url.include?('raw.githubusercontent.com') # GitHub raw files
     end
     
-    if correct_urls.length > 0
-      puts "SUCCESS Using #{correct_urls.length} CORB-safe lh3.googleusercontent.com thumbnail URLs"
-    else
-      # If no thumbnails at all, that's also acceptable (no talks exist)
-      puts "INFO No thumbnail URLs found (no talks with Google Drive slides)"
-    end
+    assert_equal 0, problematic_remotes.length,
+      "❌ Found #{problematic_remotes.length} remote thumbnail URLs that could cause loading issues: #{problematic_remotes.join(', ')}"
+    
+    puts "SUCCESS Using only local thumbnails and safe external assets"
   end
 
   def test_thumbnail_structure_and_accessibility

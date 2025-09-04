@@ -70,7 +70,16 @@ class TalkMigrator
       return false
     end
     
-    # Step 9: Run migration tests (optional for batch operations)
+    # Step 9: Rebuild Jekyll site (always do this after successful file generation)
+    jekyll_success = rebuild_jekyll_site
+    unless jekyll_success
+      puts "⚠️  Jekyll rebuild failed, but migration file was created"
+      puts "   You may need to rebuild manually with: bundle exec jekyll build"
+      puts "   The talk file was created correctly at: #{@jekyll_file}"
+      # Don't return false here - the migration technically succeeded
+    end
+    
+    # Step 10: Run migration tests (optional for batch operations)
     if skip_tests
       puts "⏭️  Skipping tests (batch mode)"
       puts "\n✅ MIGRATION COMPLETED!"
@@ -78,7 +87,7 @@ class TalkMigrator
       puts "Resources: #{@resources.length} extracted"
     else
       unless run_migration_tests
-        puts "⚠️  Migration tests failed, but file was created"
+        puts "⚠️  Migration tests failed, but file was created and site rebuilt"
         puts "   This may indicate incomplete migration that needs manual review"
       end
       
@@ -636,6 +645,31 @@ class TalkMigrator
       puts "   #{i+1}. #{error}"
     end
     puts "\nFIX THESE ISSUES AND TRY AGAIN"
+  end
+  
+  def rebuild_jekyll_site
+    puts "\n🏗️  Rebuilding Jekyll site to include migrated content..."
+    
+    # Change to project root for building Jekyll
+    project_root = File.expand_path('../..', __dir__)
+    Dir.chdir(project_root) do
+      puts "📍 Building from: #{Dir.pwd}"
+      
+      # Build Jekyll site
+      puts "🚀 bundle exec jekyll build"
+      build_success = system("bundle exec jekyll build --quiet")
+      
+      unless build_success
+        puts "❌ Jekyll build FAILED"
+        puts "   The new talk may have syntax errors or missing data"
+        return false
+      end
+      
+      puts "✅ Jekyll build successful"
+      puts "   Migrated content is now available in the rendered site"
+      
+      true
+    end
   end
   
   def run_migration_tests

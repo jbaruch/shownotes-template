@@ -1,290 +1,342 @@
-# Migration Documentation
+# Migration Guide
+
+Complete guide for migrating conference talks from Notist to your Jekyll-based show notes platform.
 
 ## Overview
 
-This document consolidates all migration-related information for the shownotes project, covering the process of migrating conference talks from noti.st to Jekyll format.
+The migration process automatically extracts content from Notist talks and creates Jekyll-compatible pages with all resources, thumbnails, and metadata properly configured.
 
-## Migration Workflow
+## Prerequisites
 
-### Step-by-Step Process
+Before migrating talks, ensure you have:
 
-#### 1. Extract Talk Metadata
-From `https://noti.st/USERNAME/TALK_ID` (or custom domain):
-- Talk title, conference, date, description
-- Speaker information
+1. **Jekyll site configured** - See [Setup Guide](SETUP.md)
+2. **Google Drive API setup** - Required for slide hosting
+3. **Internet connection** - For downloading content and thumbnails
 
-#### 2. Extract PDF Slides
-From noti.st presentation page:
-- Find PDF download link: `https://on.notist.cloud/pdf/deck-*.pdf`
-- Download the PDF file locally
-- Upload to Google Drive (see Google Drive Setup section)
-- Get shareable link: `https://drive.google.com/file/d/FILE_ID/view`
+## Quick Migration
 
-#### 3. Extract Video Links
-- Look for embedded YouTube/Vimeo videos
-- Get direct video URLs
-- Test video accessibility
-
-#### 4. Extract Resource Links
-- Collect all reference links, code repositories, demos
-- Validate link accessibility
-- Categorize by type (documentation, tools, examples)
-
-#### 5. Generate Jekyll Markdown
-- Use `utils/migration/migrate_talk.rb` script
-- Generate clean markdown format with minimal frontmatter
-- Include source_url for validation
-
-## Google Drive Setup
-
-### Prerequisites
-Before running the migration script, you need to set up Google Drive access:
-
-#### 1. Create Google Service Account
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing one
-3. Enable Google Drive API
-4. Create a Service Account
-5. Download the JSON credentials file
-
-#### 2. Configure Credentials
-1. Save the JSON file as `Google API.json` in the project root
-2. **Important**: Add `Google API.json` to `.gitignore` to keep credentials secure
-3. Never commit API credentials to version control
-
-#### 3. Set Up Shared Drive
-1. Create a Google Drive folder for PDF uploads
-2. Share the folder with the service account email (found in the JSON file)
-3. Give the service account "Editor" permissions
-4. Note the folder ID from the URL for use in the migration script
-
-### Security Notes
-- The `Google API.json` file contains sensitive credentials
-- This file should be git-ignored and never committed
-- Each user will need their own service account and credentials
-- Shared drive permissions are required for PDF uploads
-
-### GitHub Actions Integration
-
-For automated migration testing in CI/CD pipelines:
-
-#### Setting Up Migration Test Credentials
-
-1. **Go to your GitHub repository** → **Settings** → **Secrets and variables** → **Actions**
-2. **Create a new repository secret**:
-   - **Name**: `GOOGLE_API_CREDENTIALS_JSON`
-   - **Value**: Copy the entire contents of your `Google API.json` file
-
-#### Migration Testing in CI
-
-- **External Tests**: Will use the GitHub secret for Google Drive API integration
-- **Migration Tests**: Will validate that migrations detect incomplete data properly
-- **Local vs CI**: 
-  - Local development uses local `Google API.json` file
-  - CI environment uses `GOOGLE_API_CREDENTIALS_JSON` secret
-  - Tests skip gracefully when credentials unavailable
-
-### CI/CD Integration
-
-For automated migration testing in CI/CD pipelines:
-
-#### Setting Up GitHub Secrets for Migration Tests
-
-1. **Go to your GitHub repository** → **Settings** → **Secrets and variables** → **Actions**
-2. **Create a new repository secret**:
-   - **Name**: `GOOGLE_API_CREDENTIALS_JSON`
-   - **Value**: Copy the entire contents of your `Google API.json` file
-
-#### CI Migration Testing Behavior
-
-- **External Tests**: Will use the GitHub secret for Google Drive API integration
-- **Migration Tests**: Will validate that migrations detect incomplete data properly
-- **Local vs CI**:
-  - Local development uses local `Google API.json` file
-  - CI environment uses `GOOGLE_API_CREDENTIALS_JSON` secret
-  - Tests skip gracefully when credentials unavailable
-
-This enables comprehensive migration validation in your CI pipeline while keeping credentials secure.
-
-## Migration Scripts
-
-### Enhanced Migration Tool v2.0
-
-The migration process is automated through an enhanced script that supports two migration modes:
-
-#### Single Talk Migration
-
-For migrating individual talks:
+### Single Talk Migration
 
 ```bash
-bundle exec ruby migrate_talk.rb <talk_url>
+# Basic migration
+ruby migrate_talk.rb https://noti.st/yourname/your-talk
+
+# With verbose output
+ruby migrate_talk.rb https://noti.st/yourname/your-talk --verbose
+
+# Migration with testing
+ruby migrate_talk.rb https://noti.st/yourname/your-talk --test
 ```
 
-**Example:**
-```bash
-bundle exec ruby migrate_talk.rb https://speaking.jbaru.ch/PjlHKD/robocoders-judgment-day-ai-ides-face-off
-```
+### What Happens During Migration
 
-**Process:**
-1. Fetches and parses the individual talk page
-2. Extracts metadata (title, conference, date, speaker)
-3. Downloads and uploads PDF slides to Google Drive
-4. Finds video URLs (YouTube/Vimeo)
-5. Extracts all resource links
-6. Validates resource sources (no Notist dependencies)
-7. Generates Jekyll markdown file
-8. **Automatically runs migration tests** to validate completeness
-9. Reports success/failure with actionable feedback
+1. **Content Extraction**
+   - Fetches talk metadata from Notist
+   - Extracts title, description, and resources
+   - Downloads thumbnail from og:image
+   - Identifies slides and video URLs
 
-#### Bulk Speaker Migration
+2. **File Processing**
+   - Downloads PDF slides (if available)
+   - Uploads slides to Google Drive
+   - Creates local thumbnail copy
+   - Generates Jekyll markdown file
 
-For migrating all talks from a speaker's profile:
+3. **Validation**
+   - Tests all URLs for accessibility
+   - Verifies Google Drive permissions
+   - Validates generated content structure
+   - Runs quality checks
 
-```bash
-bundle exec ruby migrate_talk.rb --speaker <speaker_profile_url>
-```
+## Batch Migration
 
-**Example:**
-```bash
-bundle exec ruby migrate_talk.rb --speaker https://speaking.jbaru.ch
-```
-
-**Process:**
-1. **Discovery**: Automatically finds all talk URLs on the speaker's profile page
-2. **Batch Migration**: Migrates each talk sequentially using single talk process
-3. **Progress Tracking**: Shows real-time progress with detailed status
-4. **Error Handling**: Continues even if individual talks fail
-5. **Comprehensive Testing**: Runs migration tests after all migrations complete
-6. **Summary Report**: Provides detailed success/failure analysis with recommendations
-
-#### Migration Script Features
-
-**🧪 Automatic Test Integration:**
-- Runs `bundle exec rake test:migration` after each migration
-- Validates migration completeness immediately
-- Provides feedback on incomplete migrations
-- Same tests that run in CI pipeline
-
-**📊 Enhanced Reporting:**
-- Real-time progress for bulk migrations
-- Success rate tracking and analysis
-- Clear error messages with actionable steps
-- Recommendations for manual review
-
-**🔧 Robust Error Handling:**
-- Graceful failure handling for network issues
-- Continues bulk migration even if individual talks fail
-- Detailed error logging for debugging
-- Recovery guidance for common issues
-
-**CLI Help & Versioning:**
-```bash
-# Get detailed help
-bundle exec ruby migrate_talk.rb --help
-
-# Check version and capabilities
-bundle exec ruby migrate_talk.rb --version
-```
-
-#### Migration Workflow
-
-**For New Migrations:**
-1. Set up Google Drive credentials (see Google Drive Setup section)
-2. Choose migration mode (single talk vs. bulk speaker)
-3. Run migration script with appropriate URL
-4. Review generated files in `_talks/` directory
-5. Check migration test results for completeness validation
-6. Commit generated files to repository
-
-**Quality Assurance:**
-- Migration tests run automatically after each migration
-- Tests validate resource count matches source
-- Tests check for proper resource types and sources
-- CI pipeline runs same tests for continuous validation
-
-## Migration Quality Validation
-
-### Overview
-- **Migration Script**: `utils/migration/migrate_talk.rb` - Single authoritative migration script
-- **Test Suite**: `test/migration/migration_test.rb` - Comprehensive validation
-- **Format**: Clean markdown with minimal YAML frontmatter
-
-### Verification Checklist
-
-#### Structure Validation
-- ✅ **Build**: No errors in Jekyll compilation
-- ✅ **Server**: Local preview available at http://127.0.0.1:4000/
-- ✅ **Collections**: _talks collection properly configured
-
-#### Sample Migration Test
-- ✅ **File Created**: Clean markdown format with minimal frontmatter
-- ✅ **Front Matter**: All required fields present including source_url
-- ✅ **Resources**: Properly structured and counted (excluding slides/video)
-- ✅ **Content**: Proper markdown with sections
-
-## Test Coverage
-
-### Migration Test Suite
-The migration test suite (`test/migration/migration_test.rb`) provides comprehensive validation:
-
-| Test Category | Coverage | Status |
-|---------------|----------|---------|
-| **Content Migration Accuracy** | Resource count validation, source comparison | ✅ Complete |
-| **Resource Type Detection** | Slides, video, links, code repositories | ✅ Complete |
-| **URL Validation** | Video accessibility, redirect handling | ✅ Complete |
-| **Format Consistency** | Clean markdown, no YAML monstrosity | ✅ Complete |
-| **External Dependencies** | Google Drive slides, YouTube videos | ✅ Complete |
-
-## Known Issues
-
-### Migration Script Limitations
-- Requires manual intervention for complex resource extraction
-- Google Drive API quota limitations for large batches
-- Network dependencies for source validation
-
-## Migration Commands
+### Multiple Talks
 
 ```bash
-# Migrate a single talk
-cd utils/migration
-ruby migrate_talk.rb https://noti.st/USERNAME/TALK_ID
+# Create a list of URLs
+echo "https://noti.st/yourname/talk1" > talks_to_migrate.txt
+echo "https://noti.st/yourname/talk2" >> talks_to_migrate.txt
+echo "https://noti.st/yourname/talk3" >> talks_to_migrate.txt
 
-# Clean up Google Drive files (for re-migration)
-cd utils/google_drive
-ruby cleanup_google_drive.rb
-
-# Validate migration
-bundle exec ruby test/migration/migration_test.rb
-
-# Run all migration tests
-bundle exec ruby test/run_tests.rb --category migration
+# Migrate all talks
+while read url; do
+  ruby migrate_talk.rb "$url"
+  sleep 2  # Be respectful to Notist servers
+done < talks_to_migrate.txt
 ```
 
-## File Format
+### From Speaker Profile
 
-### Clean Markdown Format (Current Standard)
+The migration script supports speaker mode for bulk migration:
+
+```bash
+# Migrate all talks from a speaker profile
+ruby migrate_talk.rb --speaker https://noti.st/yourname
+```
+
+This will automatically discover and migrate all talks from the speaker's profile.
+
+## Migration Process Details
+
+### Content Mapping
+
+| Notist Field | Jekyll Output | Notes |
+|--------------|---------------|-------|
+| Talk Title | `title:` frontmatter | Cleaned of HTML |
+| Description | Content body | Converted to Markdown |
+| Slides URL | `slideshare_url:` | Also uploaded to Google Drive |
+| Video URL | `video_url:` | YouTube/Vimeo links preserved |
+| Event Name | `conference:` | Extracted from page |
+| Event Date | `date:` | ISO format (YYYY-MM-DD) |
+| og:image | Local thumbnail | Downloaded to assets/images/thumbnails/ |
+
+### File Structure
+
+Migration creates:
+
+```text
+_talks/
+└── YYYY-MM-DD-conference-talk-title.md    # Main talk file
+
+assets/images/thumbnails/
+└── talk-title-thumbnail.png               # Local thumbnail
+
+pdfs/
+└── YYYY-MM-DD-conference-talk-title.pdf   # Slides (if available)
+```
+
+### Generated Content Example
+
 ```markdown
 ---
 layout: talk
-source_url: https://noti.st/USERNAME/TALK_ID
+title: "Your Talk Title"
+date: 2024-06-12
+conference: "Conference Name"
+slideshare_url: "https://docs.google.com/presentation/d/..."
+video_url: "https://www.youtube.com/watch?v=..."
+thumbnail_url: "/assets/images/thumbnails/talk-title-thumbnail.png"
 ---
 
-# Talk Title
+# Your Talk Title
 
-**Conference:** Conference Name
-**Date:** YYYY-MM-DD
-**Slides:** [View Slides](https://drive.google.com/file/d/FILE_ID/view)
-**Video:** [Watch Video](https://youtube.com/watch?v=VIDEO_ID)
+**Conference:** Conference Name  
+**Date:** June 12, 2024  
+**Slides:** [View Slides](https://docs.google.com/presentation/d/...)  
+**Video:** [Watch Video](https://www.youtube.com/watch?v=...)  
 
-Talk description and content...
+## Abstract
+
+Your talk description extracted from Notist...
 
 ## Resources
 
-- [Resource Name](url) - Description
+- [Resource 1](https://example.com)
+- [Resource 2](https://github.com/yourname/repo)
 ```
 
-This format ensures:
-- Minimal YAML frontmatter (layout + source_url only)
-- Clean, readable markdown content
-- Consistent metadata formatting
-- Source URL tracking for validation
+## Troubleshooting
+
+### Common Issues
+
+#### Migration Fails with "Content not found"
+
+```bash
+# Check if URL is accessible
+curl -I "https://noti.st/yourname/your-talk"
+
+# Verify URL format
+# Correct: https://noti.st/speaker/talk-slug
+# Incorrect: https://noti.st/speaker/talk-slug/
+```
+
+#### Google Drive Upload Fails
+
+```bash
+# Verify API credentials
+ls -la "Google API.json"
+
+# Test Google Drive connection
+ruby test/external/google_drive_integration_test.rb
+
+# Check quota limits
+# Google Drive API has daily upload limits
+```
+
+#### Thumbnail Download Fails
+
+```bash
+# Check og:image URL manually
+curl -I "$(ruby -e "require 'nokogiri'; require 'open-uri'; puts Nokogiri::HTML(URI.open('YOUR_NOTIST_URL')).at('meta[property=\"og:image\"]')['content']")"
+
+# Verify image format
+# Must be PNG, JPG, or WebP
+```
+
+#### Generated Content Issues
+
+```bash
+# Validate generated markdown
+bundle exec jekyll build
+
+# Check for YAML errors
+ruby -c _talks/your-generated-file.md
+
+# Run content validation
+bundle exec ruby test/migration/migration_test.rb
+```
+
+### Manual Fixes
+
+#### Fix Missing Conference Name
+
+```yaml
+# In generated file frontmatter
+conference: "Add Conference Name Here"
+```
+
+#### Fix Date Format
+
+```yaml
+# Ensure ISO format
+date: 2024-06-12  # YYYY-MM-DD
+```
+
+#### Fix Resource URLs
+
+```markdown
+## Resources
+
+- [Fixed Resource Title](https://corrected-url.com)
+```
+
+## Advanced Migration Options
+
+### Command Line Options
+
+The migration script supports several command-line options:
+
+```bash
+# Skip integration tests after migration (faster)
+ruby migrate_talk.rb https://noti.st/yourname/talk --skip-tests
+
+# Migrate all talks for a speaker
+ruby migrate_talk.rb --speaker https://noti.st/yourname
+
+# Show help and all available options
+ruby migrate_talk.rb --help
+
+# Show version information
+ruby migrate_talk.rb --version
+```
+
+### Speaker Mode vs Single Talk Mode
+
+**Single Talk Mode** (default):
+```bash
+ruby migrate_talk.rb https://noti.st/yourname/individual-talk
+```
+
+**Speaker Mode** (bulk migration):
+```bash
+ruby migrate_talk.rb --speaker https://noti.st/yourname
+```
+
+### Migration Behavior Control
+
+The migration script automatically:
+- Checks if talks already exist (by source URL)
+- Downloads thumbnails from Notist og:image  
+- Uploads slides to Google Drive
+- Runs validation tests (unless `--skip-tests`)
+- Rebuilds Jekyll site
+
+You can modify this behavior by:
+- Using `--skip-tests` for faster migration
+- Using `--speaker` for bulk processing
+- Manually editing generated files after migration
+
+## Post-Migration
+
+### Verification Checklist
+
+- [ ] Generated file exists in `_talks/`
+- [ ] Thumbnail appears in `assets/images/thumbnails/`
+- [ ] Jekyll builds without errors
+- [ ] Talk page displays correctly
+- [ ] All links are accessible
+- [ ] Google Drive slides are public
+- [ ] Mobile layout works
+
+### Testing Migration
+
+```bash
+# Test specific migrated talk
+TEST_SINGLE_TALK=your-talk-slug bundle exec ruby test/migration/migration_test.rb
+
+# Run full migration test suite
+bundle exec ruby test/run_tests.rb --category migration
+
+# Validate site build
+bundle exec jekyll build
+bundle exec jekyll serve
+```
+
+### Manual Improvements
+
+After migration, you may want to:
+
+1. **Enhance descriptions** - Add more context or details
+2. **Organize resources** - Group by type or importance  
+3. **Add speaker notes** - Include additional insights
+4. **Update links** - Replace any broken or outdated URLs
+5. **Optimize thumbnails** - Crop or enhance if needed
+
+## Migration Scripts
+
+The migration functionality is built into the main script:
+
+```bash
+# Main migration script with all functionality
+ruby migrate_talk.rb [options] <url>
+```
+
+Available options:
+- `--speaker` - Migrate all talks from speaker profile
+- `--skip-tests` - Skip validation tests after migration
+- `--help` - Show detailed usage information
+- `--version` - Show version information
+
+For additional utilities, see the `utils/` directory which contains:
+- `full_cleanup.rb` - Cleanup utility for development
+- `utils/migration/migrate_talk.rb` - Alternative migration implementation
+
+## Best Practices
+
+### Before Migration
+
+1. **Test with one talk first** - Verify your setup works
+2. **Backup existing content** - In case something goes wrong
+3. **Check API limits** - Google Drive has daily quotas
+4. **Verify URLs** - Make sure Notist URLs are accessible
+
+### During Migration
+
+1. **Be respectful** - Add delays between requests
+2. **Monitor progress** - Use verbose mode for large batches
+3. **Check errors** - Don't ignore failed migrations
+4. **Test incrementally** - Build and test after each migration
+
+### After Migration
+
+1. **Review content** - Check generated files for accuracy
+2. **Test functionality** - Verify all links and resources work
+3. **Optimize performance** - Compress images if needed
+4. **Update documentation** - Keep your talk list current
+
+## Next Steps
+
+- **[Usage Guide](USAGE.md)** - Learn about manual content creation
+- **[Advanced Features](ADVANCED.md)** - Customize your platform
+- **[Testing](TESTING.md)** - Understand the test suite

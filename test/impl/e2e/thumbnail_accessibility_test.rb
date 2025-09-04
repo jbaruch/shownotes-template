@@ -76,14 +76,14 @@ class ThumbnailAccessibilityTest < Minitest::Test
       broken_thumbnails.each { |thumb| puts "   - #{thumb}" }
       
       puts "\n💡 RECOMMENDATION:"
-      puts "   Google Drive thumbnails are often blocked by modern browsers due to CORS policies."
-      puts "   Consider using alternative thumbnail generation methods for better cross-browser compatibility."
+      puts "   Some thumbnails may be inaccessible due to network issues or missing files."
+      puts "   Consider checking that all referenced thumbnail files exist locally."
     end
     
     # This test warns about broken thumbnails but doesn't fail the build
-    # since it's a known limitation of Google Drive thumbnails in browsers
+    # since thumbnails may be missing for talks that haven't been migrated yet
     if broken_thumbnails.any?
-      puts "\n⚠️  WARNING: Some thumbnails may not display in certain browsers"
+      puts "\n⚠️  WARNING: Some thumbnails may not display properly"
     else
       puts "\n✅ All thumbnails are accessible"
     end

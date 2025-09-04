@@ -1,25 +1,68 @@
 # Development Guide
 
-## Overview
+Complete development documentation for contributors to the Conference Talk Show Notes platform.
 
-Development guide for the shownotes project, including AI agent guidelines, development practices, and project maintenance.
+## Architecture Overview
 
-## Project Structure
+### Current System Architecture
 
 ```text
-shownotes/
-├── docs/                          # Documentation
-│   ├── MIGRATION.md              # Migration procedures
-│   ├── TESTING.md                # Test documentation
-│   └── DEVELOPMENT.md            # This file
-├── test/                         # Test suite (organized)
-├── _talks/                       # Talk content files
-├── _layouts/                     # Jekyll layouts
-├── _plugins/                     # Jekyll plugins
-├── lib/                          # Ruby libraries
-├── utils/                        # Utility scripts
-├── migrate_talk.rb               # Migration script
-└── README.md                     # Main project documentation
+Jekyll Static Site Generator
+├── Content Management
+│   ├── _talks/              # Individual talk files (Markdown)
+│   ├── _layouts/            # Page templates
+│   └── _includes/           # Reusable components
+├── Processing Pipeline
+│   ├── migrate_talk.rb      # Notist migration script
+│   ├── lib/                 # Core Ruby libraries
+│   └── utils/               # Helper scripts  
+├── Static Assets
+│   ├── assets/images/       # Thumbnails and media
+│   ├── assets/css/          # Stylesheets
+│   └── pdfs/                # PDF slides
+└── Testing Framework
+    ├── test/migration/      # Migration tests
+    ├── test/impl/           # Implementation tests
+    └── test/external/       # External service tests
+```
+
+### Key Components
+
+#### Talk Processing Pipeline
+
+1. **Migration Script** (`migrate_talk.rb`)
+   - Fetches metadata from Notist API
+   - Downloads thumbnails from og:image
+   - Generates Jekyll-compatible Markdown
+   - Validates content structure
+
+2. **Jekyll Processing**
+   - Builds static HTML from Markdown
+   - Processes Liquid templates
+   - Generates site navigation
+   - Optimizes assets
+
+3. **Local Thumbnail System**
+   - Stores thumbnails in `assets/images/thumbnails/`
+   - Uses `{talk-slug}-thumbnail.png` naming
+   - Provides fallback placeholders
+   - No external dependencies
+
+#### Content Structure
+
+```yaml
+# Talk frontmatter structure
+---
+layout: talk
+title: "Talk Title"
+date: 2024-01-15
+conference: "Conference Name"
+slideshare_url: "https://..."
+video_url: "https://..."
+thumbnail_url: "/assets/images/thumbnails/talk-slug-thumbnail.png"
+---
+
+Talk content in Markdown...
 ```
 
 ## Development Practices

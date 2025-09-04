@@ -31,9 +31,21 @@ _site-fixed.html
 .cache/
 .vuepress/dist/
 _test_site/
+_perf_test_site/
 
 # Temporary storage (PDFs uploaded to Google Drive)
 pdfs/
+
+# Development helper scripts (use proper test suite instead)
+debug_*.rb
+test_*.rb
+compare_*.rb
+analyze_*.rb
+migrate_talk_*.rb
+*_comparison.rb
+
+# Shell scripts (use Ruby tools instead)
+*.sh
 
 # IDE and editors
 .vscode/

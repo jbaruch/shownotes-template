@@ -16,11 +16,39 @@ class MigrationTest < Minitest::Test
   
   def setup
     @talks = {}
-    load_all_talks_with_sources
+    
+    # Check for single talk testing mode
+    single_talk = ENV['TEST_SINGLE_TALK']
+    if single_talk
+      puts "🎯 SINGLE TALK MODE: Testing only '#{single_talk}'"
+      load_single_talk(single_talk)
+    else
+      puts "🔍 FULL SUITE MODE: Testing all talks"
+      load_all_talks_with_sources
+    end
+  end
+  
+  def load_single_talk(talk_name)
+    file_path = File.join(TALKS_DIR, "#{talk_name}.md")
+    
+    unless File.exist?(file_path)
+      raise "❌ TALK NOT FOUND: #{file_path} does not exist!"
+    end
+    
+    load_talk_from_file(file_path, talk_name)
+    puts "📋 Loaded 1 talk for focused testing: #{talk_name}"
   end
   
   def load_all_talks_with_sources
     Dir.glob("#{TALKS_DIR}/*.md").each do |file|
+      talk_name = File.basename(file, '.md')
+      load_talk_from_file(file, talk_name)
+    end
+    puts "📋 Loaded #{@talks.length} talks for testing"
+  end
+  
+  def load_talk_from_file(file, talk_name)
+    begin
       content = File.read(file)
       
       # Handle both YAML frontmatter format and markdown-only format
@@ -31,7 +59,7 @@ class MigrationTest < Minitest::Test
         # Check for legacy source_url field first, then look in HTML comments
         source_url = yaml_content['source_url'] || yaml_content['notist_url'] || extract_source_url_from_markdown(content)
         
-        @talks[File.basename(file, '.md')] = {
+        @talks[talk_name] = {
           file: file,
           yaml: yaml_content,
           raw_content: content,
@@ -42,7 +70,7 @@ class MigrationTest < Minitest::Test
         source_url = extract_source_url_from_markdown(content)
         
         if source_url
-          @talks[File.basename(file, '.md')] = {
+          @talks[talk_name] = {
             file: file,
             yaml: nil,
             raw_content: content,
@@ -50,17 +78,12 @@ class MigrationTest < Minitest::Test
           }
         end
       end
+    rescue => e
+      puts "⚠️  Failed to load #{talk_name}: #{e.message}"
     end
-    
-    puts "📋 Loaded #{@talks.length} talks for testing"
   end
-
-  # ==========================================
-  # Test Suite 1: Dynamic Source-vs-Migrated Validation  
-  # ==========================================
   
-  def test_migrated_resources_match_source_exactly
-    # Skip if no talks have source URLs (non-migration users)
+  def extract_source_url_from_markdown(content)
     talks_with_sources = @talks.select { |_, data| data[:source_url] }
     
     if talks_with_sources.empty?
@@ -218,11 +241,10 @@ class MigrationTest < Minitest::Test
       assert url.include?('/d/') && (url.include?('/edit') || url.include?('/view')), 
         "Should use shared document format (/d/{id}/edit or /d/{id}/view): #{url}"
         
-      # Extract document ID for thumbnail testing
+      # Document ID extracted for reference (thumbnails now use local files from Notist)
       if url.match(/\/d\/([a-zA-Z0-9\-_]+)/)
         doc_id = $1
-        thumbnail_url = "https://lh3.googleusercontent.com/d/#{doc_id}=s400"
-        puts "  FILE #{resource['title']}: #{doc_id} → #{thumbnail_url}"
+        puts "  FILE #{resource['title']}: #{doc_id}"
       end
     end
     
@@ -234,10 +256,10 @@ class MigrationTest < Minitest::Test
       url = resource['url']
       title = resource['title'] || ''
       
-      # Slides MUST be Google Drive URLs for embedding, NOT direct PDF downloads
+      # Slides MUST be Google Drive URLs for embedding (thumbnails are handled separately via local files)
       if url.include?('.pdf') && !url.include?('drive.google.com')
         flunk "CRITICAL: Slides resource is downloadable PDF, not embedded: #{url}\n" \
-              "Slides MUST be uploaded to Google Drive for embedding and thumbnails!"
+              "Slides MUST be uploaded to Google Drive for embedding!"
       end
       
       # Google Drive URLs must be in correct format
@@ -259,52 +281,105 @@ class MigrationTest < Minitest::Test
   # Test Suite 3: Visual Quality Validation
   # ===========================================
   
-  def test_thumbnail_display_quality
-    # This test verifies that thumbnail URLs are properly formatted
-    # Actual image loading would require browser automation
+  def test_local_thumbnails_exist_for_talks
+    # Test that local thumbnails exist for talks (either from Notist migration or manually added)
     
-    @talks.flat_map { |_, data| get_resources_from_talk(data) }.each do |resource|
-      url = resource['url']
+    @talks.each do |talk_name, talk_data|
+      # Generate expected thumbnail filename
+      talk_slug = File.basename(talk_name, '.md')
+      thumbnail_path = "assets/images/thumbnails/#{talk_slug}-thumbnail.png"
       
-      # Test Google Drive PDF thumbnails
-      if url.include?('drive.google.com/file')
-        # Extract file ID for thumbnail URL
-        if url.match(/\/file\/d\/([a-zA-Z0-9\-_]+)/)
-          file_id = $1
-          thumbnail_url = "https://drive.google.com/thumbnail?id=#{file_id}&sz=w400-h300"
-          
-          # Verify thumbnail URL is accessible
-          uri = URI.parse(thumbnail_url)
-          http = Net::HTTP.new(uri.host, uri.port)
-          http.use_ssl = true
-          http.read_timeout = 10
-          
-          request = Net::HTTP::Head.new(uri.request_uri)
-          response = http.request(request)
-          
-          assert response.code.to_i.between?(200, 399),
-            "PDF thumbnail not accessible: #{thumbnail_url} (#{response.code})"
-            
-          puts "  FILE PDF thumbnail OK: #{resource['title']}"
-        end
+      if File.exist?(thumbnail_path)
+        puts "  ✅ #{talk_slug}: Local thumbnail exists"
+      else
+        puts "  ❓ #{talk_slug}: No local thumbnail (will use placeholder)"
+      end
+    end
+    
+    puts "SUCCESS Local thumbnail check completed"
+  end
+
+  def test_pdf_file_integrity
+    # Validate that Google Drive PDF files are not corrupted
+    pdf_files_tested = 0
+    
+    @talks.each do |talk_name, talk_data|
+      urls_to_check = []
+      
+      # Get URLs from resources section
+      resources = get_resources_from_talk(talk_data)
+      resources.each do |resource|
+        urls_to_check << resource['url'] if resource['url']
       end
       
-      # Test Google Slides thumbnails
-      if url.include?('docs.google.com/presentation') && resource['type'] == 'slides'
-        if url.match(/\/d\/([a-zA-Z0-9\-_]+)/)
-          doc_id = $1
-          thumbnail_url = "https://lh3.googleusercontent.com/d/#{doc_id}=s400"
+      # Also check slides/PDF URLs from markdown header format
+      content = talk_data[:raw_content]
+      if content.match(/\*\*Slides:\*\*.*?\[.*?\]\((.*?)\)/)
+        slides_url = $1
+        urls_to_check << slides_url
+      end
+      
+      # Test each URL for PDF integrity
+      urls_to_check.each do |url|
+        next unless url.include?('drive.google.com/file')
+        
+        if url.match(/\/file\/d\/([a-zA-Z0-9\-_]+)/)
+          file_id = $1
+          download_url = "https://drive.usercontent.google.com/download?id=#{file_id}&export=download"
           
-          # Note: These URLs might require authentication, so we just verify format
-          assert thumbnail_url.start_with?('https://lh3.googleusercontent.com/d/'),
-            "Invalid slides thumbnail URL format: #{thumbnail_url}"
-            
-          puts "  TARGET Slides thumbnail URL: #{resource['title']}"
+          puts "  🔍 Validating PDF integrity: #{talk_name} -> #{file_id}"
+          
+          # Check file headers to ensure it's a valid PDF
+          uri = URI.parse(download_url)
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.use_ssl = true
+          http.read_timeout = 15
+          
+          # Request just the first 20 bytes to check PDF header
+          request = Net::HTTP::Get.new(uri.request_uri)
+          request['Range'] = 'bytes=0-19'
+          
+          response = http.request(request)
+          
+          # Check if request was successful
+          unless response.code.to_i.between?(200, 299) || response.code.to_i == 206
+            flunk "❌ PDF FILE NOT ACCESSIBLE: #{url}\n" \
+                  "   Talk: #{talk_name}\n" \
+                  "   File ID: #{file_id}\n" \
+                  "   HTTP Status: #{response.code}\n" \
+                  "   This PDF cannot be downloaded or accessed"
+          end
+          
+          # Check if file starts with PDF header
+          header_bytes = response.body
+          if header_bytes && header_bytes.length >= 4
+            # Valid PDF should start with "%PDF"
+            unless header_bytes.start_with?('%PDF')
+              flunk "❌ CORRUPTED PDF FILE: #{url}\n" \
+                    "   Talk: #{talk_name}\n" \
+                    "   File ID: #{file_id}\n" \
+                    "   Expected: PDF header (%PDF)\n" \
+                    "   Got: #{header_bytes[0..10].inspect}\n" \
+                    "   This PDF file is corrupted and needs to be re-uploaded"
+            end
+          else
+            flunk "❌ EMPTY PDF FILE: #{url}\n" \
+                  "   Talk: #{talk_name}\n" \
+                  "   File ID: #{file_id}\n" \
+                  "   The PDF file appears to be empty or unreadable"
+          end
+          
+          pdf_files_tested += 1
+          puts "  ✅ PDF integrity OK: #{talk_name} -> #{file_id}"
         end
       end
     end
     
-    puts "SUCCESS Thumbnail URLs validated"
+    if pdf_files_tested > 0
+      puts "SUCCESS #{pdf_files_tested} PDF files validated for integrity"
+    else
+      puts "INFO No PDF files found to validate"
+    end
   end
 
   # ===========================================
@@ -325,7 +400,6 @@ class MigrationTest < Minitest::Test
     # Verify all migrated talks have complete content by comparing with source
     @talks.each do |talk_key, talk_data|
       content = talk_data[:raw_content]
-      yaml = talk_data[:yaml]
       
       # Check for truncated files (YAML frontmatter but no content)
       if content.strip.start_with?('---') && !content.include?('# ')

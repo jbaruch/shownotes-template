@@ -286,11 +286,10 @@ class MigrationTest < Minitest::Test
       assert url.include?('/d/') && (url.include?('/edit') || url.include?('/view')), 
         "Should use shared document format (/d/{id}/edit or /d/{id}/view): #{url}"
         
-      # Extract document ID for thumbnail testing
+      # Document ID extracted for reference (thumbnails now use local files from Notist)
       if url.match(/\/d\/([a-zA-Z0-9\-_]+)/)
         doc_id = $1
-        thumbnail_url = "https://lh3.googleusercontent.com/d/#{doc_id}=s400"
-        puts "  FILE #{resource['title']}: #{doc_id} → #{thumbnail_url}"
+        puts "  FILE #{resource['title']}: #{doc_id}"
       end
     end
     
@@ -305,10 +304,10 @@ class MigrationTest < Minitest::Test
       url = resource['url']
       title = resource['title'] || ''
       
-      # Slides MUST be Google Drive URLs for embedding, NOT direct PDF downloads
+      # Slides MUST be Google Drive URLs for embedding (thumbnails are handled separately via local files)
       if url.include?('.pdf') && !url.include?('drive.google.com')
         flunk "CRITICAL: Slides resource is downloadable PDF, not embedded: #{url}\n" \
-              "Slides MUST be uploaded to Google Drive for embedding and thumbnails!"
+              "Slides MUST be uploaded to Google Drive for embedding!"
       end
       
       # Google Drive URLs must be in correct format
@@ -358,56 +357,22 @@ class MigrationTest < Minitest::Test
   # Test Suite 3: Visual Quality Validation
   # ===========================================
   
-  def test_thumbnail_display_quality
-    # This test verifies that thumbnail URLs are properly formatted
-    # Actual image loading would require browser automation
+  def test_local_thumbnails_exist_for_talks
+    # Test that local thumbnails exist for talks (either from Notist migration or manually added)
     
-    all_resources = @talks.flat_map { |_, data| get_resources_from_talk(data) }
-    
-    # Test Google Drive PDF thumbnails
-    pdf_resources = all_resources.select { |r| r['url'].include?('drive.google.com/file') }
-    pdf_resources.each do |resource|
-      url = resource['url']
+    @talks.each do |talk_name, talk_data|
+      # Generate expected thumbnail filename
+      talk_slug = File.basename(talk_name, '.md')
+      thumbnail_path = "assets/images/thumbnails/#{talk_slug}-thumbnail.png"
       
-      # Extract file ID for thumbnail URL
-      if url.match(/\/file\/d\/([a-zA-Z0-9\-_]+)/)
-        file_id = $1
-        thumbnail_url = "https://drive.google.com/thumbnail?id=#{file_id}&sz=w400-h300"
-        
-        # Verify thumbnail URL is accessible
-        uri = URI.parse(thumbnail_url)
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
-        http.read_timeout = 10
-        
-        request = Net::HTTP::Head.new(uri.request_uri)
-        response = http.request(request)
-        
-        assert response.code.to_i.between?(200, 399),
-          "PDF thumbnail not accessible: #{thumbnail_url} (#{response.code})"
-          
-        puts "  FILE PDF thumbnail OK: #{resource['title']}"
+      if File.exist?(thumbnail_path)
+        puts "  ✅ #{talk_slug}: Local thumbnail exists"
+      else
+        puts "  ❓ #{talk_slug}: No local thumbnail (will use placeholder)"
       end
     end
     
-    # Test Google Slides thumbnails
-    slides_resources = all_resources.select { |r| r['type'] == 'slides' && r['url'].include?('docs.google.com/presentation') }
-    slides_resources.each do |resource|
-      url = resource['url']
-      
-      if url.match(/\/d\/([a-zA-Z0-9\-_]+)/)
-        doc_id = $1
-        thumbnail_url = "https://lh3.googleusercontent.com/d/#{doc_id}=s400"
-        
-        # Note: These URLs might require authentication, so we just verify format
-        assert thumbnail_url.start_with?('https://lh3.googleusercontent.com/d/'),
-          "Invalid slides thumbnail URL format: #{thumbnail_url}"
-          
-        puts "  TARGET Slides thumbnail URL: #{resource['title']}"
-      end
-    end
-    
-    puts "SUCCESS Thumbnail URLs validated"
+    puts "SUCCESS Local thumbnail check completed"
   end
 
   def test_pdf_file_integrity

@@ -1,8 +1,34 @@
-# Test Documentation
+# Testing Guide
 
-## Overview
+Simple guide for running tests and validating changes to the Conference Talk Show Notes platform.
 
-Comprehensive testing documentation for the shownotes project, covering test scenarios, coverage analysis, and validation results.
+## Quick Start
+
+### Run All Tests
+
+```bash
+# Install dependencies first
+bundle install
+
+# Run the complete test suite
+bundle exec ruby test/run_tests.rb
+```
+
+### Run Specific Test Categories
+
+```bash
+# Migration tests (verify talk migration works)
+bundle exec ruby test/run_tests.rb --category migration
+
+# Unit tests (fast core functionality tests)
+bundle exec ruby test/run_tests.rb --category unit
+
+# External tests (API connectivity)
+bundle exec ruby test/run_tests.rb --category external
+
+# Integration tests (full workflow)
+bundle exec ruby test/run_tests.rb --category integration
+```
 
 ## Test Organization
 
@@ -10,174 +36,174 @@ Comprehensive testing documentation for the shownotes project, covering test sce
 
 ```text
 test/
-├── run_tests.rb                    # Main unified test runner
-├── migration/                      # Migration validation tests
-├── external/                       # External API and dependency tests
-├── tools/                          # Build tool and parser tests
-└── impl/                           # Implementation tests
-    ├── unit/                       # Fast unit tests (20 files)
-    ├── integration/                # Integration tests (6 files)
-    ├── e2e/                        # End-to-end tests (2 files)
-    └── performance/                # Performance tests (1 file)
+├── run_tests.rb              # Main test runner - use this
+├── migration/                # Tests for talk migration
+│   ├── migration_test.rb     # Core migration validation
+│   └── *_test.rb            # Additional migration tests
+├── impl/                     # Implementation tests
+│   ├── unit/                 # Fast unit tests
+│   ├── integration/          # Integration tests  
+│   ├── e2e/                  # End-to-end tests
+│   └── performance/          # Performance tests
+├── external/                 # External service tests
+└── tools/                    # Build and utility tests
 ```
 
-### Running Tests
+## Common Test Scenarios
+
+### Testing Talk Migration
 
 ```bash
-# Run all tests
-bundle exec ruby test/run_tests.rb
+# Test migrating a specific talk
+bundle exec ruby migrate_talk.rb "https://noti.st/speaker/talk-slug"
 
-# Run by category
-bundle exec ruby test/run_tests.rb --category unit
-bundle exec ruby test/run_tests.rb --category migration
-bundle exec ruby test/run_tests.rb --category external
+# Validate the migration worked
+bundle exec ruby test/migration/migration_test.rb
 ```
 
-## Migration Test Scenarios
+### Testing Site Build
 
-### Overview
+```bash
+# Test Jekyll site builds correctly
+bundle exec jekyll build
 
-Test scenarios specifically for **per-page migration validation** from noti.st to Jekyll. This focuses on content migration quality and per-page functionality, not infrastructure setup.
+# Test site serves locally
+bundle exec jekyll serve
 
-### Test Categories
+# Run integration tests against local site
+bundle exec ruby test/run_tests.rb --category integration
+```
 
-#### Test Suite 1: Content Migration Accuracy
+### Testing Thumbnails
 
-**Test 1.1: Complete Resource Migration**
+```bash
+# Verify thumbnail system works
+bundle exec ruby test/impl/unit/thumbnail_test.rb
 
-- **Objective**: Verify ALL resources from source are migrated
-- **Method**: Dynamic source comparison against noti.st original
-- **Expected**: Source resource count = Migrated resource count
-- **Validation**: Count resources excluding slides/video (they're separate entities)
+# Test thumbnail fallback behavior
+bundle exec ruby test/impl/integration/thumbnail_integration_test.rb
+```
 
-**Test 1.2: Resource Type Detection**
+## Troubleshooting Tests
 
-- **Objective**: Correctly categorize resources (slides, video, links, code)
-- **Method**: Parse content and validate resource types
-- **Expected**: Each resource properly identified and formatted
-- **Validation**: Type-specific formatting and accessibility
+### Test Failures
 
-**Test 1.3: Video Detection Accuracy**
+#### Migration Tests Fail
 
-- **Objective**: Detect video presence and validate accessibility
-- **Method**: Check source for video, validate YouTube/Vimeo URLs
-- **Expected**: Video URLs work and follow redirects properly
-- **Validation**: HTTP 200 response after following redirects
+```bash
+# Check if source URL is accessible
+curl -I "https://noti.st/speaker/talk-slug"
 
-#### Test Suite 2: Content Quality Assurance
+# Verify Google Drive API setup
+bundle exec ruby test/external/google_drive_integration_test.rb
 
-**Test 2.1: Title Extraction**
+# Run specific migration test
+bundle exec ruby test/migration/migration_test.rb --verbose
+```
 
-- **Objective**: Extract accurate talk titles from source
-- **Method**: Parse source page title, clean formatting
-- **Expected**: Title matches source exactly
-- **Validation**: No HTML entities, proper capitalization
+#### Build Tests Fail
 
-**Test 2.2: Metadata Validation**
+```bash
+# Check Jekyll dependencies
+bundle check
 
-- **Objective**: Ensure all required metadata is present
-- **Method**: Validate conference, date, slides, video fields
-- **Expected**: All fields populated with valid data
-- **Validation**: Date format, URL validity
+# Rebuild site cleanly
+bundle exec jekyll clean
+bundle exec jekyll build
 
-**Test 2.3: Content Formatting**
+# Check for syntax errors
+bundle exec jekyll doctor
+```
 
-- **Objective**: Ensure clean markdown format (not YAML monstrosity)
-- **Method**: Parse generated files for format compliance
-- **Expected**: Minimal YAML frontmatter + clean markdown body
-- **Validation**: No liquid syntax in frontmatter, proper markdown structure
+#### External Tests Fail
 
-#### Test Suite 3: External Dependencies
+```bash
+# Test network connectivity
+ping google.com
 
-**Test 3.1: URL Accessibility**
+# Check API credentials
+ls -la "Google API.json"
 
-- **Objective**: Verify all external links are accessible
-- **Method**: HTTP requests to validate URL responses
-- **Expected**: 200 OK responses for all links
-- **Validation**: Handle redirects, timeout protection
+# Test specific external service
+bundle exec ruby test/external/notist_api_test.rb
+```
 
-**Test 3.2: Google Drive Integration**
+### Common Issues
 
-- **Objective**: Validate slides uploaded to Google Drive
-- **Method**: Test Google Drive URLs and permissions
-- **Expected**: Slides accessible via public sharing link
-- **Validation**: PDF format, proper sharing permissions
+#### Bundler Problems
 
-**Test 3.3: Video Embedding**
+```bash
+# Update Gemfile.lock
+bundle update
 
-- **Objective**: Ensure video embeds work properly
-- **Method**: Validate YouTube/Vimeo embed codes
-- **Expected**: Videos playable and properly embedded
-- **Validation**: No privacy/cookie consent issues
+# Clean bundle cache
+bundle clean --force
 
-## Test Coverage Analysis
+# Reinstall gems
+bundle install --redownload
+```
 
-### Requirements to Test Mapping
+#### Permission Issues
 
-#### REQ-1.1.1: Talk Information Display
+```bash
+# Fix file permissions
+chmod +x test/run_tests.rb
+chmod +x migrate_talk.rb
 
-- **Test Scenarios**: Core information display validation
-- **Gherkin**: "Talk page displays core information correctly"
-- **Coverage**: Required
+# Check Google Drive API file
+chmod 600 "Google API.json"
+```
 
-#### REQ-1.1.2: Resource Management
+## Test Development
 
-- **Test Scenarios**: Resource display and error handling
-- **Gherkin**: "Talk page displays resources correctly" + "Talk page handles missing resources gracefully"
-- **Coverage**: Required
+### Adding New Tests
 
-#### REQ-1.1.3: Mobile Responsiveness
+Create tests in appropriate directory:
 
-- **Test Scenarios**: Cross-device compatibility
-- **Gherkin**: "Talk page is mobile responsive"
-- **Coverage**: Required
+```ruby
+# test/impl/unit/my_feature_test.rb
+require_relative '../../../lib/my_feature'
 
-#### REQ-1.1.4: Security
+class MyFeatureTest < Test::Unit::TestCase
+  def test_basic_functionality
+    feature = MyFeature.new
+    assert_equal "expected", feature.process("input")
+  end
+end
+```
 
-- **Test Scenarios**: Input validation and XSS prevention
-- **Gherkin**: "Talk page handles user input securely"
-- **Coverage**: Required
+Register in test runner:
 
-#### REQ-1.1.5: Performance
+```ruby
+# test/run_tests.rb (add to appropriate category)
+UNIT_TESTS = [
+  # ... existing tests
+  'test/impl/unit/my_feature_test.rb'
+]
+```
 
-- **Test Scenarios**: Load time and optimization
-- **Gherkin**: "Talk page loads quickly"
-- **Coverage**: Required
+### Test Best Practices
 
-### Test Implementation Guidelines
+- **Fast tests**: Unit tests should run quickly
+- **Isolated tests**: Tests shouldn't depend on each other
+- **Clear assertions**: Use descriptive assertion messages
+- **Cleanup**: Clean up any created files or state
 
-| Test Category | Focus Areas | Implementation Status |
-|---------------|-------------|----------------------|
-| **Content Migration Accuracy** | Resource extraction, validation | Required |
-| **Content Quality Assurance** | Metadata, formatting | Required |
-| **External Dependencies** | URL validation, API integration | Required |
-| **Security Validation** | Input sanitization, XSS prevention | Required |
-| **Performance Testing** | Load times, optimization | Required |
-| **Accessibility** | WCAG compliance, screen readers | Required |
-| **Mobile Responsiveness** | Touch interfaces, viewport handling | Required |
-| **Template Consistency** | Layout, formatting standards | Required |
-| **Error Handling** | Graceful degradation | Required |
-| **Jekyll Integration** | Build process, collections | Required |
-| **Speaker Configuration** | Profile management | Required |
+## Continuous Integration
 
-**Goal**: Comprehensive test coverage across all functional areas
+Tests run automatically on:
+- Pull requests
+- Main branch commits
+- Scheduled daily runs
 
-## Test Validation Results
+View results in GitHub Actions or your CI platform.
 
-### Test Quality Guidelines
+## Next Steps
 
-The test suite is designed to ensure migration quality and site functionality. All tests should provide consistent, reliable results without false positives or negatives.
-
-### Infrastructure Requirements
-
-All infrastructure tests should pass:
-
-- Jekyll build compilation: No errors
-- Server startup: Running locally
-- Collections configuration: _talks collection working
-- Template rendering: No liquid syntax errors
-- CSS/JS assets: Loading properly
-- Mobile responsiveness: Viewport meta tags working
+- Run tests locally before committing
+- Add tests for new features
+- Keep tests updated with code changes
+- Monitor test performance and reliability
 
 ### Test Quality Metrics
 
