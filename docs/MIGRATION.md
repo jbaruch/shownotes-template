@@ -48,6 +48,8 @@ The migration system requires Google Drive API access to upload and host PDF sli
 6. **Important**: Rename the downloaded file to `Google API.json`
 7. Place it in your project root directory: `/Users/jbaruch/Projects/shownotes/Google API.json`
 
+> **Security Note**: The `Google API.json` file is automatically excluded from git commits via `.gitignore`, so your credentials are safe as long as you use the exact filename `Google API.json`.
+
 ### 4. Create Shared Drive (Important!)
 
 **Critical**: You must use a **Shared Drive**, not a regular folder with sharing permissions.
@@ -104,6 +106,29 @@ The migration script will automatically:
 - Verify `Google API.json` file is in the project root
 - Check that the file is valid JSON (not corrupted during download)
 - Ensure Google Drive API is enabled in your project
+
+### GitHub Actions Setup
+
+For automated testing and CI/CD workflows, you need to add the Google API credentials as a GitHub secret:
+
+1. **Copy the JSON content**:
+   - Open your local `Google API.json` file
+   - Copy the entire content (it should be a single line of JSON)
+
+2. **Add GitHub secret**:
+   - Go to your GitHub repository
+   - Navigate to "Settings" > "Secrets and variables" > "Actions"
+   - Click "New repository secret"
+   - **Name**: `GOOGLE_API_JSON`
+   - **Value**: Paste the entire JSON content from your `Google API.json` file
+   - Click "Add secret"
+
+3. **Workflow integration**:
+   - The GitHub Actions workflow automatically uses this secret
+   - It creates a temporary `Google API.json` file during test execution
+   - Migration tests will fail without this secret properly configured
+
+> **Important**: Without the `GOOGLE_API_JSON` secret, GitHub Actions workflows will fail on migration tests that require Google Drive access.
 
 ## Quick Migration
 
