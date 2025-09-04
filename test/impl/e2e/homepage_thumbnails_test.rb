@@ -6,7 +6,7 @@ require 'uri'
 require 'nokogiri'
 
 class HomepageThumbnailsTest < Minitest::Test
-  JEKYLL_BASE_URL = ENV['TEST_BASE_URL'] || 'http://localhost:4000/shownotes'
+  JEKYLL_BASE_URL = ENV['TEST_BASE_URL'] || 'http://localhost:4000'
   
   @@server_pid = nil
   @@server_running = false
@@ -30,11 +30,11 @@ class HomepageThumbnailsTest < Minitest::Test
       sleep 2
       
       puts "Building Jekyll site for homepage thumbnails test..."
-      build_result = system('bundle exec jekyll build --quiet')
+      build_result = system('bundle exec jekyll build --config _config_test.yml --quiet')
       raise "Failed to build Jekyll site" unless build_result
       
       puts "Starting Jekyll server for homepage thumbnails test..."
-      @@server_pid = spawn('bundle exec jekyll serve --detach --skip-initial-build')
+      @@server_pid = spawn('bundle exec jekyll serve --config _config_test.yml --detach --skip-initial-build')
       
       # Wait for server to start (up to 30 seconds)
       30.times do

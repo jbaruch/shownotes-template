@@ -7,7 +7,7 @@ require 'selenium-webdriver'
 require 'fileutils'
 
 class VisualTest < Minitest::Test
-  JEKYLL_BASE_URL = 'http://localhost:4000/shownotes'
+  JEKYLL_BASE_URL = 'http://localhost:4000'
   
   @@jekyll_pid = nil
   @@server_running = false
@@ -31,11 +31,11 @@ class VisualTest < Minitest::Test
     # Start Jekyll server if not running
     unless @@server_running
       puts "Building Jekyll site for visual tests..."
-      build_result = system('bundle exec jekyll build --quiet')
+      build_result = system('bundle exec jekyll build --config _config_test.yml --quiet')
       raise "Failed to build Jekyll site" unless build_result
       
       puts "Starting Jekyll server for visual tests..."
-      @@jekyll_pid = spawn('bundle exec jekyll serve --detach --skip-initial-build')
+      @@jekyll_pid = spawn('bundle exec jekyll serve --config _config_test.yml --detach --skip-initial-build')
       
       # Wait for server to start (up to 30 seconds)
       30.times do
