@@ -130,6 +130,9 @@ class TalkMigrator
   private
   
   def talk_already_exists?
+    # Normalize the talk URL for comparison (remove protocol differences)
+    normalized_talk_url = normalize_url(@talk_url)
+    
     # Check if any existing talk files have this source URL
     Dir.glob('_talks/*.md').each do |file|
       content = File.read(file)
@@ -137,7 +140,8 @@ class TalkMigrator
       # Check for source URL in HTML comment (new format)
       if content.match(/<!-- Source: (.+?) -->/)
         existing_source_url = $1.strip
-        return true if existing_source_url == @talk_url
+        normalized_existing_url = normalize_url(existing_source_url)
+        return true if normalized_existing_url == normalized_talk_url
       end
       
       # Check legacy YAML frontmatter format for backward compatibility
@@ -145,7 +149,10 @@ class TalkMigrator
         begin
           yaml_content = YAML.safe_load($1, permitted_classes: [Date])
           existing_source_url = yaml_content['source_url'] || yaml_content['notist_url']
-          return true if existing_source_url == @talk_url
+          if existing_source_url
+            normalized_existing_url = normalize_url(existing_source_url)
+            return true if normalized_existing_url == normalized_talk_url
+          end
         rescue => e
           # Continue if YAML parsing fails
         end
@@ -153,6 +160,19 @@ class TalkMigrator
     end
     
     false
+  end
+  
+  def normalize_url(url)
+    # Normalize URL for comparison: remove protocol difference, trailing slashes, etc.
+    return url unless url
+    
+    normalized = url.strip
+    # Convert https to http for consistent comparison
+    normalized = normalized.sub(/^https:\/\//, 'http://')
+    # Remove trailing slash
+    normalized = normalized.chomp('/')
+    
+    normalized
   end
   
   def fetch_talk_page
@@ -330,8 +350,9 @@ class TalkMigrator
     resources_section = @doc.css('#resources .resource-list')
     
     if resources_section.empty?
-      @errors << "No resources section found (#resources .resource-list)"
-      return false
+      puts "⚠️  No resources section found - talk has no additional resources"
+      @resources = []
+      return true
     end
     
     # Extract resources from the structured list - use precise selector
@@ -352,8 +373,9 @@ class TalkMigrator
     end
     
     if resource_links.empty?
-      @errors << "No valid resources found in resources section"
-      return false
+      puts "⚠️  No valid resources found in resources section - talk has no additional resources"
+      @resources = []
+      return true
     end
     
     @resources = resource_links
@@ -1449,6 +1471,9 @@ class SpeakerMigrator
       # Skip if it's the home page or speaker profile itself
       next if href == @speaker_url
       next if href.match?(/^#{Regexp.escape(uri.to_s)}\/?$/)
+      
+      # Skip video URLs - these are not talks
+      next if href.match?(/\/videos\//)
       
       # Look for talk-specific URL patterns (6-character IDs followed by slug)
       # Pattern: /XXXXXX/talk-title-slug
