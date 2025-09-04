@@ -15,7 +15,7 @@ extracted_description: |-
 
 **Conference:** Devoxx Poland 2025  
 **Date:** 2025-06-12  
-**Slides:** [View Slides](https://drive.google.com/file/d/1k0i06lndwlZmab9rPGtfj8W6M8YSDjTX/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/11Tp3i6Lai-ALPKogDRGmWZ0a1TPr-KpL/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=u6dWLYQHpkg)  
 
 A presentation at Devoxx Poland 2025 in

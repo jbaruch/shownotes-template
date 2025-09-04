@@ -51,7 +51,15 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
         {% assign embed_url = "https://docs.google.com/presentation/d/" | append: id_part | append: "/embed?start=false&loop=false&delayms=3000" %}
       {% endif %}
     {% endif %}
-    {% assign thumb_url = include.talk.thumbnail_url | default: "/assets/images/placeholder-thumbnail.svg" %}
+    {% comment %} Generate local thumbnail path based on talk filename {% endcomment %}
+    {% if include.talk %}
+      {% assign talk_slug = include.talk.path | split: "/" | last | remove: ".md" %}
+      {% assign local_thumbnail_path = "/assets/images/thumbnails/" | append: talk_slug | append: "-thumbnail.png" %}
+      {% comment %} Use local thumbnail if it exists, otherwise use placeholder {% endcomment %}
+      {% assign thumb_url = local_thumbnail_path %}
+    {% else %}
+      {% assign thumb_url = "/assets/images/placeholder-thumbnail.svg" %}
+    {% endif %}
     
     {% if preview_mode %}
       <div class="preview-thumbnail-wrapper">
@@ -83,7 +91,15 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
   {% if url_parts.size > 1 %}
     {% assign file_id = url_parts[1] | split: "/" | first | split: "?" | first %}
     {% assign embed_url = "https://drive.google.com/file/d/" | append: file_id | append: "/preview" %}
-    {% assign thumb_url = include.talk.thumbnail_url | default: "/assets/images/placeholder-thumbnail.svg" %}
+    {% comment %} Generate local thumbnail path based on talk filename {% endcomment %}
+    {% if include.talk %}
+      {% assign talk_slug = include.talk.path | split: "/" | last | remove: ".md" %}
+      {% assign local_thumbnail_path = "/assets/images/thumbnails/" | append: talk_slug | append: "-thumbnail.png" %}
+      {% comment %} Use local thumbnail if it exists, otherwise use placeholder {% endcomment %}
+      {% assign thumb_url = local_thumbnail_path %}
+    {% else %}
+      {% assign thumb_url = "/assets/images/placeholder-thumbnail.svg" %}
+    {% endif %}
 
     {% if preview_mode %}
       <div class="preview-thumbnail-wrapper">

@@ -1,5 +1,12 @@
 ---
 layout: talk
+extracted_abstract: |-
+  Did you notice how everything in IT is crap right now? Services are bloated, slow, and buggy, and the hardware requirements to run even the simplest applications are enormous. It’s not just me, right? Everything is full of bugs, support is clueless, nothing works as described, and don’t even get me started on IoT protocols and the Cloud Native space. Oh, and how about taking half of the world’s air traffic offline because of a null pointer exception pushed to production without verification?
+  And on top of what’s broken, the pace of innovation has crawled to a stop (except maybe in the AI space). There’s nothing materially new in the last ten versions of Android and iOS or the last hundred versions of Chrome and Firefox. Google spent months hyping a new login screen that ended up being just a rearrangement, and can you name one new exciting feature in any software older than five years (plugging in a ChatGPT bot doesn’t count)? When Facebook was bragging about breaking things, at least it was to move faster. What’s their excuse now?
+  This talk will dig into the reasons behind this technical decline, which we call “Technical Enshittification.” We’ll explore how technical debt, poor innovation practices, and stagnation in core products are dragging us down.
+  While this talk probably won’t be able to fix the Googles, the Apples, and the Metas, we will focus on what you can do to prevent this decline in your own projects and companies.
+  We’ll discuss practical strategies to combat and prevent this mess, focusing on Developer Productivity Engineering (DPE), user-centered design, robust testing, and effective project management. Real-world examples will show how to keep IT services efficient, innovative, and user-friendly.
+  Join us to learn how to turn things around and ensure long-term success in today’s digital landscape.
 extracted_description: |-
   Did you notice how everything in IT is crap right now? Services are bloated, slow, and buggy, and the hardware requirements to run even the simplest applications are enormous. It’s not just me, right? Everything is full of bugs, support is clueless, nothing works as described, and don’t even get me started on IoT protocols and the Cloud Native space. Oh, and how about taking half of the world’s air traffic offline because of a null pointer exception pushed to production without verification?
   And on top of what’s broken, the pace of innovation has crawled to a stop (except maybe in the AI space). There’s nothing materially new in the last ten versions of Android and iOS or the last hundred versions of Chrome and Firefox. Google spent months hyping a new login screen that ended up being just a rearrangement, and can you name one new exciting feature in any software older than five years (plugging in a ChatGPT bot doesn’t count)? When Facebook was bragging about breaking things, at least it was to move faster. What’s their excuse now?
@@ -14,7 +21,7 @@ extracted_description: |-
 
 **Conference:** Voxxed Days Luxembourg 2025  
 **Date:** 2025-06-20  
-**Slides:** [View Slides](https://drive.google.com/file/d/1P3Q1KtXbqW8UGdThYByHVwJsDqpcuyIv/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1QZzuh2glWQbNaDZPdX4T_DrmcozmLyrv/view)  
 **Video:** [Watch Video](https://www.youtube.com/watch?v=iFN1Y_8Cuik)  
 
 A presentation at Voxxed Days Luxembourg 2025 in

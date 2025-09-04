@@ -130,13 +130,27 @@ layout: default
 
                     {% if preview_resource %}
                     <div class="talk-preview-large">
-                        {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='large' title=talk.extracted_title talk=talk talk_url=talk.url %}
+                        {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='large' title=talk.extracted_title talk=talk %}
                     </div>
                     {% endif %}
 
                     <div class="talk-content">
                         <header class="talk-header">
                             <h3>{{ talk.extracted_title | default: talk.title }}</h3>
+                            <div class="talk-meta">
+                                {% if talk.extracted_conference %}
+                                <span class="meta-item conference-name">
+                                    <span class="meta-icon conference" aria-hidden="true"></span>
+                                    {{ talk.extracted_conference }}
+                                </span>
+                                {% endif %}
+                                {% if talk.extracted_date %}
+                                <time class="meta-item" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
+                                    <span class="meta-icon date" aria-hidden="true"></span>
+                                    {{ talk.extracted_date | date: "%B %d, %Y" }}
+                                </time>
+                                {% endif %}
+                            </div>
                         </header>
                         {% if talk.extracted_description %}
                             <p class="talk-summary">{{ talk.extracted_description | truncate: 100 }}</p>

@@ -1,4 +1,11 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Disable frozen string literal warnings that flood output from liquid 4.0.4
+ENV['RUBYOPT'] = '--disable-frozen-string-literal'
+
+# Suppress deprecation warnings from legacy gems like liquid 4.0.4
+$VERBOSE = nil
 
 require 'net/http'
 require 'uri'
@@ -222,7 +229,7 @@ class TalkMigrator
         @talk_data[:date] = Date.parse(time_elem['datetime']).strftime("%Y-%m-%d")
         puts "SUCCESS Date extracted from datetime attribute: #{@talk_data[:date]}"
       rescue => e
-        puts "DEBUG Failed to parse datetime attribute: #{e.message}"
+        puts "❌ Failed to parse datetime attribute: #{e.message}"
       end
     end
     
@@ -252,7 +259,7 @@ class TalkMigrator
             puts "SUCCESS Conference extracted from JSON-LD: #{@talk_data[:conference]}"
           end
         rescue JSON::ParserError => e
-          puts "DEBUG JSON-LD parsing failed: #{e.message}"
+          puts "❌ JSON-LD parsing failed: #{e.message}"
         end
       end
     end
@@ -391,11 +398,14 @@ class TalkMigrator
     end
     
     # Upload to Google Drive (REQUIRED - migration fails if this fails)
-    drive_url = upload_to_google_drive(local_pdf_path)
-    unless drive_url
+    upload_result = upload_to_google_drive(local_pdf_path)
+    unless upload_result
       @errors << "Failed to upload PDF to Google Drive"
       return false
     end
+    
+    drive_url = upload_result[:url]
+    drive_file_id = upload_result[:file_id]
     
     # Add PDF as slides resource with Google Drive URL
     pdf_resource = {
@@ -407,6 +417,13 @@ class TalkMigrator
     @talk_data[:pdf_url] = drive_url
     
     @resources.unshift(pdf_resource) # Add at beginning
+    
+    # Download thumbnail for local hosting using Notist slide deck image
+    thumbnail_result = download_thumbnail_for_slides()
+    unless thumbnail_result
+      puts "❌ ABORTING: Thumbnail download failed - cannot proceed"
+      return false
+    end
     
     puts "SUCCESS PDF processed and uploaded"
     true
@@ -852,11 +869,10 @@ class TalkMigrator
           return
         end
       rescue JSON::ParserError => e
-        puts "DEBUG JSON-LD parsing failed for location: #{e.message}"
+        puts "❌ JSON-LD parsing failed for location: #{e.message}"
       end
     end
     
-    puts "DEBUG No location found in page"
     @talk_data[:location] = ""
   end
   
@@ -960,20 +976,132 @@ class TalkMigrator
   
   def download_file(url, local_path)
     require 'fileutils'
+    require 'open-uri'
     FileUtils.mkdir_p(File.dirname(local_path))
     
-    uri = URI.parse(url)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true if uri.scheme == 'https'
-    
-    response = http.get(uri.path)
-    
-    if response.code.to_i.between?(200, 299)
-      File.open(local_path, 'wb') { |file| file.write(response.body) }
-      true
-    else
+    begin
+      # Use open-uri which handles redirects and headers better than Net::HTTP
+      options = {
+        'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language' => 'en-US,en;q=0.9',
+        'Accept-Encoding' => 'gzip, deflate, br',
+        'Connection' => 'keep-alive',
+        'Upgrade-Insecure-Requests' => '1'
+      }
+      
+      URI.open(url, options) do |file|
+        File.open(local_path, 'wb') do |output|
+          output.write(file.read)
+        end
+        
+        return true
+      end
+    rescue => e
+      puts "   ❌ Download failed: #{e.message}"
       false
     end
+  end
+  
+  def download_thumbnail_for_slides()
+    puts "   Downloading thumbnail for slides..."
+    
+    # Extract thumbnail from Notist page og:image meta tag
+    og_image = @doc.css('meta[property="og:image"]').first
+    thumbnail_url = og_image ? og_image['content'] : nil
+
+    unless thumbnail_url
+      puts "   ❌ FATAL: Could not find og:image thumbnail on Notist page"
+      return false
+    end
+
+    # Verify it's a Notist slide deck URL
+    unless thumbnail_url.include?('on.notist.cloud/slides/')
+      puts "   ❌ FATAL: og:image is not a Notist slide deck thumbnail: #{thumbnail_url}"
+      return false
+    end
+
+    puts "   ✅ Found Notist slide deck thumbnail: #{thumbnail_url}"
+
+    # Generate local thumbnail filename based on talk slug
+    talk_slug = generate_talk_slug
+    thumbnail_filename = "#{talk_slug}-thumbnail.png"
+    local_thumbnail_path = "assets/images/thumbnails/#{thumbnail_filename}"
+
+    # Create directory if it doesn't exist
+    require 'fileutils'
+    FileUtils.mkdir_p('assets/images/thumbnails')
+
+    # Download thumbnail using dedicated function
+    if download_thumbnail_file(thumbnail_url, local_thumbnail_path)
+      puts "   ✅ Thumbnail downloaded: #{local_thumbnail_path}"
+      
+      # Verify file exists and has content
+      if File.exist?(local_thumbnail_path) && File.size(local_thumbnail_path) > 0
+        return local_thumbnail_path
+      else
+        puts "   ❌ FATAL: Thumbnail file missing or empty after download"
+        return false
+      end
+    else
+      puts "   ❌ FATAL: Failed to download thumbnail from: #{thumbnail_url}"
+      return false
+    end
+  end  # Dedicated thumbnail download function using proven working method
+  def download_thumbnail_file(url, local_path)
+    require 'net/http'
+    require 'fileutils'
+    
+    puts "   THUMBNAIL DOWNLOAD: Starting download of #{url}"
+    puts "   THUMBNAIL DOWNLOAD: Target path: #{local_path}"
+    puts "   THUMBNAIL DOWNLOAD: URL length: #{url.length} chars"
+    
+    FileUtils.mkdir_p(File.dirname(local_path))
+    
+    begin
+      uri = URI.parse(url)
+      puts "   THUMBNAIL DOWNLOAD: Parsed URI - Host: #{uri.host}, Path: #{uri.path}"
+      
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      http.read_timeout = 30
+      http.open_timeout = 10
+      
+      response = http.get(uri.path)
+      puts "   THUMBNAIL DOWNLOAD: Response code: #{response.code}"
+      puts "   THUMBNAIL DOWNLOAD: Content-Type: #{response['content-type']}"
+      puts "   THUMBNAIL DOWNLOAD: Content-Length: #{response['content-length']}"
+      
+      if response.code == '200'
+        File.open(local_path, 'wb') { |f| f.write(response.body) }
+        file_size = File.size(local_path)
+        puts "   THUMBNAIL DOWNLOAD: File written successfully, size: #{file_size} bytes"
+        return true
+      else
+        puts "   THUMBNAIL DOWNLOAD: HTTP error - Code: #{response.code}"
+        return false
+      end
+    rescue => e
+      puts "   THUMBNAIL DOWNLOAD: Exception: #{e.class}: #{e.message}"
+      puts "   THUMBNAIL DOWNLOAD: Backtrace: #{e.backtrace.first(3).join(', ')}"
+      return false
+    end
+  end
+  
+  def extract_file_id_from_drive_url(url)
+    match = url.match(/\/d\/([a-zA-Z0-9_-]+)/)
+    match ? match[1] : nil
+  end
+  
+  def generate_talk_slug
+    # Generate a slug similar to the Jekyll filename
+    date_part = @talk_data[:date]
+    conference_slug = generate_smart_conference_slug(@talk_data[:conference])
+    title_slug = generate_smart_title_slug(@talk_data[:title])
+    
+    # Combine parts to create a consistent slug
+    "#{date_part}-#{conference_slug}-#{title_slug}"
   end
   
   def setup_google_drive_service
@@ -1034,7 +1162,21 @@ class TalkMigrator
       permission = Google::Apis::DriveV3::Permission.new(role: 'reader', type: 'anyone')
       service.create_permission(uploaded_file.id, permission, supports_all_drives: true)
       
-      "https://drive.google.com/file/d/#{uploaded_file.id}/view"
+      # Get detailed file metadata including thumbnail information
+      detailed_file = service.get_file(
+        uploaded_file.id, 
+        fields: 'id,name,webViewLink,thumbnailLink,mimeType', 
+        supports_all_drives: true
+      )
+      
+      puts "   DEBUG: File metadata - ID: #{detailed_file.id}, thumbnailLink: #{detailed_file.thumbnail_link}"
+      
+      # Return both URL and metadata for thumbnail generation
+      {
+        url: "https://drive.google.com/file/d/#{uploaded_file.id}/view",
+        file_id: uploaded_file.id,
+        thumbnail_link: detailed_file.thumbnail_link
+      }
     rescue => e
       puts "⚠️  Google Drive upload failed: #{e.message}"
       nil
@@ -1504,6 +1646,10 @@ if __FILE__ == $0
       options[:speaker_mode] = true
     end
     
+    opts.on("--skip-tests", "Skip integration tests after migration") do
+      options[:skip_tests] = true
+    end
+    
     opts.on("-h", "--help", "Show this help message") do
       puts opts
       exit 0
@@ -1550,7 +1696,7 @@ if __FILE__ == $0
     puts "Will migrate individual talk"
     puts
     
-    migrator = TalkMigrator.new(url)
+    migrator = TalkMigrator.new(url, skip_tests: options[:skip_tests] || false)
     migrator.migrate
   end
   

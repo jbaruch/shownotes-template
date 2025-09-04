@@ -63,18 +63,40 @@ class MigrationTest < Minitest::Test
 
   def get_resources_from_talk(talk_data)
     # Handle both YAML frontmatter and markdown-only formats
+    resources = []
+    
     if talk_data[:yaml] && talk_data[:yaml]['resources']
-      return talk_data[:yaml]['resources']
-    else
-      # Extract resources from markdown content
-      resources = []
-      content = talk_data[:raw_content]
-      lines = content.split("\n")
-      
-      # Find Resources section
-      resources_start = lines.find_index { |line| line.strip == "## Resources" }
-      return resources if resources_start.nil?
-      
+      resources.concat(talk_data[:yaml]['resources'])
+    end
+    
+    # Extract resources from markdown content
+    content = talk_data[:raw_content]
+    lines = content.split("\n")
+    
+    # Check for slides/video in header
+    lines.each do |line|
+      if match = line.match(/\*\*Slides:\*\* \[([^\]]+)\]\(([^)]+)\)/)
+        title = match[1].strip
+        url = match[2].strip
+        resources << {
+          'title' => title,
+          'url' => url,
+          'type' => 'slides'
+        }
+      elsif match = line.match(/\*\*Video:\*\* \[([^\]]+)\]\(([^)]+)\)/)
+        title = match[1].strip
+        url = match[2].strip
+        resources << {
+          'title' => title,
+          'url' => url,
+          'type' => 'video'
+        }
+      end
+    end
+    
+    # Find Resources section
+    resources_start = lines.find_index { |line| line.strip == "## Resources" }
+    if resources_start
       # Parse resource lines
       (resources_start + 1...lines.length).each do |i|
         line = lines[i].strip
@@ -90,9 +112,9 @@ class MigrationTest < Minitest::Test
           }
         end
       end
-      
-      resources
     end
+    
+    resources
   end
 
   # ==========================================
@@ -388,6 +410,105 @@ class MigrationTest < Minitest::Test
     puts "SUCCESS Thumbnail URLs validated"
   end
 
+  def test_pdf_file_integrity
+    # Verify that locally downloaded PDFs match the original file sizes from Notist
+    # This helps detect corrupted downloads or incomplete transfers
+    
+    all_resources = @talks.flat_map { |_, data| get_resources_from_talk(data) }
+    pdf_resources = all_resources.select { |r| r['url'].include?('drive.google.com/file') }
+    
+    puts "🔍 Found #{pdf_resources.length} PDF resources to check"
+    
+    pdf_resources.each do |resource|
+      # Extract Google Drive file ID to find local PDF
+      drive_url = resource['url']
+      if drive_url.match(/\/file\/d\/([a-zA-Z0-9\-_]+)/)
+        file_id = $1
+        
+        # Find corresponding local PDF file in pdfs/ directory
+        pdfs_dir = File.join(File.dirname(__FILE__), '..', 'pdfs')
+        local_pdf_files = Dir.glob("#{pdfs_dir}/*.pdf")
+        
+        puts "📁 Found #{local_pdf_files.length} local PDF files"
+        
+        # Find the PDF by checking if the file was recently created (within last 24 hours)
+        recent_pdfs = local_pdf_files.select do |pdf_path|
+          File.mtime(pdf_path) > (Time.now - 86400) # Modified within last 24 hours
+        end
+        
+        puts "🕒 Found #{recent_pdfs.length} recent PDF files"
+        
+        if recent_pdfs.empty?
+          puts "  ⚠️  No recent PDFs found for verification - skipping size check"
+          next
+        end
+        
+        recent_pdfs.each do |local_pdf_path|
+          local_size = File.size(local_pdf_path)
+          pdf_filename = File.basename(local_pdf_path)
+          
+          puts "📄 Checking #{pdf_filename} (#{format_file_size(local_size)})"
+          
+          # Try to find the original Notist PDF URL from talk source
+          # Match based on PDF filename containing talk identifiers
+          talk_date = pdf_filename[0, 10] # Extract YYYY-MM-DD
+          talk_with_this_pdf = @talks.find do |talk_key, talk_data|
+            # Match by date or filename pattern
+            (talk_key.start_with?(talk_date) || pdf_filename.include?(talk_key.split('-')[3..-1].join('-'))) &&
+            get_resources_from_talk(talk_data).any? { |r| r['url'] == drive_url }
+          end
+          
+          # If we couldn't match by filename, just find any talk with this Google Drive URL
+          talk_with_this_pdf ||= @talks.find do |_, talk_data|
+            get_resources_from_talk(talk_data).any? { |r| r['url'] == drive_url }
+          end
+          
+          if talk_with_this_pdf
+            source_url = talk_with_this_pdf[1][:source_url]
+            puts "🔗 Found source URL: #{source_url}"
+            
+            if source_url
+              notist_pdf_url = extract_notist_pdf_url(source_url)
+              puts "📋 Extracted PDF URL: #{notist_pdf_url}"
+              
+              if notist_pdf_url
+                remote_size = get_remote_file_size(notist_pdf_url)
+                puts "📊 Remote size: #{remote_size ? format_file_size(remote_size) : 'unknown'}"
+                
+                if remote_size
+                  size_diff = (local_size - remote_size).abs
+                  size_diff_percent = (size_diff.to_f / remote_size * 100).round(2)
+                  
+                  puts "📏 Size comparison: local=#{format_file_size(local_size)}, remote=#{format_file_size(remote_size)}, diff=#{size_diff_percent}%"
+                  
+                  # Allow small differences (< 1%) for compression differences
+                  assert size_diff_percent < 1.0,
+                    "❌ PDF SIZE MISMATCH: #{pdf_filename}\n" \
+                    "   Local:  #{format_file_size(local_size)}\n" \
+                    "   Remote: #{format_file_size(remote_size)}\n" \
+                    "   Diff:   #{format_file_size(size_diff)} (#{size_diff_percent}%)\n" \
+                    "   This suggests corrupted or incomplete download!"
+                  
+                  puts "  ✅ PDF size OK: #{pdf_filename} (#{format_file_size(local_size)})"
+                else
+                  puts "  ⚠️  Could not verify size for: #{pdf_filename} (remote URL inaccessible)"
+                end
+              else
+                puts "  ⚠️  Could not extract PDF URL from source"
+              end
+            else
+              puts "  ⚠️  No source URL found for this PDF"
+            end
+          else
+            puts "  ⚠️  Could not find talk associated with this PDF"
+          end
+        end
+      end
+    end
+    
+    puts "SUCCESS PDF file integrity checked"
+  end
+
   # ===========================================
   # Test Suite 4: Migration Quality Assurance
   # ===========================================
@@ -608,6 +729,55 @@ class MigrationTest < Minitest::Test
     return 'slides' if url.include?('docs.google.com/presentation') || url.include?('drive.google.com')
     return 'code' if url.include?('github.com')
     'link'
+  end
+
+  def extract_notist_pdf_url(source_url)
+    # Extract PDF URL from Notist talk page
+    begin
+      require 'nokogiri'
+      require 'open-uri'
+      
+      doc = Nokogiri::HTML(URI.open(source_url))
+      pdf_link = doc.css('a[href*="notist.cloud/pdf"]').first
+      pdf_link&.[]('href')
+    rescue => e
+      puts "  ⚠️  Could not extract PDF URL from #{source_url}: #{e.message}"
+      nil
+    end
+  end
+
+  def get_remote_file_size(url)
+    # Get file size from HTTP HEAD request
+    begin
+      uri = URI.parse(url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true if uri.scheme == 'https'
+      http.read_timeout = 10
+      
+      request = Net::HTTP::Head.new(uri.request_uri)
+      response = http.request(request)
+      
+      if response.code.to_i.between?(200, 299)
+        content_length = response['Content-Length']
+        content_length ? content_length.to_i : nil
+      else
+        nil
+      end
+    rescue => e
+      puts "  ⚠️  Could not get remote file size for #{url}: #{e.message}"
+      nil
+    end
+  end
+
+  def format_file_size(bytes)
+    # Format file size in human-readable format
+    if bytes < 1024
+      "#{bytes} B"
+    elsif bytes < 1024 * 1024
+      "#{(bytes / 1024.0).round(1)} KB"
+    else
+      "#{(bytes / (1024.0 * 1024)).round(1)} MB"
+    end
   end
 
   def print_migration_summary

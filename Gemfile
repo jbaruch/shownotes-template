@@ -1,7 +1,8 @@
 source 'https://rubygems.org'
 
-# Modern versions for Ruby 3.4+
-gem 'jekyll', '~> 4.4'
+# Use latest stable versions
+gem 'jekyll', '>= 4.3.0'  # Allow any version 4.3+
+gem 'liquid', '>= 4.0.4'  # Override to allow newer liquid versions
 gem 'minitest', '~> 5.25'
 gem 'kramdown-parser-gfm'
 gem 'jekyll-feed'
