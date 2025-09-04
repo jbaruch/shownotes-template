@@ -1,0 +1,39 @@
+---
+layout: talk
+---
+
+<!-- Source: https://speaking.jbaru.ch/xdAEIH/we-solved-devops-whats-next -->
+# We Solved DevOps. What’s Next?
+
+**Conference:** NJFS Webinar November 2024  
+**Date:** 2024-11-04  
+**Slides:** [View Slides](https://drive.google.com/file/d/1cu8hRfBAqJ2Xg7t4pIRN1JZ0VrFbWxQ_/view)  
+**Video:** [Watch Video](https://www.youtube.com/watch?v=oYBVkPhZKRU)  
+
+A presentation at NJFS Webinar November 2024 by 
+                    {{ site.speaker.display_name | default: site.speaker.name }}
+
+## Abstract
+
+Hear me out: We solved DevOps. I am not saying that everyone is doing it right (or even trying), but we have the solution if you want to do it right. Here is the theory, the technology, the communities, the docs, and the books—go knock yourself out. Do DevOps: empower your teams, make deployments a breeze, build invincible CI/CD pipelines, and create production environments that are secure, stable, and observable. Done.
+Now, in perfect alignment with DevOps and the Theory of Constraints, it’s time to turn our gaze to the next bottleneck: the production environments of our production environments. They’re a mess. We accept soul-sucking toil, slow and unstable tests and builds, and constant distractions as the norm, just as we accepted the insufferable, manual “throw garbage between silos” all-night deployments of the pre-DevOps era. But, as with DevOps, we shouldn’t take these for granted. It’s time to rise again and resist our development environments’ “Pre-DevOps” state. Let’s engineer better developer productivity for all!
+
+## Resources
+
+- [DevOps Vision 2025 - Register Today And Save $500 of Early Bird Pricing](https://devopsvision.io/)
+- [Baruch’s Book “DevOps Tools for Java Developers”](https://amzn.to/4fo7gzU)
+- [State Of DevOps Report 2018](https://services.google.com/fh/files/misc/state-of-devops-2018.pdf)
+- [State Of DevOps Report 2021](https://services.google.com/fh/files/misc/state-of-devops-2021.pdf)
+- [State Of DevOps Report 2024](https://services.google.com/fh/files/misc/2024_final_dora_report.pdf)
+- [The Problem with Gradle (any build tool actually) article by Bruce Eckel](https://www.bruceeckel.com/2021/01/02/the-problem-with-gradle/)
+- [Gradle Build Cache](https://docs.gradle.org/current/userguide/build_cache.html)
+- [Gradle Remote Cache Manual](https://docs.gradle.com/build-cache-node/)
+- [Meta’s Predictive Test Selection Research](https://engineering.fb.com/2018/11/21/developer-tools/predictive-test-selection/)
+- [Develocity Predictive Test Selection](https://gradle.com/gradle-enterprise-solutions/predictive-test-selection/)
+- [Spring Project PTS Simulations](https://ge.spring.io/scans/test-selection?predictive-test-selection.view=simulator&search.timeZoneId=America/Chicago)
+- [Gradle Parallel Execution](https://docs.gradle.org/current/userguide/performance.html#parallel_execution)
+- [Develocity Test Distribution](https://gradle.com/gradle-enterprise-solutions/test-distribution/)
+- [Develocity Reporting and Visualisation](https://gradle.com/develocity/product-tour/observe/reporting-and-visualization/)
+- [Developer Productivity Engineering Handbook](https://gradle.com/developer-productivity-engineering/handbook/)
+- [Get Started with DPE University](https://dpeuniversity.gradle.com/app)
+- [DPE Summit 2024: Watch the Keynotes!](https://dpe.org/summit2024/)

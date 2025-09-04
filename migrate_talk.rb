@@ -734,10 +734,16 @@ class TalkMigrator
         end
       end
       
-      # Validate Resources section exists
-      unless markdown_content.match(/## Resources/)
-        @errors << "Missing Resources section"
-        return false
+      # Validate Resources section exists (only if non-slides/video resources were found)
+      other_resources = @resources.reject { |r| r['type'] == 'slides' || r['type'] == 'video' }
+      if other_resources.any?
+        unless markdown_content.match(/## Resources/)
+          @errors << "Missing Resources section (expected due to #{other_resources.length} resources)"
+          return false
+        end
+      else
+        # For talks with no additional resources, Resources section is optional
+        puts "   No additional resources found - Resources section not required"
       end
       
       puts "SUCCESS Migration validation passed"
