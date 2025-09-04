@@ -21,7 +21,6 @@ dist/
 build/
 _site/
 _site-fixed.html
-/assets/images/thumbnails/
 .next/
 .nuxt/
 .output/
