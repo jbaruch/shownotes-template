@@ -13,6 +13,17 @@ class FeaturedTalksLimitTest < Minitest::Test
     # Load expected count from config
     config = YAML.load_file('_config.yml')
     @expected_featured_limit = config['featured_talks_count'] || 4
+    
+    # Check if we have enough talks to run the test
+    talks_dir = '_talks'
+    talk_files = Dir.glob(File.join(talks_dir, '*.md'))
+    @total_talks_count = talk_files.length
+    
+    # Skip if insufficient talks
+    if @total_talks_count < @expected_featured_limit
+      skip "Insufficient talks (#{@total_talks_count}) for featured talks test (requires #{@expected_featured_limit})"
+    end
+    
     # Test if Jekyll server is running, start it if not
     begin
       uri = URI.parse(JEKYLL_BASE_URL)
