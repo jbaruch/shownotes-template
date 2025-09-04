@@ -771,18 +771,28 @@ class TalkMigrator
   
   def download_file(url, local_path)
     require 'fileutils'
+    require 'open-uri'
     FileUtils.mkdir_p(File.dirname(local_path))
     
-    uri = URI.parse(url)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true if uri.scheme == 'https'
-    
-    response = http.get(uri.path)
-    
-    if response.code.to_i.between?(200, 299)
-      File.open(local_path, 'wb') { |file| file.write(response.body) }
-      true
-    else
+    begin
+      # Use open-uri with fixed options for PDF downloads
+      options = {
+        'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept' => 'application/pdf,*/*;q=0.8',
+        'Accept-Language' => 'en-US,en;q=0.9',
+        'Accept-Encoding' => 'identity',
+        'Connection' => 'keep-alive'
+      }
+      
+      URI.open(url, options) do |file|
+        File.open(local_path, 'wb') do |output|
+          output.write(file.read)
+        end
+        
+        return true
+      end
+    rescue => e
+      puts "   ❌ Download failed: #{e.message}"
       false
     end
   end

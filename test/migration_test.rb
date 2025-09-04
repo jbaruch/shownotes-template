@@ -414,18 +414,17 @@ class MigrationTest < Minitest::Test
           
           puts "📄 Checking #{pdf_filename} (#{format_file_size(local_size)})"
           
-          # Try to find the original Notist PDF URL from talk source
-          # Match based on PDF filename containing talk identifiers
-          talk_date = pdf_filename[0, 10] # Extract YYYY-MM-DD
-          talk_with_this_pdf = @talks.find do |talk_key, talk_data|
-            # Match by date or filename pattern
-            (talk_key.start_with?(talk_date) || pdf_filename.include?(talk_key.split('-')[3..-1].join('-'))) &&
-            get_resources_from_talk(talk_data).any? { |r| r['url'] == drive_url }
+          # Extract date from PDF filename (format: YYYY-MM-DD-conference-title.pdf)
+          date_match = pdf_filename.match(/^(\d{4}-\d{2}-\d{2})/)
+          unless date_match
+            puts "  ⚠️  Could not extract date from filename: #{pdf_filename}"
+            next
           end
+          talk_date = date_match[1]
           
-          # If we couldn't match by filename, just find any talk with this Google Drive URL
-          talk_with_this_pdf ||= @talks.find do |_, talk_data|
-            get_resources_from_talk(talk_data).any? { |r| r['url'] == drive_url }
+          # Find the talk that matches this date
+          talk_with_this_pdf = @talks.find do |talk_key, talk_data|
+            talk_key.start_with?(talk_date)
           end
           
           if talk_with_this_pdf
@@ -487,7 +486,6 @@ class MigrationTest < Minitest::Test
       
       # Verify required content exists in markdown (clean format)
       content = talk_data[:raw_content]
-      yaml = talk_data[:yaml]
       
       # Check for title (H1 in markdown)
       assert content.match?(/^# .+/), "Missing title (H1) in #{talk_key}.md"

@@ -40,7 +40,14 @@ class ThumbnailAccessibilityTest < Minitest::Test
       
       # Test if the thumbnail URL is actually accessible
       begin
-        thumbnail_uri = URI.parse(src)
+        # Handle relative URLs by making them absolute
+        if src.start_with?('/')
+          full_url = "#{JEKYLL_BASE_URL}#{src}"
+        else
+          full_url = src
+        end
+        
+        thumbnail_uri = URI.parse(full_url)
         http = Net::HTTP.new(thumbnail_uri.host, thumbnail_uri.port)
         http.use_ssl = true if thumbnail_uri.scheme == 'https'
         http.read_timeout = 5
@@ -128,9 +135,13 @@ class ThumbnailAccessibilityTest < Minitest::Test
         assert img.has_attribute?('loading'), "Thumbnail images should have loading attribute"
         assert_equal 'lazy', img['loading'], "Thumbnails should use lazy loading"
         
-        # Check for onerror handler
-        assert img.has_attribute?('onerror'), "Thumbnail images should have onerror fallback"
-        assert img['onerror'].include?('placeholder-thumbnail.svg'), "onerror should activate fallback"
+        # Check for onerror handler or data-fallback
+        assert img.has_attribute?('onerror') || img.has_attribute?('data-fallback'), "Thumbnail images should have onerror fallback or data-fallback"
+        if img.has_attribute?('data-fallback')
+          assert img['data-fallback'].include?('placeholder-thumbnail.svg'), "data-fallback should reference placeholder"
+        elsif img.has_attribute?('onerror')
+          assert img['onerror'].include?('placeholder-thumbnail.svg') || img['onerror'].include?('dataset.fallback'), "onerror should activate fallback"
+        end
       end
       
       # Check that fallback structure exists

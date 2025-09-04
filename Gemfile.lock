@@ -112,10 +112,6 @@ GEM
     logger (1.7.0)
     matrix (0.4.3)
     mercenary (0.4.0)
-    mime-types (3.7.0)
-      logger
-      mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2025.0902)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (5.25.5)
@@ -130,9 +126,6 @@ GEM
     os (1.1.4)
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
-    playwright-ruby-client (1.55.0)
-      concurrent-ruby (>= 1.1.6)
-      mime-types (>= 3.0)
     public_suffix (6.0.2)
     racc (1.8.1)
     rack (3.2.1)
@@ -197,7 +190,6 @@ DEPENDENCIES
   liquid (>= 4.0.4)
   minitest (~> 5.25)
   nokogiri (~> 1.18.0)
-  playwright-ruby-client (~> 1.5)
   rake
   selenium-webdriver (~> 4.35)
 

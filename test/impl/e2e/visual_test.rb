@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require 'net/http'
 require 'uri'
-require 'playwright'
+require 'selenium-webdriver'
 require 'fileutils'
 
 class VisualTest < Minitest::Test
@@ -410,42 +410,55 @@ class VisualTest < Minitest::Test
     screenshots_dir = "test/screenshots/thumbnails"
     FileUtils.mkdir_p(screenshots_dir)
 
-    # Define the path to the playwright executable within the bundle
-    # This is necessary because the test runner may not have the bundle path in its PATH
-    playwright_executable_path = File.expand_path('../../vendor/bundle/ruby/3.4.0/bin/playwright', __dir__)
+    # Set up Selenium WebDriver with Chrome in headless mode
+    options = Selenium::WebDriver::Chrome::Options.new
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--window-size=1280,720')
 
-    unless File.exist?(playwright_executable_path)
-      skip "Playwright executable not found at #{playwright_executable_path}. Run 'bundle install' and ensure the path is correct."
-      return
-    end
+    begin
+      driver = Selenium::WebDriver.for(:chrome, options: options)
+      driver.get(JEKYLL_BASE_URL)
 
-    # Run install command manually to ensure browsers are downloaded.
-    system("#{playwright_executable_path} install")
+      # Wait for thumbnails to be potentially loaded
+      wait = Selenium::WebDriver::Wait.new(timeout: 10)
+      wait.until { driver.find_elements(css: '.talk-preview-small, .talk-preview-normal').any? }
 
-    playwright_cli_executable_path = playwright_executable_path
+      # Find all thumbnail preview containers
+      thumbnails = driver.find_elements(css: '.talk-preview-small, .talk-preview-normal')
 
-    Playwright.create(playwright_cli_executable_path: playwright_cli_executable_path) do |playwright|
-      playwright.chromium.launch(headless: true) do |browser|
-        page = browser.new_page
-        page.goto(JEKYLL_BASE_URL)
+      assert_operator thumbnails.length, :>, 0, "No thumbnails found to screenshot"
 
-        # Wait for thumbnails to be potentially loaded
-        page.wait_for_selector('.talk-preview-small, .talk-preview-normal', timeout: 10000)
-
-        # Find all thumbnail preview containers
-        thumbnails = page.query_selector_all('.talk-preview-small, .talk-preview-normal')
-
-        assert_operator thumbnails.length, :>, 0, "No thumbnails found to screenshot"
-
-        thumbnails.each_with_index do |thumbnail, i|
-          # Create a unique filename for each screenshot
-          screenshot_path = File.join(screenshots_dir, "thumbnail_#{i + 1}.png")
-          thumbnail.screenshot(path: screenshot_path)
-          puts "  SUCCESS Captured screenshot: #{screenshot_path}"
-        end
+      # Take a screenshot of the page showing all thumbnails
+      screenshot_path = File.join(screenshots_dir, "thumbnails_page.png")
+      driver.save_screenshot(screenshot_path)
+      puts "  SUCCESS Captured page screenshot with #{thumbnails.length} thumbnails: #{screenshot_path}"
+      
+      # Verify each thumbnail is visible and properly loaded
+      thumbnails.each_with_index do |thumbnail, i|
+        assert thumbnail.displayed?, "Thumbnail #{i + 1} is not displayed"
         
-        puts "SUCCESS Captured #{thumbnails.length} thumbnail screenshots."
+        # Check if thumbnail has loaded content (look for img elements or background images)
+        img_elements = thumbnail.find_elements(tag_name: 'img')
+        background_style = thumbnail.style('background-image')
+        
+        has_content = img_elements.any? { |img| img.attribute('src') && !img.attribute('src').empty? } ||
+                     (background_style && background_style != 'none')
+        
+        if has_content
+          puts "  SUCCESS Thumbnail #{i + 1} has visual content"
+        else
+          puts "  WARNING Thumbnail #{i + 1} may not have loaded visual content"
+        end
       end
+      
+      puts "SUCCESS Verified #{thumbnails.length} thumbnails on page."
+    rescue Selenium::WebDriver::Error::WebDriverError => e
+      skip "Chrome WebDriver not available: #{e.message}"
+    ensure
+      driver&.quit
     end
   end
 

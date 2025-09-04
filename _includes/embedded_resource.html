@@ -52,7 +52,8 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
       {% endif %}
     {% endif %}
     {% comment %} Generate local thumbnail path based on talk filename {% endcomment %}
-    {% assign placeholder_url = "/assets/images/placeholder-thumbnail.svg" | relative_url %}
+    {% assign placeholder_url = "/shownotes/assets/images/placeholder-thumbnail.svg" %}
+    {% comment %}Debug: Placeholder URL should be: {{ placeholder_url }}{% endcomment %}
     {% if include.talk %}
       {% assign talk_slug = include.talk.path | split: "/" | last | remove: ".md" %}
       {% assign local_thumbnail_path = "/assets/images/thumbnails/" | append: talk_slug | append: "-thumbnail.png" %}
@@ -68,12 +69,12 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
           {% if include.talk_url %}
           <a href="{{ include.talk_url }}" class="preview-link">
             <div class="slides-thumbnail-preview thumbnail-container">
-                            <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
+                            <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" data-fallback="/shownotes/assets/images/placeholder-thumbnail.svg" onerror="this.onerror=null;this.src=this.dataset.fallback;">>
             </div>
           </a>
           {% else %}
           <div class="slides-thumbnail-preview thumbnail-container">
-                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
+                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" data-fallback="/shownotes/assets/images/placeholder-thumbnail.svg" onerror="this.onerror=null;this.src=this.dataset.fallback;">
           </div>
           {% endif %}
         </div>
@@ -108,12 +109,12 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
         {% if include.talk_url %}
         <a href="{{ include.talk_url }}" class="preview-link">
           <div class="pdf-thumbnail-preview thumbnail-container">
-                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
+                          <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" data-fallback="/shownotes/assets/images/placeholder-thumbnail.svg" onerror="this.onerror=null;this.src=this.dataset.fallback;">
           </div>
         </a>
         {% else %}
         <div class="pdf-thumbnail-preview thumbnail-container">
-                        <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
+                        <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" data-fallback="/shownotes/assets/images/placeholder-thumbnail.svg" onerror="this.onerror=null;this.src=this.dataset.fallback;">
         </div>
         {% endif %}
         </div>
@@ -144,13 +145,13 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
           {% if include.talk_url %}
           <a href="{{ include.talk_url }}" class="preview-link">
             <div class="video-thumbnail-preview thumbnail-container">
-                            <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
+                            <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" data-fallback="/shownotes/assets/images/placeholder-thumbnail.svg" onerror="this.onerror=null;this.src=this.dataset.fallback;">
               <div class="play-overlay"><svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
             </div>
           </a>
           {% else %}
           <div class="video-thumbnail-preview thumbnail-container">
-                          <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" onerror="this.onerror=null;this.src='{{ placeholder_url }}';">
+                          <img src="https://img.youtube.com/vi/{{ video_id }}/maxresdefault.jpg" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" data-fallback="/shownotes/assets/images/placeholder-thumbnail.svg" onerror="this.onerror=null;this.src=this.dataset.fallback;">
             <div class="play-overlay"><svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
           </div>
           {% endif %}
