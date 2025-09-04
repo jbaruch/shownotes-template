@@ -619,11 +619,8 @@ class TalkMigrator
       'layout' => 'talk'
     }
     
-    # Add extracted_abstract and extracted_description if we have one
-    if @talk_data[:abstract] && !@talk_data[:abstract].empty?
-      yaml_data['extracted_abstract'] = @talk_data[:abstract]
-      yaml_data['extracted_description'] = @talk_data[:abstract]
-    end
+    # Note: We no longer add extracted_abstract and extracted_description to YAML
+    # Instead, we add an ## Abstract section in markdown that the plugin will parse
     
     # Generate clean markdown content with source tracking
     content = "---\n#{yaml_data.to_yaml.gsub(/^---\n/, '')}---\n\n"
@@ -1237,9 +1234,9 @@ class TalkMigrator
     # Presentation context with dynamic speaker reference
     content += generate_presentation_context
     
-    # Abstract/description
+    # Abstract/description as a markdown section
     if @talk_data[:abstract] && !@talk_data[:abstract].empty?
-      content += "#{@talk_data[:abstract]}\n\n"
+      content += "## Abstract\n\n#{@talk_data[:abstract]}\n\n"
     end
     
     # Other resources as markdown list

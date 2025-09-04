@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://jbaru.ch/talks/2025-06-12-devoxx-poland-robocoders-judgment/</loc>
-<lastmod>2025-06-12T00:00:00+00:00</lastmod>
-</url>
-<url>
 <loc>https://jbaru.ch/talks/2025-06-20-voxxed-luxembourg-technical-enshittification/</loc>
 <lastmod>2025-06-20T00:00:00+00:00</lastmod>
 </url>
@@ -15,12 +11,8 @@
 <loc>https://jbaru.ch/talks/</loc>
 </url>
 <url>
-<loc>https://jbaru.ch/pdfs/2025-06-12-devoxx-poland-2025-robocoders-judgment-day-ai-ides.pdf</loc>
-<lastmod>2025-09-04T03:35:49+00:00</lastmod>
-</url>
-<url>
 <loc>https://jbaru.ch/pdfs/2025-06-20-voxxed-days-luxembourg-2025-technical-enshittification-why-.pdf</loc>
-<lastmod>2025-09-04T03:37:19+00:00</lastmod>
+<lastmod>2025-09-04T04:21:47+00:00</lastmod>
 </url>
 <url>
 <loc>https://jbaru.ch/site-clean-rebuild.html</loc>

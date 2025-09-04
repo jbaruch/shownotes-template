@@ -88,6 +88,61 @@ module Jekyll
     def extract_description_from_content(content)
       return '' unless content
       
+      # First try to extract from ## Abstract section
+      abstract_content = extract_from_abstract_section(content)
+      return abstract_content unless abstract_content.empty?
+      
+      # Fall back to legacy extraction method
+      extract_description_legacy(content)
+    end
+    
+    def extract_abstract_from_content(content)
+      return '' unless content
+      
+      # First try to extract from ## Abstract section
+      abstract_content = extract_from_abstract_section(content)
+      return abstract_content unless abstract_content.empty?
+      
+      # Fall back to legacy extraction method
+      extract_abstract_legacy(content)
+    end
+    
+    def extract_from_abstract_section(content)
+      return '' unless content
+      
+      lines = content.to_s.split("\n")
+      abstract_lines = []
+      in_abstract_section = false
+      
+      lines.each do |line|
+        stripped = line.strip
+        
+        # Start collecting when we find ## Abstract
+        if stripped == '## Abstract'
+          in_abstract_section = true
+          next
+        end
+        
+        # Stop when we hit another ## section or Resources
+        if in_abstract_section && (stripped.start_with?('## ') && stripped != '## Abstract')
+          break
+        end
+        
+        # Collect abstract content (skip empty lines at start)
+        if in_abstract_section && !stripped.empty?
+          abstract_lines << stripped
+        elsif in_abstract_section && !abstract_lines.empty? && stripped.empty?
+          # Allow empty lines within the abstract, but stop at double empty lines
+          abstract_lines << ''
+        end
+      end
+      
+      abstract_lines.join(' ').gsub(/\s+/, ' ').strip
+    end
+    
+    def extract_description_legacy(content)
+      return '' unless content
+      
       lines = content.to_s.split("\n")
       
       # Find content after the title and metadata but before Resources
@@ -123,7 +178,7 @@ module Jekyll
       description_lines.join(' ')
     end
     
-    def extract_abstract_from_content(content)
+    def extract_abstract_legacy(content)
       return '' unless content
       
       lines = content.to_s.split("\n")
