@@ -1094,3 +1094,4 @@ VisualTest.startup
 
 # Hook into Minitest lifecycle for class-level teardown
 Minitest.after_run { VisualTest.shutdown }
+end
