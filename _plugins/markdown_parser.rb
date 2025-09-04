@@ -33,7 +33,14 @@ module Jekyll
           doc.data['extracted_date'] = extract_metadata_from_content(content, 'date')
           doc.data['extracted_slides'] = extract_metadata_from_content(content, 'slides')
           doc.data['extracted_video'] = extract_metadata_from_content(content, 'video')
-          doc.data['extracted_description'] = extract_description_from_content(content)
+          # Only extract description from content if not already in front matter
+          if !doc.data['extracted_description'] || doc.data['extracted_description'].empty?
+            doc.data['extracted_description'] = extract_description_from_content(content)
+          end
+          # Extract abstract from content if not in front matter
+          if !doc.data['extracted_abstract'] || doc.data['extracted_abstract'].empty?
+            doc.data['extracted_abstract'] = extract_abstract_from_content(content)
+          end
           doc.data['extracted_resources'] = extract_resources_from_content(content)
           doc.data['extracted_presentation_context'] = extract_and_process_presentation_context(content, site)
         end
@@ -114,6 +121,65 @@ module Jekyll
       end
       
       description_lines.join(' ')
+    end
+    
+    def extract_abstract_from_content(content)
+      return '' unless content
+      
+      lines = content.to_s.split("\n")
+      
+      # Find content after the presentation context but before Resources
+      abstract_lines = []
+      found_presentation_context = false
+      in_abstract = false
+      
+      lines.each do |line|
+        stripped = line.strip
+        
+        # Skip title line
+        next if stripped.start_with?('# ')
+        
+        # Skip metadata lines
+        next if stripped.match(/^\*\*\w+:\*\*/)
+        
+        # Skip source comment
+        next if stripped.start_with?('<!-- Source:')
+        
+        # Check if this is the start of presentation context line
+        if stripped.start_with?('A presentation at')
+          found_presentation_context = true
+          next
+        end
+        
+        # Skip lines that are part of the presentation context (including the liquid template)
+        if found_presentation_context && !in_abstract
+          if stripped.empty?
+            # Empty line after presentation context - start collecting abstract next
+            in_abstract = true
+            next
+          elsif stripped.include?('{{ site.speaker') || stripped.include?('June 2025') || stripped.include?('Luxembourg')
+            # Still part of presentation context
+            next
+          else
+            # This must be the start of the actual abstract
+            in_abstract = true
+          end
+        end
+        
+        # Stop at Resources section
+        break if stripped.start_with?('## Resources')
+        
+        # Collect abstract content
+        if in_abstract && !stripped.empty?
+          abstract_lines << stripped
+        end
+      end
+      
+      # Join and clean up the abstract
+      abstract_text = abstract_lines.join(' ')
+      
+      # Clean up extra spaces and return
+      abstract_text.gsub(/\s+/, ' ').strip
     end
     
     def extract_resources_from_content(content)

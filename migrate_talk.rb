@@ -580,9 +580,9 @@ class TalkMigrator
       'layout' => 'talk'
     }
     
-    # Add extracted_abstract if we have one
+    # Add extracted_description if we have one
     if @talk_data[:abstract] && !@talk_data[:abstract].empty?
-      yaml_data['extracted_abstract'] = @talk_data[:abstract]
+      yaml_data['extracted_description'] = @talk_data[:abstract]
     end
     
     # Generate clean markdown content with source tracking
@@ -826,7 +826,7 @@ class TalkMigrator
     if subhead
       subhead_text = subhead.text
       # Pattern: "A presentation at Conference in Month Year in Location"
-      location_match = subhead_text.match(/in\s+\w+\s+\d{4}\s+in\s+(.+)/i)
+      location_match = subhead_text.match(/in\s+\w+\s+\d{4}\s+in\s+(.+?)(?:\s+by|$)/i)
       if location_match
         @talk_data[:location] = location_match[1].strip
         puts "SUCCESS Location extracted from subhead: #{@talk_data[:location]}"
