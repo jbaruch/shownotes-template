@@ -150,6 +150,18 @@ layout: default
                                     {{ talk.extracted_date | date: "%B %d, %Y" }}
                                 </time>
                                 {% endif %}
+                                {% comment %} Video publication status - consistent with list view {% endcomment %}
+                                {% if talk.extracted_video %}
+                                    <span class="meta-item status-badge video-published">
+                                        <span class="meta-icon video" aria-hidden="true"></span>
+                                        Video Available
+                                    </span>
+                                {% else %}
+                                    <span class="meta-item status-badge video-pending">
+                                        <span class="meta-icon video" aria-hidden="true"></span>
+                                        Video Coming Soon
+                                    </span>
+                                {% endif %}
                             </div>
                         </header>
                         {% if talk.extracted_description %}
@@ -209,20 +221,23 @@ layout: default
                                         {{ talk.extracted_date | date: "%B %d, %Y" }}
                                     </time>
                                     {% endif %}
+                                    {% comment %} Video publication status - moved to metadata section {% endcomment %}
+                                    {% if talk.extracted_video %}
+                                        <span class="meta-item status-badge video-published">
+                                            <span class="meta-icon video" aria-hidden="true"></span>
+                                            Video Available
+                                        </span>
+                                    {% else %}
+                                        <span class="meta-item status-badge video-pending">
+                                            <span class="meta-icon video" aria-hidden="true"></span>
+                                            Video Coming Soon
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </header>
                             {% if talk.extracted_description %}
                                 <p class="talk-summary">{{ talk.extracted_description | truncate: 120 }}</p>
                             {% endif %}
-                            
-                            {% comment %} Video publication status {% endcomment %}
-                            <div class="video-status">
-                                {% if talk.extracted_video %}
-                                    <span class="status-badge video-published">Video Available</span>
-                                {% else %}
-                                    <span class="status-badge video-pending">Video Coming Soon</span>
-                                {% endif %}
-                            </div>
                         </div>
                     </div>
                     </a>
