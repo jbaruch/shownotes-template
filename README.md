@@ -40,7 +40,7 @@ Create `_talks/2024-06-12-conference-talk-title.md`:
 layout: talk
 ---
 
-# Your Amazing Talk Title
+# Talk Title Here
 
 **Conference:** DevConf 2024  
 **Date:** 2024-06-12  

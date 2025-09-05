@@ -92,8 +92,8 @@ class ThumbnailAccessibilityTest < Minitest::Test
     
     doc = Nokogiri::HTML(response.body)
     
-    # Find all thumbnail images
-    thumbnail_images = doc.css('.preview-image')
+    # Find all thumbnail images (using current template class)
+    thumbnail_images = doc.css('.thumbnail-image')
     assert thumbnail_images.size > 0, "Should have thumbnail images on homepage"
     
     broken_thumbnails = []
@@ -171,13 +171,13 @@ class ThumbnailAccessibilityTest < Minitest::Test
     doc = Nokogiri::HTML(response.body)
     
     # Check that we have proper fallback structure
-    preview_containers = doc.css('.talk-preview-large, .talk-preview-small')
+    preview_containers = doc.css('.featured-thumbnail, .talk-thumbnail')
     assert preview_containers.size > 0, "Should have preview containers"
     
     # Check that each preview container has fallback elements for when images fail
     preview_containers.each do |container|
       # Should have either an image with onerror fallback or a fallback element
-      img = container.css('.preview-image').first
+      img = container.css('.thumbnail-image').first
       fallback = container.css('.thumbnail-fallback').first
       
       assert img || fallback, "Preview container should have either image or fallback element"
@@ -191,7 +191,7 @@ class ThumbnailAccessibilityTest < Minitest::Test
     
     preview_containers.each do |container|
       # Check for alternative content when thumbnails fail
-      img = container.css('.preview-image').first
+      img = container.css('.thumbnail-image').first
       if img
         # Verify image has proper alt text (even if empty)
         assert img.has_attribute?('alt'), "Thumbnail images should have alt attribute for accessibility"
