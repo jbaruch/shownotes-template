@@ -106,6 +106,27 @@ body {
     top: 6px;
 }
 
+/* Thumbnail styling with automatic resizing */
+.thumbnail, .talk-thumbnail {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin: 1rem auto;
+}
+
+@media (max-width: 768px) {
+    .thumbnail, .talk-thumbnail {
+        max-width: 100%;
+        margin: 0.5rem auto;
+    }
+}
+
 /* Layout wrapper */
 .wrapper {
     max-width: 1200px;
