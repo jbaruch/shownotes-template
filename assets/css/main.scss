@@ -2,19 +2,21 @@
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
 
-@import "minima";
-
 // Thumbnail styling with automatic resizing
-.thumbnail {
-  max-width: 400px;
+.thumbnail, .talk-thumbnail {
   width: 100%;
+  max-width: 400px;
+  height: auto;
   aspect-ratio: 4/3;
   object-fit: cover;
   object-position: center;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  
-  @media (max-width: 480px) {
+  display: block;
+  margin: 1rem auto;
+
+  @media (max-width: 768px) {
     max-width: 100%;
+    margin: 0.5rem auto;
   }
 }
