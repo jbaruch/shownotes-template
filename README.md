@@ -194,8 +194,7 @@ Live examples of talks using this platform:
 
 ## 📄 License
 
-MIT License - Feel free to use for your own conference talks!
-
+[Apache 2.0](LICENSE)
 ---
 
 **🎯 Perfect for**: Conference speakers, developer advocates, technical trainers, and anyone sharing technical content at events.
