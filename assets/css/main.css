@@ -106,6 +106,27 @@ body {
     top: 6px;
 }
 
+/* Thumbnail styling with automatic resizing */
+.thumbnail, .talk-thumbnail {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin: 1rem auto;
+}
+
+@media (max-width: 768px) {
+    .thumbnail, .talk-thumbnail {
+        max-width: 100%;
+        margin: 0.5rem auto;
+    }
+}
+
 /* Layout wrapper */
 .wrapper {
     max-width: 1200px;
@@ -680,10 +701,11 @@ a:hover {
 
 .featured-thumbnail {
     width: 100%;
-    height: 200px;
+    aspect-ratio: 16 / 9;
     border-radius: var(--radius-lg);
     flex-shrink: 0;
     background-color: var(--surface);
+    overflow: hidden;
 }
 
 .featured-thumbnail-placeholder {
@@ -989,7 +1011,7 @@ a:hover {
 
 .thumbnail-container {
     width: 120px;
-    height: 80px;
+    aspect-ratio: 16 / 9;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -1000,8 +1022,8 @@ a:hover {
 
 .thumbnail-image {
     object-fit: cover;
-    width: 120px;
-    height: 80px;
+    width: 100%;
+    height: 100%;
     border-radius: 8px;
     background-color: var(--surface);
 }
@@ -1013,15 +1035,9 @@ a:hover {
     border: 1px solid var(--border-color);
 }
 
-/* Featured thumbnails */
-.featured-thumbnail {
-    width: 100%;
-    min-height: 500px;
-}
-
 .featured-thumbnail .thumbnail-image {
     width: 100% !important;
-    height: 500px !important;
+    height: 100% !important;
     object-fit: cover !important;
     background-color: var(--surface);
     border-radius: 2rem !important;

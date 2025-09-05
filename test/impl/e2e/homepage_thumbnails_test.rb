@@ -92,8 +92,8 @@ class HomepageThumbnailsTest < Minitest::Test
     
     doc = Nokogiri::HTML(response.body)
     
-    # Check for thumbnails in featured talks section
-    featured_thumbnails = doc.css('.featured-talks .preview-image')
+    # Check for thumbnails in featured talks section (using current template class)
+    featured_thumbnails = doc.css('.featured-talks .thumbnail-image, .featured-thumbnail .thumbnail-image')
     assert featured_thumbnails.size > 0, "Homepage should have thumbnails in featured talks section"
     
     # Check that thumbnail images have proper src attributes
@@ -118,8 +118,8 @@ class HomepageThumbnailsTest < Minitest::Test
     
     doc = Nokogiri::HTML(response.body)
     
-    # Check for thumbnails in all talks section
-    all_talks_thumbnails = doc.css('.all-talks .preview-image')
+    # Check for thumbnails in all talks section (using current template class)
+    all_talks_thumbnails = doc.css('.all-talks .thumbnail-image, .talk-thumbnail .thumbnail-image')
     assert all_talks_thumbnails.size > 0, "Homepage should have thumbnails in all talks section"
     
     # Check that thumbnail images have proper src attributes

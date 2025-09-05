@@ -342,28 +342,29 @@ class VisualTest < Minitest::Test
       return
     end
     
-    # Count actual thumbnail images
-    thumbnail_images = html.scan(/<img[^>]+class="[^"]*preview-image[^"]*"/).length
-    pdf_thumbnails = html.scan(/<div class="pdf-thumbnail-preview">/).length
+    # Count actual thumbnail images (using current template class)
+    thumbnail_images = html.scan(/<img[^>]+class="[^"]*thumbnail-image[^"]*"/).length
+    featured_containers = html.scan(/<div class="featured-thumbnail">/).length
+    talk_containers = html.scan(/<div class="talk-thumbnail">/).length
     
     # Each talk should have either a thumbnail image or a placeholder
-    assert thumbnail_images > 0 || pdf_thumbnails > 0,
+    assert thumbnail_images > 0 || (featured_containers + talk_containers) > 0,
       "❌ THUMBNAIL STRUCTURE MISSING: Found #{talk_items} talks but no thumbnail images or containers"
     
     # Check for proper thumbnail container structure
-    preview_containers = html.scan(/<div class="talk-preview-small">/).length
+    preview_containers = featured_containers + talk_containers
     assert preview_containers >= talk_items * 0.8, # Allow some talks without previews
       "❌ PREVIEW CONTAINERS MISSING: Expected ~#{talk_items} preview containers, found #{preview_containers}"
     
     # Check for accessible thumbnail images (alt attributes)
-    thumbnail_imgs_with_alt = html.scan(/<img[^>]+alt="[^"]*"[^>]*class="[^"]*preview-image[^"]*"/).length +
-                              html.scan(/<img[^>]+class="[^"]*preview-image[^"]*"[^>]+alt="[^"]*"/).length
+    thumbnail_imgs_with_alt = html.scan(/<img[^>]+alt="[^"]*"[^>]*class="[^"]*thumbnail-image[^"]*"/).length +
+                              html.scan(/<img[^>]+class="[^"]*thumbnail-image[^"]*"[^>]+alt="[^"]*"/).length
     if thumbnail_images > 0
       assert thumbnail_imgs_with_alt >= thumbnail_images * 0.9, # Allow some missing alt tags
         "❌ ACCESSIBILITY ISSUE: #{thumbnail_images} thumbnails found but only #{thumbnail_imgs_with_alt} have alt attributes"
     end
     
-    puts "SUCCESS Thumbnail structure validated: #{thumbnail_images} images, #{pdf_thumbnails} PDF containers, #{preview_containers} preview containers"
+    puts "SUCCESS Thumbnail structure validated: #{thumbnail_images} images, #{featured_containers} featured + #{talk_containers} talk containers"
   end
 
   def test_featured_talks_have_thumbnails
@@ -383,9 +384,9 @@ class VisualTest < Minitest::Test
       featured_cards = featured_html.scan(/<article class="talk-card featured">/).length
       
       if featured_cards > 0
-        # Count thumbnails in featured section
+        # Count thumbnails in featured section (using current template class)
         featured_thumbnails = featured_html.scan(/drive\.google\.com\/thumbnail/).length
-        featured_images = featured_html.scan(/<img[^>]+class="[^"]*preview-image[^"]*"/).length
+        featured_images = featured_html.scan(/<img[^>]+class="[^"]*thumbnail-image[^"]*"/).length
         
         assert featured_thumbnails > 0 || featured_images > 0,
           "❌ FEATURED TALKS MISSING THUMBNAILS: Found #{featured_cards} featured talks but no thumbnails"
@@ -468,10 +469,10 @@ class VisualTest < Minitest::Test
 
       # Wait for thumbnails to be potentially loaded
       wait = Selenium::WebDriver::Wait.new(timeout: 10)
-      wait.until { driver.find_elements(css: '.talk-preview-small, .talk-preview-normal').any? }
+      wait.until { driver.find_elements(css: '.featured-thumbnail, .talk-thumbnail, .thumbnail-image').any? }
 
       # Find all thumbnail preview containers
-      thumbnails = driver.find_elements(css: '.talk-preview-small, .talk-preview-normal')
+      thumbnails = driver.find_elements(css: '.featured-thumbnail, .talk-thumbnail')
 
       assert_operator thumbnails.length, :>, 0, "No thumbnails found to screenshot"
 
@@ -545,7 +546,7 @@ class VisualTest < Minitest::Test
       puts "  INFO Found #{featured_talks.length} featured talks"
       
       # Validate talks list section  
-      talk_list_items = driver.find_elements(css: '.talk-preview-small, .talk-item')
+      talk_list_items = driver.find_elements(css: '.talk-thumbnail, .talk-item, article')
       puts "  INFO Found #{talk_list_items.length} talks in list"
       
       # Validate header structure

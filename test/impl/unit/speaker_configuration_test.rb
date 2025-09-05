@@ -58,9 +58,9 @@ class SpeakerConfigurationTest < Minitest::Test
     
     rendered_index = render_index_page
     
-    # Should not have any avatar image
-    refute_includes rendered_index, '<img src='
+    # Should not have any avatar image (but talk thumbnails are OK)
     refute_includes rendered_index, 'class="author-avatar"'
+    refute_includes rendered_index, 'class="speaker-avatar"'
   end
 
   # Test social media URL generation
