@@ -86,6 +86,67 @@ body {
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Ensure all images are responsive by default */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Responsive table handling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-4) 0;
+}
+
+@media (max-width: 768px) {
+    table {
+        font-size: 0.9rem;
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 480px) {
+    table {
+        font-size: 0.85rem;
+    }
+    
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+    
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    tr {
+        border: 1px solid var(--border-color);
+        margin-bottom: var(--space-2);
+        padding: var(--space-2);
+    }
+    
+    td {
+        border: none;
+        position: relative;
+        padding-left: 50% !important;
+    }
+    
+    td:before {
+        content: attr(data-label) ": ";
+        position: absolute;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: bold;
+    }
 }
 
 /* Skip navigation link - accessibility */
@@ -1878,8 +1939,13 @@ pre code {
 }
 
 @media (max-width: 480px) {
+    .wrapper {
+        padding: 0 var(--space-3);
+    }
+    
     .site-nav ul {
         flex-direction: column;
+        gap: var(--space-2);
     }
     
     .talks-grid {
@@ -1888,6 +1954,119 @@ pre code {
     
     .talk-card {
         padding: var(--space-6);
+    }
+    
+    .page-content {
+        padding: var(--space-6) 0;
+    }
+    
+    h1 {
+        font-size: 1.875rem;
+        line-height: 1.2;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+        line-height: 1.3;
+    }
+    
+    .talk-title {
+        font-size: 1.75rem;
+        line-height: 1.25;
+    }
+    
+    .page-header h1,
+    .talk-header h1 {
+        font-size: 2rem;
+    }
+    
+    .talk-header,
+    .page-header {
+        padding: var(--space-4) var(--space-3);
+    }
+    
+    .resource-group h3,
+    .resource-link {
+        padding: var(--space-3) var(--space-4);
+    }
+}
+
+/* Additional mobile breakpoint for very small screens */
+@media (max-width: 360px) {
+    .wrapper {
+        padding: 0 var(--space-2);
+    }
+    
+    .site-title {
+        font-size: 1.25rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.25rem;
+    }
+    
+    .talk-title {
+        font-size: 1.5rem;
+    }
+    
+    .page-header h1,
+    .talk-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .talk-header,
+    .page-header {
+        padding: var(--space-3) var(--space-2);
+    }
+    
+    .resource-group h3,
+    .resource-link {
+        padding: var(--space-2) var(--space-3);
+        font-size: 0.9rem;
+    }
+    
+    .talk-card {
+        padding: var(--space-4);
+    }
+    
+    .site-nav ul {
+        gap: var(--space-1);
+    }
+    
+    .site-nav a {
+        padding: var(--space-2) var(--space-3);
+        font-size: 0.9rem;
+    }
+    
+    /* Improve link wrapping and spacing */
+    .talk-meta {
+        gap: var(--space-2);
+    }
+    
+    .talk-meta strong {
+        display: block;
+        margin-bottom: var(--space-1);
+    }
+    
+    .talk-meta a {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        -webkit-hyphens: auto;
+        hyphens: auto;
+    }
+    
+    /* Ensure tables are responsive */
+    table {
+        font-size: 0.85rem;
+    }
+    
+    /* Better button spacing */
+    .resource-group {
+        margin: var(--space-4) 0;
     }
 }
 
@@ -2028,6 +2207,26 @@ pre code {
     
     .speaker-name {
         font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .speaker-section {
+        padding: var(--space-4);
+        margin: var(--space-4) 0;
+    }
+    
+    .speaker-avatar {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .speaker-name {
+        font-size: 1.125rem;
+    }
+    
+    .speaker-bio {
+        font-size: 0.9rem;
     }
     
     .social-link {
