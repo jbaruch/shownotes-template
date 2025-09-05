@@ -46,17 +46,17 @@ plugins:
 
 # Speaker configuration
 speaker:
-  name: "Jane Doe"
+  name: "Your full name"
   display_name: ""                 # Optional: Override for display (if empty, uses name)
-  bio: "Jane Doe is an all around awesome speaker"
+  bio: "Your bio for the header"
   avatar_url: ""                   # Optional: Custom avatar URL (fallback if no social media avatars available)
   # Social media handles (all optional - leave empty to hide)
   social:
-    # linkedin: "your-username"           # Optional: LinkedIn username (generates https://linkedin.com/in/jbaruch)
-    # x: "your-username"                 # Optional: X.com username (generates https://x.com/jbaruch)  
-    # github: "your-username"            # Optional: GitHub username (generates https://github.com/jbaruch + avatar from GitHub)
-    # mastodon: ""                 # Optional: Full Mastodon URL (e.g., "https://mastodon.social/@username")
-    # bluesky: "your-username"                  # Optional: BlueSky username (generates https://bsky.app/profile/jbaruch)
+    linkedin: "your-username"           # Optional: LinkedIn username (generates https://linkedin.com/in/jbaruch)
+    x: "your-username"                 # Optional: X.com username (generates https://x.com/jbaruch)  
+    github: "your-username"            # Optional: GitHub username (generates https://github.com/jbaruch + avatar from GitHub)
+    mastodon: ""                 # Optional: Full Mastodon URL (e.g., "https://mastodon.social/@username")
+    bluesky: "your-username"                  # Optional: BlueSky username (generates https://bsky.app/profile/jbaruch)
 
 # Site metadata (templates will use speaker config)
 title: "Speaker Presentations"
