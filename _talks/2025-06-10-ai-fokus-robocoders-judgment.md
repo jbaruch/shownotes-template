@@ -25,7 +25,7 @@ Join us to see if AI IDEs can deliver on their bold promise of transforming deve
 
 - [The Birth of Vibecoding](https://x.com/karpathy/status/1886192184808149383?lang=en)
 - [GitHub Repo with Requirements, Instructions and Prompts](https://github.com/jbaruch/rocoders-ai-fokus)
-- [Prompt Driven Development Presentation](https://speaking.jbaru.ch/yaBltt/prompt-driven-development-aligning-ideas-tests-and-code)
+- [Prompt Driven Development Presentation](https://noti.st/jbaruch/yaBltt/prompt-driven-development-aligning-ideas-tests-and-code)
 - [Windsurf IDE](https://windsurf.com/)
 - [GitHub Copilot - Agentic Mode](https://github.blog/news-insights/product-news/github-copilot-the-agent-awakens/)
 - [Junie - JetBrains Coding Agent](https://www.jetbrains.com/junie/)

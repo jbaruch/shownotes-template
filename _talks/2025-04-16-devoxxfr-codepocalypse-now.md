@@ -26,7 +26,7 @@ This isn’t just a comparison; it’s a live experiment under pressure. Come an
 - [Windsurf IDE](https://windsurf.com/)
 - [Infinite monkey theorem](https://en.wikipedia.org/wiki/Infinite_monkey_theorem)
 - [Getting started with LangChain4j with Quarkus](https://quarkus.io/quarkus-workshop-langchain4j/step-01/#anatomy-of-the-application)
-- [Prompt Driven Development Presentation](https://speaking.jbaru.ch/yaBltt/prompt-driven-development-aligning-ideas-tests-and-code)
+- [Prompt Driven Development Presentation](https://noti.st/jbaruch/yaBltt/prompt-driven-development-aligning-ideas-tests-and-code)
 - [Memento (film)](https://en.wikipedia.org/wiki/Memento_(film))
 - [LangChain4J Chat Memory](https://docs.langchain4j.dev/tutorials/chat-memory/)
 - [LangChain4J RAG](https://docs.langchain4j.dev/tutorials/rag)
