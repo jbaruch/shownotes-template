@@ -1,4 +1,4 @@
-url: "https://jbaruch.github.io"
+url: "https://your-username.github.io"
 baseurl: "/shownotes"
 hero_background: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920"
 
@@ -44,19 +44,19 @@ plugins:
   - jekyll-sitemap
   - jekyll-seo-tag
 
-# Speaker configuration (single source of truth)
+# Speaker configuration
 speaker:
-  name: "Baruch Sadogursky"
+  name: "Your full name"
   display_name: ""                 # Optional: Override for display (if empty, uses name)
-  bio: "Developer advocate and expert in DevOps, software development practices, and technology trends. Regular speaker at major conferences about improving developer productivity and software quality."
+  bio: "Your bio for the header"
   avatar_url: ""                   # Optional: Custom avatar URL (fallback if no social media avatars available)
   # Social media handles (all optional - leave empty to hide)
   social:
-    linkedin: "jbaruch"           # Optional: LinkedIn username (generates https://linkedin.com/in/jbaruch)
-    x: "jbaruch"                 # Optional: X.com username (generates https://x.com/jbaruch)  
-    github: "jbaruch"            # Optional: GitHub username (generates https://github.com/jbaruch + avatar from GitHub)
+    linkedin: "your-username"           # Optional: LinkedIn username (generates https://linkedin.com/in/jbaruch)
+    x: "your-username"                 # Optional: X.com username (generates https://x.com/jbaruch)  
+    github: "your-username"            # Optional: GitHub username (generates https://github.com/jbaruch + avatar from GitHub)
     mastodon: ""                 # Optional: Full Mastodon URL (e.g., "https://mastodon.social/@username")
-    bluesky: "jbaru.ch"                  # Optional: BlueSky username (generates https://bsky.app/profile/jbaruch)
+    bluesky: "your-username"                  # Optional: BlueSky username (generates https://bsky.app/profile/jbaruch)
 
 # Site metadata (templates will use speaker config)
 title: "Speaker Presentations"
