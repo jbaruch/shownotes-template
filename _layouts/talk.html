@@ -28,6 +28,18 @@ layout: default
                             {{ page.extracted_date | date: "%B %d, %Y" }}
                         </time>
                         {% endif %}
+                        {% comment %} Video publication status - consistent across all views {% endcomment %}
+                        {% if page.extracted_video %}
+                            <span class="meta-item status-badge video-published">
+                                <span class="meta-icon video" aria-hidden="true"></span>
+                                Video Available
+                            </span>
+                        {% else %}
+                            <span class="meta-item status-badge video-pending">
+                                <span class="meta-icon video" aria-hidden="true"></span>
+                                Video Coming Soon
+                            </span>
+                        {% endif %}
         </div>
         
     </header>
