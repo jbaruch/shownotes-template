@@ -155,4 +155,4 @@ bundle exec ruby test/run_tests.rb -c migration
 
 ## License
 
-[Add your license information]
+[Apache 2.0](LICENCE)
