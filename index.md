@@ -116,42 +116,38 @@ layout: default
                 {% for talk in recent_talks %}
                   <article class="featured-talk-card">
                     <a href="{{ talk.url | relative_url }}" class="featured-talk-card-link">
-                    {% assign preview_resource = null %}
-                    {% if talk.extracted_slides %}
-                        {% assign preview_resource = talk.extracted_slides %}
-                        {% assign preview_type = 'slides' %}
-                    {% elsif talk.extracted_video %}
-                        {% assign preview_resource = talk.extracted_video %}
-                        {% assign preview_type = 'video' %}
-                    {% elsif talk.source.type == 'pdf' %}
-                        {% assign preview_resource = talk.source.url %}
-                        {% assign preview_type = 'pdf' %}
-                    {% endif %}
-
-                    {% if preview_resource %}
-                    <div class="talk-preview-large">
-                        {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='large' title=talk.extracted_title talk=talk %}
+                    {% comment %} Generate thumbnail based on filename slug {% endcomment %}
+                    {% assign talk_slug = talk.path | split: '/' | last | replace: '.md', '' %}
+                    {% assign thumbnail_path = '/assets/images/thumbnails/' | append: talk_slug | append: '-thumbnail.png' | relative_url %}
+                    {% assign placeholder_url = '/assets/images/placeholder-thumbnail.svg' | relative_url %}
+                    
+                    <div class="featured-thumbnail">
+                        <img src="{{ thumbnail_path }}" alt="{{ talk.extracted_title | default: talk.title | escape }}" class="thumbnail-image" loading="lazy" data-fallback="{{ placeholder_url }}" onerror="this.onerror=null;this.src=this.dataset.fallback;">
                     </div>
-                    {% endif %}
 
-                    <div class="talk-content">
-                        <header class="talk-header">
-                            <h3>{{ talk.extracted_title | default: talk.title }}</h3>
-                            <div class="talk-meta">
-                                {% if talk.extracted_conference %}
-                                <span class="meta-item conference-name">
-                                    <span class="meta-icon conference" aria-hidden="true"></span>
-                                    {{ talk.extracted_conference }}
+                    <div class="featured-info">
+                        <h3>{{ talk.extracted_title | default: talk.title }}</h3>
+                        <div class="talk-meta">
+                            {% if talk.extracted_conference %}
+                            <span class="meta-item conference-name">
+                                📍 {{ talk.extracted_conference }}
+                            </span>
+                            {% endif %}
+                            {% if talk.extracted_date %}
+                            <time class="meta-item date" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
+                                📅 {{ talk.extracted_date | date: "%B %d, %Y" }}
+                            </time>
+                            {% endif %}
+                            {% if talk.extracted_video %}
+                                <span class="meta-item status-badge video-published">
+                                    🎥 Video Available
                                 </span>
-                                {% endif %}
-                                {% if talk.extracted_date %}
-                                <time class="meta-item" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
-                                    <span class="meta-icon date" aria-hidden="true"></span>
-                                    {{ talk.extracted_date | date: "%B %d, %Y" }}
-                                </time>
-                                {% endif %}
-                            </div>
-                        </header>
+                            {% else %}
+                                <span class="meta-item status-badge video-pending">
+                                    ⏳ Video Coming Soon
+                                </span>
+                            {% endif %}
+                        </div>
                         {% if talk.extracted_description %}
                             <p class="talk-summary">{{ talk.extracted_description | truncate: 100 }}</p>
                         {% endif %}
@@ -173,58 +169,43 @@ layout: default
                     <a href="{{ talk.url | relative_url }}" class="talk-list-item-link">
                     {% comment %} Extract slides resource for preview (prioritize slides over video) {% endcomment %}
                     {% assign preview_resource = null %}
+                    {% comment %} Generate thumbnail based on filename slug {% endcomment %}
+                    {% assign talk_slug = talk.path | split: '/' | last | replace: '.md', '' %}
+                    {% assign thumbnail_path = '/assets/images/thumbnails/' | append: talk_slug | append: '-thumbnail.png' | relative_url %}
+                    {% assign placeholder_url = '/assets/images/placeholder-thumbnail.svg' | relative_url %}
                     
-                    {% comment %} Check for extracted slides/video URLs {% endcomment %}
-                    {% if talk.extracted_slides %}
-                        {% assign preview_resource = talk.extracted_slides %}
-                        {% assign preview_type = 'slides' %}
-                    {% elsif talk.extracted_video %}
-                        {% assign preview_resource = talk.extracted_video %}
-                        {% assign preview_type = 'video' %}
-                    {% elsif talk.source.type == 'pdf' %}
-                        {% assign preview_resource = talk.source.url %}
-                        {% assign preview_type = 'pdf' %}
-                    {% endif %}
-
-                    <div class="talk-content">
-                        {% if preview_resource %}
-                        <div class="talk-preview-small">
-                            {% include embedded_resource.html url=preview_resource type=preview_type preview_mode=true size='small' title=talk.extracted_title talk=talk %}
+                        <div class="talk-thumbnail">
+                            <img src="{{ thumbnail_path }}" alt="{{ talk.extracted_title | default: talk.title | escape }}" class="thumbnail-image" loading="lazy" data-fallback="{{ placeholder_url }}" onerror="this.onerror=null;this.src=this.dataset.fallback;">
                         </div>
-                        {% endif %}
                         
-                        <div class="talk-text-content">
-                            <header class="talk-header">
-                                <h3>{{ talk.extracted_title | default: talk.title }}</h3>
-                                <div class="talk-meta">
-                                    {% if talk.extracted_conference %}
-                                    <span class="meta-item conference-name">
-                                        <span class="meta-icon conference" aria-hidden="true"></span>
-                                        {{ talk.extracted_conference }}
+                        <div class="talk-info">
+                            <h3>{{ talk.extracted_title | default: talk.title }}</h3>
+                            <div class="talk-meta">
+                                {% if talk.extracted_conference %}
+                                <span class="meta-item conference-name">
+                                    📍 {{ talk.extracted_conference }}
+                                </span>
+                                {% endif %}
+                                {% if talk.extracted_date %}
+                                <time class="meta-item date" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
+                                    📅 {{ talk.extracted_date | date: "%B %d, %Y" }}
+                                </time>
+                                {% endif %}
+                                {% comment %} Video publication status - moved to metadata section {% endcomment %}
+                                {% if talk.extracted_video %}
+                                    <span class="meta-item status-badge video-published">
+                                        🎥 Video Available
                                     </span>
-                                    {% endif %}
-                                    {% if talk.extracted_date %}
-                                    <time class="meta-item" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
-                                        <span class="meta-icon date" aria-hidden="true"></span>
-                                        {{ talk.extracted_date | date: "%B %d, %Y" }}
-                                    </time>
-                                    {% endif %}
-                                </div>
-                            </header>
+                                {% else %}
+                                    <span class="meta-item status-badge video-pending">
+                                        ⏳ Video Coming Soon
+                                    </span>
+                                {% endif %}
+                            </div>
                             {% if talk.extracted_description %}
                                 <p class="talk-summary">{{ talk.extracted_description | truncate: 120 }}</p>
                             {% endif %}
-                            
-                            {% comment %} Video publication status {% endcomment %}
-                            <div class="video-status">
-                                {% if talk.extracted_video %}
-                                    <span class="status-badge video-published">Video Available</span>
-                                {% else %}
-                                    <span class="status-badge video-pending">Video Coming Soon</span>
-                                {% endif %}
-                            </div>
                         </div>
-                    </div>
                     </a>
                 </article>
                 {% endfor %}

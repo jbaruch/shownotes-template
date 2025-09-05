@@ -18,15 +18,23 @@ layout: default
         <div class="talk-meta">
                                     {% if page.extracted_conference %}
                         <span class="meta-item conference-name">
-                            <span class="meta-icon conference" aria-hidden="true"></span>
-                            {{ page.extracted_conference }}
+                            📍 {{ page.extracted_conference }}
                         </span>
                         {% endif %}
                         {% if page.extracted_date %}
-                        <time class="meta-item" datetime="{{ page.extracted_date | date_to_xmlschema }}">
-                            <span class="meta-icon date" aria-hidden="true"></span>
-                            {{ page.extracted_date | date: "%B %d, %Y" }}
+                        <time class="meta-item date" datetime="{{ page.extracted_date | date_to_xmlschema }}">
+                            📅 {{ page.extracted_date | date: "%B %d, %Y" }}
                         </time>
+                        {% endif %}
+                        {% comment %} Video publication status - consistent across all views {% endcomment %}
+                        {% if page.extracted_video %}
+                            <span class="meta-item status-badge video-published">
+                                🎥 Video Available
+                            </span>
+                        {% else %}
+                            <span class="meta-item status-badge video-pending">
+                                ⏳ Video Coming Soon
+                            </span>
                         {% endif %}
         </div>
         

@@ -313,33 +313,57 @@ a:hover {
 .talk-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-6);
-    margin-bottom: var(--space-6);
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
 }
 
 .meta-item {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    color: var(--text-secondary);
-    font-weight: 500;
+    color: var(--primary-dark);
+    font-weight: 700;
     padding: var(--space-2) var(--space-4);
-    background: var(--background);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.12));
     border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    white-space: nowrap;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    letter-spacing: 0.025em;
 }
 
-.meta-icon {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
+.meta-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.16)) !important;
+    border-color: rgba(99, 102, 241, 0.35) !important;
 }
 
-.meta-icon.speaker { background: var(--primary-color); }
-.meta-icon.conference { background: var(--info-color); }
-.meta-icon.date { background: var(--success-color); }
-.meta-icon.status { background: var(--warning-color); }
+.meta-item.conference-name {
+    color: var(--primary-dark) !important;
+}
+
+.meta-item.date {
+    color: var(--primary-dark) !important;
+}
+
+.meta-item.status-badge.video-published {
+    color: #047857 !important;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.12)) !important;
+    border: 1px solid rgba(99, 102, 241, 0.25) !important;
+    font-weight: 700 !important;
+    text-transform: none !important;
+}
+
+.meta-item.status-badge.video-pending {
+    color: #b45309 !important;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.12)) !important;
+    border: 1px solid rgba(99, 102, 241, 0.25) !important;
+    font-weight: 700 !important;
+    text-transform: none !important;
+}
 
 .talk-description {
     font-size: 1.1rem;
@@ -651,18 +675,17 @@ a:hover {
 }
 
 .featured-talk-card {
-    background: var(--surface);
+    background: linear-gradient(135deg, var(--background) 0%, var(--surface) 50%, rgba(99, 102, 241, 0.02) 100%);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-xl);
-    padding: 0;
+    padding: var(--space-6);
     transition: all 0.3s ease;
     box-shadow: var(--shadow-md);
     position: relative;
     overflow: hidden;
-}
-
-.featured-talk-card .talk-content {
-    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
 }
 
 .featured-talk-card::before {
@@ -673,14 +696,42 @@ a:hover {
     right: 0;
     height: 4px;
     background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    opacity: 1;
 }
 
-.featured-talk-card .talk-header h3 {
-    font-size: 1.375rem;
-    font-weight: 600;
+.featured-thumbnail {
+    width: 100%;
+    height: 200px;
+    border-radius: var(--radius-lg);
+    flex-shrink: 0;
+    background-color: var(--surface);
+}
+
+.featured-thumbnail-placeholder {
+    width: 100%;
+    height: 200px;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 2px dashed var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    flex-shrink: 0;
+}
+
+.featured-info {
+    flex: 1;
+    padding-top: var(--space-6);
+}
+
+.featured-info h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
     margin: 0 0 var(--space-4) 0;
-    line-height: 1.3;
+    line-height: 1.2;
     color: var(--text-primary);
+    font-family: var(--font-family);
 }
 
 .featured-talk-card .talk-description {
@@ -757,40 +808,86 @@ a:hover {
 }
 
 .talk-list-item {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    background: var(--background);
+    background: linear-gradient(135deg, var(--background) 0%, var(--surface) 50%, rgba(99, 102, 241, 0.02) 100%);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 15px;
+    padding: var(--space-6);
     transition: all 0.2s ease;
-    gap: 15px;
-}
-
-.talk-list-item .talk-content {
-    flex: 1;
-    display: flex;
-    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+    display: flex !important;
+    flex-direction: row !important;
     gap: var(--space-4);
+    align-items: flex-start;
 }
 
-.talk-list-item .talk-preview-small {
+.talk-list-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.talk-list-item:hover::before {
+    opacity: 1;
+}
+
+.talk-thumbnail {
     flex-shrink: 0;
     width: 120px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.talk-list-item .talk-text-content {
+.talk-thumbnail .thumbnail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.talk-thumbnail .thumbnail-image[src*="placeholder-thumbnail.svg"] {
+    object-fit: contain;
+    background-color: var(--surface);
+    border: 1px solid var(--border-color);
+}
+
+.talk-thumbnail-placeholder {
+    flex-shrink: 0;
+    width: 120px;
+    height: 80px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 2px dashed var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.talk-info {
     flex: 1;
-    min-width: 0; /* Prevent overflow */
+    min-width: 0;
 }
 
-.talk-list-item h3 {
+.talk-info h3 {
     font-size: 1.125rem;
     font-weight: 600;
-    margin: 0 0 15px 0;
+    margin: 0 0 var(--space-3) 0;
     line-height: 1.3;
     color: var(--text-primary);
+}
+
+.talk-summary {
+    margin: var(--space-3) 0 0 0;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-size: 0.95rem;
 }
 
 .talk-meta-inline {
@@ -812,8 +909,7 @@ a:hover {
 }
 
 /* Clickable card link styles */
-.featured-talk-card-link,
-.talk-list-item-link {
+.featured-talk-card-link {
     text-decoration: none;
     color: inherit;
     display: block;
@@ -821,7 +917,20 @@ a:hover {
     transition: all 0.2s ease;
 }
 
-.featured-talk-card-link:hover,
+.talk-list-item-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: var(--space-4);
+    align-items: flex-start;
+}
+
+.featured-talk-card-link:hover {
+    text-decoration: none;
+}
+
 .talk-list-item-link:hover {
     text-decoration: none;
 }
@@ -900,17 +1009,56 @@ a:hover {
 }
 
 .thumbnail-container {
-    width: 100%;
-    height: 100%;
+    width: 120px;
+    height: 80px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
 }
 
 .thumbnail-image {
     object-fit: cover;
+    width: 120px;
+    height: 80px;
+    border-radius: 8px;
+    background-color: var(--surface);
+}
+
+/* Ensure fallback images display properly */
+.thumbnail-image[src*="placeholder-thumbnail.svg"] {
+    object-fit: contain;
+    background-color: var(--surface);
+    border: 1px solid var(--border-color);
+}
+
+/* Featured thumbnails */
+.featured-thumbnail {
     width: 100%;
-    height: 100%;
+    min-height: 500px;
+}
+
+.featured-thumbnail .thumbnail-image {
+    width: 100% !important;
+    height: 500px !important;
+    object-fit: cover !important;
+    background-color: var(--surface);
+    border-radius: 2rem !important;
+    display: block;
+}
+
+.featured-thumbnail .thumbnail-image[src*="placeholder-thumbnail.svg"] {
+    object-fit: contain;
+    background-color: var(--surface);
+    border: 1px solid var(--border-color);
+}
+
+.featured-thumbnail .thumbnail-image[src*="placeholder-thumbnail.svg"] {
+    object-fit: contain;
+    background-color: var(--surface);
+    border: 1px solid var(--border-color);
 }
 
 .slides-thumbnail-preview .thumbnail-container,
@@ -1704,6 +1852,10 @@ pre code {
     
     .talks-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .talk-list-item {
+        flex-direction: row;
     }
     
     .page-header h1 {
