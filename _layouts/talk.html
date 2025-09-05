@@ -1,0 +1,168 @@
+---
+layout: default
+---
+
+<article class="talk" itemscope itemtype="https://schema.org/PresentationDigitalDocument">
+    <!-- Breadcrumb navigation -->
+    <nav class="breadcrumb" role="navigation" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="{{ '/' | relative_url }}">Home</a></li>
+            <li aria-current="page">{{ page.extracted_title | default: page.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Talk header -->
+    <header class="talk-header">
+        <h1 class="talk-title" itemprop="name">{{ page.extracted_title | default: page.title }}</h1>
+        
+        <div class="talk-meta">
+                                    {% if page.extracted_conference %}
+                        <span class="meta-item conference-name">
+                            <span class="meta-icon conference" aria-hidden="true"></span>
+                            {{ page.extracted_conference }}
+                        </span>
+                        {% endif %}
+                        {% if page.extracted_date %}
+                        <time class="meta-item" datetime="{{ page.extracted_date | date_to_xmlschema }}">
+                            <span class="meta-icon date" aria-hidden="true"></span>
+                            {{ page.extracted_date | date: "%B %d, %Y" }}
+                        </time>
+                        {% endif %}
+        </div>
+        
+    </header>
+
+
+    <!-- Main content: slides and video side by side -->
+    {% if page.extracted_slides or page.extracted_video %}
+    <section class="talk-main-content">
+        <div class="media-container">
+            <!-- Slides embed -->
+            {% if page.extracted_slides %}
+            <div class="media-item slides-embed">
+                <h2>Slides</h2>
+                {% include embedded_resource.html url=page.extracted_slides type="slides" %}
+            </div>
+            {% endif %}
+
+            <!-- Video embed -->
+            {% if page.extracted_video %}
+            <div class="media-item video-embed">
+                <h2>Video</h2>
+                {% include embedded_resource.html url=page.extracted_video type="video" %}
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Talk content -->
+    <section class="talk-content">
+        {% if page.extracted_presentation_context %}
+            <div class="talk-presentation-context">
+                {{ page.extracted_presentation_context }}
+            </div>
+        {% endif %}
+        
+        {% if page.extracted_abstract %}
+            <div class="talk-abstract">
+                <h2>Abstract</h2>
+                {{ page.extracted_abstract | markdownify }}
+            </div>
+        {% endif %}
+        
+        {% if page.extracted_resources and page.extracted_resources != "" %}
+            <div class="talk-resources">
+                <h2>Resources</h2>
+                <div class="resources-list">
+                    {{ page.extracted_resources | markdownify }}
+                </div>
+            </div>
+        {% endif %}
+    </section>
+
+</article>
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "PresentationDigitalDocument",
+  "name": "{{ page.extracted_title | default: page.title | escape }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ site.speaker.display_name | default: site.speaker.name | escape }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ page.extracted_conference | escape }}"
+  },
+  "datePublished": "{{ page.extracted_date }}",
+  {% if page.extracted_abstract %}"description": "{{ page.extracted_abstract | escape }}",{% endif %}
+  "url": "{{ page.url | absolute_url }}"
+}
+</script>
+
+<!-- Resource enhancement script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add target="_blank" to external links
+    const links = document.querySelectorAll('a[href^="http"]');
+    links.forEach(link => {
+        if (!link.hasAttribute('target')) {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener');
+        }
+    });
+    
+    // Enhance resources section formatting
+    const resourcesSection = document.querySelector('#resources');
+    if (resourcesSection && resourcesSection.nextElementSibling) {
+        const ul = resourcesSection.nextElementSibling;
+        if (ul.tagName === 'UL') {
+            // Wrap resources in proper container
+            const container = document.createElement('div');
+            container.className = 'talk-resources';
+            
+            const title = document.createElement('h2');
+            title.textContent = 'Resources';
+            
+            const resourcesList = document.createElement('ul');
+            resourcesList.className = 'resources-list';
+            
+            // Convert existing list items
+            Array.from(ul.children).forEach(li => {
+                const newLi = document.createElement('li');
+                newLi.className = 'resource-link-item';
+                
+                const link = li.querySelector('a');
+                if (link) {
+                    const newLink = document.createElement('a');
+                    newLink.href = link.href;
+                    newLink.target = '_blank';
+                    newLink.rel = 'noopener';
+                    newLink.className = 'resource-link';
+                    
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'resource-title';
+                    titleDiv.textContent = link.textContent;
+                    
+                    newLink.appendChild(titleDiv);
+                    newLi.appendChild(newLink);
+                } else {
+                    newLi.innerHTML = li.innerHTML;
+                }
+                
+                resourcesList.appendChild(newLi);
+            });
+            
+            container.appendChild(title);
+            container.appendChild(resourcesList);
+            
+            // Replace the original section
+            resourcesSection.parentNode.replaceChild(container, resourcesSection);
+            ul.remove();
+        }
+    }
+});
+</script>

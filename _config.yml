@@ -1,0 +1,84 @@
+url: "https://your-username.github.io"
+baseurl: "/shownotes"
+hero_background: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920"
+
+# Jekyll configuration
+markdown: kramdown
+highlighter: rouge
+permalink: /:categories/:title/
+encoding: utf-8
+timezone: UTC
+
+# Kramdown configuration
+kramdown:
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+
+# Collections
+collections:
+  talks:
+    output: true
+    permalink: /talks/:path/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "talks"
+    values:
+      layout: "talk"
+
+# Build settings
+# sass:
+#   style: compressed
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Speaker configuration
+speaker:
+  name: "Your full name"
+  display_name: ""                 # Optional: Override for display (if empty, uses name)
+  bio: "Your bio for the header"
+  avatar_url: ""                   # Optional: Custom avatar URL (fallback if no social media avatars available)
+  # Social media handles (all optional - leave empty to hide)
+  social:
+    linkedin: "your-username"           # Optional: LinkedIn username (generates https://linkedin.com/in/jbaruch)
+    x: "your-username"                 # Optional: X.com username (generates https://x.com/jbaruch)  
+    github: "your-username"            # Optional: GitHub username (generates https://github.com/jbaruch + avatar from GitHub)
+    mastodon: ""                 # Optional: Full Mastodon URL (e.g., "https://mastodon.social/@username")
+    bluesky: "your-username"                  # Optional: BlueSky username (generates https://bsky.app/profile/jbaruch)
+
+# Site metadata (templates will use speaker config)
+title: "Speaker Presentations"
+description: "Conference talk show notes and resources"
+
+# Featured talks configuration
+featured_talks_count: 3
+
+# SEO settings (will use speaker info dynamically)
+# No need for redundant author or twitter config since speaker section provides this
+
+# Exclude from build
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - test/
+  - .bundle/
+  - node_modules/
+  - .git/
+  - README.md
+  - docs/
+
+# Security - Note: safe mode https://drive.google.com/drive/folders/1Q8Auh_XnZtrDsdnKe_rFOnx3mZVhphLn?usp=drive_linkstrips iframes, so disabled for embed functionality
+# safe: true

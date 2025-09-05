@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- SEO -->
+    <title>{% if page.title %}{{ page.title | escape }} - {% endif %}{% if site.speaker.display_name and site.speaker.display_name != "" %}Presentations by {{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}Presentations by {{ site.speaker.name }}{% else %}Presentations{% endif %}</title>
+    <meta name="description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.speaker.bio }}{% endif %}">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% if page.title %}{{ page.title | escape }}{% else %}{% if site.speaker.display_name and site.speaker.display_name != "" %}Presentations by {{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}Presentations by {{ site.speaker.name }}{% else %}Presentations{% endif %}{% endif %}">
+    <meta property="og:description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.speaker.bio }}{% endif %}">
+    <meta property="og:type" content="{% if page.layout == 'talk' %}article{% else %}website{% endif %}">
+    <meta property="og:url" content="{{ page.url | absolute_url }}">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{% if page.title %}{{ page.title | escape }}{% else %}{% if site.speaker.display_name and site.speaker.display_name != "" %}Presentations by {{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}Presentations by {{ site.speaker.name }}{% else %}Presentations{% endif %}{% endif %}">
+    <meta name="twitter:description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.speaker.bio }}{% endif %}">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self' https://www.youtube.com https://docs.google.com https://drive.google.com; connect-src 'self'{% if jekyll.environment == 'development' %} ws://127.0.0.1:35729{% endif %};">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Skip navigation link -->
+    <link rel="icon" href="{{ '/favicon.svg' | relative_url }}" type="image/svg+xml">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header" role="banner">
+        <div class="wrapper">
+            <a class="site-title" href="{{ '/' | relative_url }}" rel="home">{% if site.speaker.display_name and site.speaker.display_name != "" %}{{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}{{ site.speaker.name }}{% else %}Speaker{% endif %} - Presentations</a>
+            
+            {% unless page.url == "/" %}
+            <nav class="site-nav" role="navigation" aria-label="Main navigation">
+                <ul>
+                    <li><a href="{{ '/' | relative_url }}">Home</a></li>
+                </ul>
+            </nav>
+            {% endunless %}
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main id="main-content" class="page-content" role="main">
+        <div class="wrapper">
+            {{ content }}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="wrapper">
+            <p>&copy; {{ 'now' | date: '%Y' }} {% if site.speaker.display_name and site.speaker.display_name != "" %}{{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}{{ site.speaker.name }}{% else %}Speaker{% endif %}. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

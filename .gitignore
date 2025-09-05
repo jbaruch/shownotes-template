@@ -1,0 +1,109 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Google API credentials
+"Google API.json"
+Google API.json
+
+# Build outputs
+dist/
+build/
+_site/
+_site-fixed.html
+.next/
+.nuxt/
+.output/
+
+# Static site generators
+.jekyll-cache/
+.jekyll-metadata
+.cache/
+.vuepress/dist/
+_test_site/
+_perf_test_site/
+
+# Temporary storage (PDFs uploaded to Google Drive)
+pdfs/
+
+# Development helper scripts (use proper test suite instead)
+debug_*.rb
+test_*.rb
+compare_*.rb
+analyze_*.rb
+migrate_talk_*.rb
+*_comparison.rb
+
+# Shell scripts (use Ruby tools instead)
+*.sh
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Coverage
+coverage/
+*.lcov
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+jspm_packages/
+vendor/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# PDFs (will be uploaded to Google Drive)
+pdfs/*.pdf
+
+# Test screenshots (temporary files, not for version control)
+test/screenshots/
+test/**/screenshots/
+
+# Test downloads (temporary test files)
+test_downloads/
+**/test_downloads/

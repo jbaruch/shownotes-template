@@ -1,0 +1,154 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ develop, main ]
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - '_plugins/**'
+      - '_config.yml'
+      - 'Gemfile*'
+      - '_layouts/**'
+      - '_includes/**'
+      - '.github/workflows/**'
+      - 'Rakefile'
+      - '*.rb'
+      - 'utils/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        ruby-version: ['3.4.5']
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby ${{ matrix.ruby-version }}
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true
+    
+    - name: Run unit tests
+      run: bundle exec rake test:unit
+    
+    - name: Run integration tests
+      run: bundle exec rake test:integration
+    
+    - name: Run migration tests
+      run: bundle exec rake test:migration
+
+  performance:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4.5'
+        bundler-cache: true
+    
+    - name: Run performance tests
+      run: bundle exec rake test:performance
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4.5'
+        bundler-cache: true
+    
+    - name: Security scan
+      run: bundle exec bundle-audit
+
+  e2e:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4.5'
+        bundler-cache: true
+    
+    - name: Run E2E tests
+      run: bundle exec rake test:e2e
+
+  tools:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4.5'
+        bundler-cache: true
+    
+    - name: Run tool tests
+      run: bundle exec rake test:tools
+
+  external:
+    runs-on: ubuntu-latest
+    continue-on-error: true  # External tests may fail due to network/API issues
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4.5'
+        bundler-cache: true
+    
+    - name: Run external tests
+      run: bundle exec rake test:external
+      env:
+        # Pass Google API credentials if available (will be empty if secret not set)
+        GOOGLE_API_CREDENTIALS_JSON: ${{ secrets.GOOGLE_API_CREDENTIALS }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [test, security, performance, e2e, tools]  # Note: external tests not required for build
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4.5'
+        bundler-cache: true
+    
+    - name: Build Jekyll site
+      run: |
+        bundle exec jekyll build
+    
+    - name: Test built site
+      run: |
+        test -d _site
+        test -f _site/index.html
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: site-build
+        path: _site/
