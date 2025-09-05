@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/tPC2jl/developer-relations-for-startup-founders -->
+<!-- Source: https://noti.st/jbaruch/tPC2jl/developer-relations-for-startup-founders -->
 # Developer Relations for Startup Founders
 
 **Conference:** The Developer Facing Startup Founders Academy - DevRel Session  

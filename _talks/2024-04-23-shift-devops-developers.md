@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/YRn0ZH/devops-for-developers-or-maybe-against-them -->
+<!-- Source: https://noti.st/jbaruch/YRn0ZH/devops-for-developers-or-maybe-against-them -->
 # DevOps for developers (or maybe against them?!)
 
 **Conference:** Shift  

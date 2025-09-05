@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/9ZjNwA/devops-reframed-embracing-the-path-to-developer-productivity-engineering -->
+<!-- Source: https://noti.st/jbaruch/9ZjNwA/devops-reframed-embracing-the-path-to-developer-productivity-engineering -->
 # DevOps Reframed: Embracing the Path to Developer Productivity Engineering
 
 **Conference:** DevOps Days Buffalo 2023  

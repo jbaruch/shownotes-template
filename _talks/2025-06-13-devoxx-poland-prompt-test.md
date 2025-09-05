@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/OPwAkg/prompt-test-code-a-new-productivity-boost-for-developers -->
+<!-- Source: https://noti.st/jbaruch/OPwAkg/prompt-test-code-a-new-productivity-boost-for-developers -->
 # Prompt-Test-Code: A New Productivity Boost for Developers
 
 **Conference:** Devoxx Poland 2025  

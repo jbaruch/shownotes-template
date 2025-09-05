@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/xZvzKQ/developer-productivity-diy-with-chatgpt-or-how-i-learned-to-stop-worrying-and-love-the-ai -->
+<!-- Source: https://noti.st/jbaruch/xZvzKQ/developer-productivity-diy-with-chatgpt-or-how-i-learned-to-stop-worrying-and-love-the-ai -->
 # Developer Productivity – DIY (with ChatGPT) or How I Learned to Stop Worrying and Love the AI
 
 **Conference:** Devoxx Ukraine 2023  

@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/tjq73m/clean-code-redefined-sonar-and-dpe-what-yes -->
+<!-- Source: https://noti.st/jbaruch/tjq73m/clean-code-redefined-sonar-and-dpe-what-yes -->
 # Clean Code redefined: sonar and dpe. What? Yes.
 
 **Conference:** SonarSouce Brown Bag  

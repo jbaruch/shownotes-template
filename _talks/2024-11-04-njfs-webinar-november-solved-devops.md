@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/xdAEIH/we-solved-devops-whats-next -->
+<!-- Source: https://noti.st/jbaruch/xdAEIH/we-solved-devops-whats-next -->
 # We Solved DevOps. What’s Next?
 
 **Conference:** NJFS Webinar November 2024  

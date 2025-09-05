@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/Ka61OD/improving-the-developer-experience-with-developer-productivity-engineering -->
+<!-- Source: https://noti.st/jbaruch/Ka61OD/improving-the-developer-experience-with-developer-productivity-engineering -->
 # Improving the Developer Experience with Developer Productivity Engineering
 
 **Conference:** Developer Week 2024  

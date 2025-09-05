@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/Fyul9t/devops-reframed-embracing-the-path-to-developer-productivity-engineering -->
+<!-- Source: https://noti.st/jbaruch/Fyul9t/devops-reframed-embracing-the-path-to-developer-productivity-engineering -->
 # DevOps Reframed: Embracing the Path to Developer Productivity Engineering
 
 **Conference:** NFJS Webinar September 2023  

@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/d0om9h/engineering-success-the-managers-guide-to-boosting-developer-productivity -->
+<!-- Source: https://noti.st/jbaruch/d0om9h/engineering-success-the-managers-guide-to-boosting-developer-productivity -->
 # Engineering Success: The Manager’s Guide to Boosting Developer Productivity
 
 **Conference:** Tech Leadership Summit 2023  

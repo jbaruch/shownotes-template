@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/L9elPq/codepocalypse-now-langchain4j-vs-spring-ai -->
+<!-- Source: https://noti.st/jbaruch/L9elPq/codepocalypse-now-langchain4j-vs-spring-ai -->
 # Codepocalypse Now: LangChain4j vs. Spring AI
 
 **Conference:** J-Spring 2025  

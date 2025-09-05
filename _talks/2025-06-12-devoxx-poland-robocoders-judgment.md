@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/PjlHKD/robocoders-judgment-day-ai-ides-face-off -->
+<!-- Source: https://noti.st/jbaruch/PjlHKD/robocoders-judgment-day-ai-ides-face-off -->
 # RoboCoders: Judgment Day – AI IDEs Face Off
 
 **Conference:** Devoxx Poland 2025  

@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/UrWlWU/surviving-the-techpocalypse-empowering-survivors-with-developer-productivity-engineering -->
+<!-- Source: https://noti.st/jbaruch/UrWlWU/surviving-the-techpocalypse-empowering-survivors-with-developer-productivity-engineering -->
 # Surviving the Techpocalypse: Empowering Survivors with Developer Productivity Engineering
 
 **Conference:** DevOps Days Tel Aviv 2024  

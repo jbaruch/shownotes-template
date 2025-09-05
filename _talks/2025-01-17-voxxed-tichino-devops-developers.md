@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/7y4wIa/devops-for-developers-or-maybe-against-them -->
+<!-- Source: https://noti.st/jbaruch/7y4wIa/devops-for-developers-or-maybe-against-them -->
 # DevOps for developers (or maybe against them?!)
 
 **Conference:** Voxxed Days Tichino 2025  

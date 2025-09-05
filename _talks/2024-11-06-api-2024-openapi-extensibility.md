@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/l874wi/openapi-extensibility-the-good-the-bad-and-the-yamly -->
+<!-- Source: https://noti.st/jbaruch/l874wi/openapi-extensibility-the-good-the-bad-and-the-yamly -->
 # OpenAPI Extensibility - The Good, The Bad and The YAMLy
 
 **Conference:** API:World 2024  

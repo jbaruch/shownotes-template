@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/lF50gm/influencing-devops-without-authority-how-devops-engineer-can-advance-real-devops -->
+<!-- Source: https://noti.st/jbaruch/lF50gm/influencing-devops-without-authority-how-devops-engineer-can-advance-real-devops -->
 # Influencing DevOps without Authority - how “DevOps engineer” can advance real DevOps
 
 **Conference:** DevOps Vision 2023  

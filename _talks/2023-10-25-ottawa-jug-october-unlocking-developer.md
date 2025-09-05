@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/C8ostF/unlocking-developer-productivity-a-dual-perspective-on-best-practices-testing -->
+<!-- Source: https://noti.st/jbaruch/C8ostF/unlocking-developer-productivity-a-dual-perspective-on-best-practices-testing -->
 # Unlocking Developer Productivity: A Dual Perspective on Best Practices & Testing
 
 **Conference:** Ottawa JUG, October 2023  

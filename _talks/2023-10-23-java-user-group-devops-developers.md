@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/y0d1sG/devops-for-developers-or-maybe-against-them -->
+<!-- Source: https://noti.st/jbaruch/y0d1sG/devops-for-developers-or-maybe-against-them -->
 # DevOps for developers (or maybe against them?!)
 
 **Conference:** Java User Group Québec Meeting October 2023  

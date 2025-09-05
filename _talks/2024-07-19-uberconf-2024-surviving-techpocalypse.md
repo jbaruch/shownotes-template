@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/gSN6WP/surviving-the-techpocalypse-empowering-survivors-with-developer-productivity-engineering -->
+<!-- Source: https://noti.st/jbaruch/gSN6WP/surviving-the-techpocalypse-empowering-survivors-with-developer-productivity-engineering -->
 # Surviving the Techpocalypse: Empowering Survivors with Developer Productivity Engineering
 
 **Conference:** UberConf 2024  

@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/wtopGc/developer-are-the-rainmakers -->
+<!-- Source: https://noti.st/jbaruch/wtopGc/developer-are-the-rainmakers -->
 # Developer Are the Rainmakers
 
 **Conference:** Developer Week 2024  

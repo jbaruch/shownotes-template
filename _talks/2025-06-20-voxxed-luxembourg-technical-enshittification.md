@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/V8R94I/technical-enshittification-why-everything-in-it-is-horrible-right-now-and-how-to-fix-it -->
+<!-- Source: https://noti.st/jbaruch/V8R94I/technical-enshittification-why-everything-in-it-is-horrible-right-now-and-how-to-fix-it -->
 # Technical Enshittification: Why Everything in IT is Horrible Right Now and How to Fix It
 
 **Conference:** Voxxed Days Luxembourg 2025  

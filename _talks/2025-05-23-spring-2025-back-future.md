@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/RwiRvR/back-to-the-future-of-software-how-to-survive-ai-with-intent-integrity-chain -->
+<!-- Source: https://noti.st/jbaruch/RwiRvR/back-to-the-future-of-software-how-to-survive-ai-with-intent-integrity-chain -->
 # Back to the Future of Software: How to Survive AI with Intent Integrity Chain
 
 **Conference:** Spring I/O 2025  

@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/yaBltt/prompt-driven-development-aligning-ideas-tests-and-code -->
+<!-- Source: https://noti.st/jbaruch/yaBltt/prompt-driven-development-aligning-ideas-tests-and-code -->
 # Prompt-Driven Development:Aligning Ideas, Tests, and Code
 
 **Conference:** IJ Conference 2025  

@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/KutsVw/technical-enshittification-why-everything-in-it-is-horrible-right-now-and-how-to-fix-it -->
+<!-- Source: https://noti.st/jbaruch/KutsVw/technical-enshittification-why-everything-in-it-is-horrible-right-now-and-how-to-fix-it -->
 # Technical Enshittification: Why Everything in IT is Horrible Right Now and How to Fix It
 
 **Conference:** JCON 2025  

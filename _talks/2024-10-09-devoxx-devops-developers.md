@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/BpunVF/devops-for-developers-or-maybe-against-them -->
+<!-- Source: https://noti.st/jbaruch/BpunVF/devops-for-developers-or-maybe-against-them -->
 # DevOps for developers (or maybe against them?!)
 
 **Conference:** Devoxx  

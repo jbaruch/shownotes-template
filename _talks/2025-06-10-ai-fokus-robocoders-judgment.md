@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/mbT7c6/robocoders-judgment-day-ai-ides-face-off -->
+<!-- Source: https://noti.st/jbaruch/mbT7c6/robocoders-judgment-day-ai-ides-face-off -->
 # RoboCoders: Judgment Day – AI IDEs Face Off
 
 **Conference:** AI Fokus  

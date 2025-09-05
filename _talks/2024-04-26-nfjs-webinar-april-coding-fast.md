@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/pqGGv6/coding-fast-and-slow-applying-kahnemans-insights-to-improve-development-practices-and-efficiency -->
+<!-- Source: https://noti.st/jbaruch/pqGGv6/coding-fast-and-slow-applying-kahnemans-insights-to-improve-development-practices-and-efficiency -->
 # Coding Fast and Slow: Applying Kahneman’s Insights to Improve Development Practices and Efficiency
 
 **Conference:** NFJS Webinar April 2024  

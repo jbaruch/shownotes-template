@@ -2,7 +2,7 @@
 layout: talk
 ---
 
-<!-- Source: https://speaking.jbaru.ch/wjMveW/coding-fast-and-slow-applying-kahnemans-insights-to-improve-development-practices-and-efficiency -->
+<!-- Source: https://noti.st/jbaruch/wjMveW/coding-fast-and-slow-applying-kahnemans-insights-to-improve-development-practices-and-efficiency -->
 # Coding Fast and Slow: Applying Kahneman’s Insights to Improve Development Practices and Efficiency
 
 **Conference:** Geecon  
