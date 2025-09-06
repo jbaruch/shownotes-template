@@ -427,6 +427,9 @@ a:hover {
     border: 1px solid rgba(99, 102, 241, 0.25) !important;
     font-weight: 700 !important;
     text-transform: none !important;
+    padding: var(--space-2) var(--space-4) !important;
+    border-radius: var(--radius-md) !important;
+    letter-spacing: 0.025em !important;
 }
 
 .meta-item.status-badge.video-pending {
@@ -435,6 +438,9 @@ a:hover {
     border: 1px solid rgba(99, 102, 241, 0.25) !important;
     font-weight: 700 !important;
     text-transform: none !important;
+    padding: var(--space-2) var(--space-4) !important;
+    border-radius: var(--radius-md) !important;
+    letter-spacing: 0.025em !important;
 }
 
 .talk-description {
@@ -1936,8 +1942,9 @@ pre code {
     }
     
     .talk-meta {
-        flex-direction: column;
-        gap: var(--space-3);
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-2);
     }
     
     .talk-header,
@@ -2001,6 +2008,13 @@ pre code {
     .resource-group h3,
     .resource-link {
         padding: var(--space-3) var(--space-4);
+    }
+}
+
+/* Hide thumbnails on very small screens */
+@media (max-width: 400px) {
+    .talk-thumbnail {
+        display: none;
     }
 }
 
