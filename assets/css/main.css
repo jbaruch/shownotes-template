@@ -2012,7 +2012,7 @@ pre code {
 }
 
 /* Hide thumbnails on very small screens */
-@media (max-width: 400px) {
+@media (max-width: 500px) {
     .talk-thumbnail {
         display: none;
     }
