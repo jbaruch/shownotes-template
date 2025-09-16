@@ -6,7 +6,8 @@ layout: talk
 
 **Conference:** Infobip Shift Zadar 2025  
 **Date:** 2025-09-15  
-**Slides:** [View Slides](https://drive.google.com/file/d/1NNpqDagBVYdOQQey7-2TuKgHf79hXQ-t/view)  
+**Slides:** [View Slides](https://drive.google.com/file/d/1NNpqDagBVYdOQQey7-2TuKgHf79hXQ-t/view)
+**Video:** [Watch Video](https://www.youtube.com/watch?v=stUY2oJU0Ew)  
 
 A presentation at Infobip Shift in
                     September 2025 in
