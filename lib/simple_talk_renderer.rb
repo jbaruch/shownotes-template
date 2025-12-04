@@ -3,9 +3,15 @@
 require 'liquid'
 require 'kramdown'
 require 'yaml'
+require_relative 'utils/html_sanitizer'
+require_relative 'utils/url_validator'
+require_relative 'utils/date_validator'
 
 # Simple talk rendering functionality without complex dependencies  
 class SimpleTalkRenderer
+  include HtmlSanitizer
+  include UrlValidator
+  include DateValidator
   # Generate talk page HTML from talk data
   def generate_talk_page(talk_data)
     # Register custom filters
@@ -263,29 +269,8 @@ class SimpleTalkRenderer
 
   private
   
-  # Check if date string is valid
-  def valid_date?(date_string)
-    return false unless date_string.is_a?(String)
-    return false unless date_string.match?(/^\d{4}-\d{2}-\d{2}$/)
-    
-    # Parse and validate the date
-    year, month, day = date_string.split('-').map(&:to_i)
-    return false if month < 1 || month > 12
-    return false if day < 1 || day > 31
-    
-    # Check for valid month/day combinations
-    case month
-    when 2
-      leap_year = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
-      return false if day > (leap_year ? 29 : 28)
-    when 4, 6, 9, 11
-      return false if day > 30
-    end
-    
-    true
-  rescue
-    false
-  end
+  # valid_date? method now provided by DateValidator module
+  # (kept as comment for reference - actual implementation in lib/utils/date_validator.rb)
 
   # Register custom Liquid filters
   def register_liquid_filters
@@ -359,7 +344,8 @@ class SimpleTalkRenderer
     sanitized
   end
 
-  # HTML escape dangerous characters and remove dangerous patterns
+  # html_escape method - now uses escape_html from HtmlSanitizer module
+  # This wrapper maintains backward compatibility with existing code
   def html_escape(text)
     sanitized = text.to_s
     
@@ -369,25 +355,19 @@ class SimpleTalkRenderer
     # Remove dangerous event handler attributes
     sanitized = sanitized.gsub(/\s*on\w+\s*=/i, '')
     
-    # HTML escape remaining characters
-    sanitized.gsub('&', '&amp;')
-            .gsub('<', '&lt;')
-            .gsub('>', '&gt;')
-            .gsub('"', '&quot;')
-            .gsub("'", '&#x27;')
+    # Use HtmlSanitizer's escape_html for the actual escaping
+    escape_html(sanitized)
   end
 
   # Sanitize URLs to remove dangerous protocols
   def sanitize_url(url)
     return '' unless url.is_a?(String)
     
-    # Remove any javascript: or data: protocols
-    if url.match?(/^javascript:/i) || url.match?(/^data:/i)
-      return ''
-    end
+    # Use UrlValidator's safe_url? method
+    return '' unless safe_url?(url)
     
-    # HTML escape the URL
-    html_escape(url)
+    # Use HtmlSanitizer's escape_html for the actual escaping
+    escape_html(url)
   end
 
   # Fix code block classes to match test expectations

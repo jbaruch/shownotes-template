@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative 'utils/html_sanitizer'
+require_relative 'utils/url_validator'
+
 begin
   require 'jekyll'
   require 'liquid'
@@ -71,6 +74,9 @@ end
 
 # Talk rendering functionality for Jekyll integration
 class TalkRenderer
+  include HtmlSanitizer
+  include UrlValidator
+  
   def initialize
     @site = nil
     setup_jekyll_site
@@ -234,15 +240,9 @@ class TalkRenderer
     
     return '' if url.nil? || url.empty?
     
-    # Security: validate URL is safe for linking
-    unless url.match?(/^https?:\/\//)
-      return ''
-    end
-    
-    # Security: reject URLs containing malicious content
-    if url.include?('<script>') || url.include?('javascript:') || url.include?('alert(')
-      return ''
-    end
+    # Security: validate URL is safe for linking using UrlValidator
+    return '' unless http_or_https?(url)
+    return '' unless safe_url?(url)
     
     escaped_url = escape_html(url)
     escaped_title = escape_html(title)
@@ -256,11 +256,8 @@ class TalkRenderer
     HTML
   end
 
-  # HTML escape utility
-  def escape_html(text)
-    return '' if text.nil?
-    text.to_s.gsub('&', '&amp;').gsub('<', '&lt;').gsub('>', '&gt;').gsub('"', '&quot;').gsub("'", '&#x27;')
-  end
+  # HTML escape utility - now provided by HtmlSanitizer module
+  # (kept as comment for reference - actual implementation in lib/utils/html_sanitizer.rb)
 
   # Extract HTML section by CSS class
   def extract_section(html, css_class)
@@ -579,8 +576,6 @@ class TalkRenderer
     Kramdown::Document.new(content).to_html
   end
 
-  def sanitize_html(html)
-    # Basic XSS protection - escape script tags
-    html.gsub(/<script[^>]*>.*?<\/script>/mi, '&lt;script&gt;alert(\'xss\')&lt;/script&gt;')
-  end
+  # sanitize_html method now provided by HtmlSanitizer module
+  # (kept as comment for reference - actual implementation in lib/utils/html_sanitizer.rb)
 end
