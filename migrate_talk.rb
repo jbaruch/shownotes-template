@@ -16,8 +16,14 @@ require 'date'
 require 'google/apis/drive_v3'
 require 'googleauth'
 require 'optparse'
+require_relative 'lib/utils/url_validator'
+require_relative 'lib/utils/date_validator'
+require_relative 'lib/utils/filename_generator'
 
 class TalkMigrator
+  include UrlValidator
+  include DateValidator
+  include FilenameGenerator
   
   def initialize(talk_url, skip_tests: false)
     @talk_url = talk_url
@@ -254,11 +260,12 @@ class TalkMigrator
     # First extract from time[datetime] element which is most reliable
     time_elem = @doc.css('time[datetime]').first
     if time_elem && time_elem['datetime']
-      begin
-        @talk_data[:date] = Date.parse(time_elem['datetime']).strftime("%Y-%m-%d")
+      parsed_date = parse_date(time_elem['datetime'])
+      if parsed_date
+        @talk_data[:date] = parsed_date
         puts "SUCCESS Date extracted from datetime attribute: #{@talk_data[:date]}"
-      rescue => e
-        puts "❌ Failed to parse datetime attribute: #{e.message}"
+      else
+        puts "❌ Failed to parse datetime attribute"
       end
     end
     
@@ -280,8 +287,11 @@ class TalkMigrator
         begin
           json_data = JSON.parse(script.content)
           if json_data['datePublished'] && !@talk_data[:date]
-            @talk_data[:date] = Date.parse(json_data['datePublished']).strftime("%Y-%m-%d")
-            puts "SUCCESS Date extracted from JSON-LD: #{@talk_data[:date]}"
+            parsed_date = parse_date(json_data['datePublished'])
+            if parsed_date
+              @talk_data[:date] = parsed_date
+              puts "SUCCESS Date extracted from JSON-LD: #{@talk_data[:date]}"
+            end
           end
           if json_data.dig('publication', 'name') && !@talk_data[:conference]
             @talk_data[:conference] = json_data['publication']['name']
@@ -597,31 +607,9 @@ class TalkMigrator
   def generate_jekyll_file
     puts "\n6️⃣ Generating Jekyll file..."
     
-    # Generate filename with intelligent length management
-    date_part = @talk_data[:date]
-    
-    # Smart conference slug generation - extract key terms
-    conference_slug = generate_smart_conference_slug(@talk_data[:conference])
-    
-    # Smart title slug generation - extract key terms
-    title_slug = generate_smart_title_slug(@talk_data[:title])
-    
-    # Ensure reasonable total length (prefer under 80 characters)
-    base_length = date_part.length + 1 + conference_slug.length + 1 + 3  # date + - + conference + - + .md
-    available_for_title = 75 - base_length  # Leave some buffer
-    
-    if title_slug.length > available_for_title && available_for_title > 15
-      # Truncate at word boundary
-      truncated = title_slug[0...available_for_title]
-      last_dash = truncated.rindex('-')
-      if last_dash && last_dash > available_for_title * 0.6
-        title_slug = truncated[0...last_dash]
-      else
-        title_slug = truncated.gsub(/-+$/, '')
-      end
-    end
-    
-    @jekyll_file = "_talks/#{date_part}-#{conference_slug}-#{title_slug}.md"
+    # Generate filename using FilenameGenerator utility
+    filename = generate_talk_filename(@talk_data[:date], @talk_data[:conference], @talk_data[:title])
+    @jekyll_file = "_talks/#{filename}"
     
     # Generate minimal YAML front matter (clean format)
     yaml_data = {
@@ -1074,10 +1062,8 @@ class TalkMigrator
   end
 
   def generate_pdf_filename
-    date_part = @talk_data[:date]
-    conference_slug = @talk_data[:conference].downcase.gsub(/[^a-z0-9]+/, '-')
-    title_slug = @talk_data[:title].downcase.gsub(/[^a-z0-9]+/, '-')[0..30]
-    "#{date_part}-#{conference_slug}-#{title_slug}.pdf"
+    # Generate PDF filename using FilenameGenerator utility
+    generate_talk_filename(@talk_data[:date], @talk_data[:conference], @talk_data[:title], extension: '.pdf')
   end
   
   def download_file(url, local_path)
@@ -1200,13 +1186,8 @@ class TalkMigrator
   end
   
   def generate_talk_slug
-    # Generate a slug similar to the Jekyll filename
-    date_part = @talk_data[:date]
-    conference_slug = generate_smart_conference_slug(@talk_data[:conference])
-    title_slug = generate_smart_title_slug(@talk_data[:title])
-    
-    # Combine parts to create a consistent slug
-    "#{date_part}-#{conference_slug}-#{title_slug}"
+    # Generate a slug using FilenameGenerator utility (without extension)
+    generate_talk_filename(@talk_data[:date], @talk_data[:conference], @talk_data[:title], extension: '')
   end
   
   def setup_google_drive_service
@@ -1344,10 +1325,9 @@ class TalkMigrator
     
     # Add location and date information if available
     if @talk_data[:location] && !@talk_data[:location].empty?
-      # Extract date parts for readable format
-      begin
-        date_obj = Date.parse(@talk_data[:date])
-        month_year = date_obj.strftime("%B %Y")
+      # Extract date parts for readable format using DateValidator
+      month_year = format_date(@talk_data[:date], "%B %Y")
+      if month_year
         
         context += " in\n"
         context += "                    #{month_year} in\n"
@@ -1423,6 +1403,10 @@ class TalkMigrator
 end
 
 class SpeakerMigrator
+  include UrlValidator
+  include DateValidator
+  include FilenameGenerator
+  
   def initialize(speaker_url)
     @speaker_url = speaker_url
     @migrated_talks = []
@@ -1786,8 +1770,9 @@ if __FILE__ == $0
   
   url = ARGV[0]
   
-  # Validate URL format
-  unless url.match?(/^https?:\/\//)
+  # Validate URL format using UrlValidator
+  validator = Object.new.extend(UrlValidator)
+  unless validator.http_or_https?(url)
     puts "Error: URL must start with http:// or https://"
     exit 1
   end
