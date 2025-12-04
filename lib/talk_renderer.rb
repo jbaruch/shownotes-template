@@ -110,11 +110,6 @@ class TalkRenderer
     url.match?(/docs\.google\.com\/presentation\/d\//)
   end
 
-  # Check if URL is YouTube
-  def youtube_url?(url)
-    url.match?(/(?:youtube\.com\/watch\?v=|youtu\.be\/|m\.youtube\.com\/watch\?v=)/)
-  end
-
   # Convert URL to embed format
   def convert_to_embed_url(url)
     return url unless embeddable_url?(url)
