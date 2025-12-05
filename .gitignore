@@ -107,3 +107,7 @@ test/**/screenshots/
 # Test downloads (temporary test files)
 test_downloads/
 **/test_downloads/
+
+# Test output files (baseline comparisons, coverage reports)
+test_baseline_output.txt
+*_baseline_output.txt
