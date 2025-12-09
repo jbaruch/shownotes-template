@@ -231,7 +231,7 @@ class UrlValidatorTest < Minitest::Test
   end
   
   def test_notist_url_with_speaking_domain
-    assert notist_url?('https://speaking.jbaru.ch/abc123')
+    assert notist_url?('https://example.com/abc123')
   end
   
   def test_notist_url_with_notist_ninja

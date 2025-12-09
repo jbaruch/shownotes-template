@@ -25,7 +25,7 @@ Main migration script for converting talks from noti.st to Jekyll format.
 **Usage:**
 ```bash
 cd utils/migration
-ruby migrate_talk.rb https://speaking.jbaru.ch/TALK_ID
+ruby migrate_talk.rb https://noti.st/yourname/TALK_ID
 ```
 
 **Features:**
