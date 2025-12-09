@@ -19,31 +19,59 @@ module Jekyll
 
   class MarkdownTalkProcessor < Generator
     safe true
-    priority :high
+    priority :highest
 
     def generate(site)
+      Jekyll.logger.info "MarkdownTalkProcessor:", "Starting plugin execution in #{Jekyll.env} environment"
+      
       talks_collection = site.collections['talks']
       if talks_collection && talks_collection.docs
+        Jekyll.logger.info "MarkdownTalkProcessor:", "Found #{talks_collection.docs.size} talks to process"
+        
         talks_collection.docs.each do |doc|
-          content = doc.content
-          
-          # Extract metadata from markdown content
-          doc.data['extracted_title'] = extract_title_from_content(content)
-          doc.data['extracted_conference'] = extract_metadata_from_content(content, 'conference')
-          doc.data['extracted_date'] = extract_metadata_from_content(content, 'date')
-          doc.data['extracted_slides'] = extract_metadata_from_content(content, 'slides')
-          doc.data['extracted_video'] = extract_metadata_from_content(content, 'video')
-          # Only extract description from content if not already in front matter
-          if !doc.data['extracted_description'] || doc.data['extracted_description'].empty?
-            doc.data['extracted_description'] = extract_description_from_content(content)
+          begin
+            Jekyll.logger.debug "MarkdownTalkProcessor:", "Processing #{doc.path}"
+            content = doc.content
+            
+            # Extract metadata from markdown content
+            doc.data['extracted_title'] = extract_title_from_content(content)
+            doc.data['extracted_conference'] = extract_metadata_from_content(content, 'conference')
+            doc.data['extracted_date'] = extract_metadata_from_content(content, 'date')
+            doc.data['extracted_slides'] = extract_metadata_from_content(content, 'slides')
+            doc.data['extracted_video'] = extract_metadata_from_content(content, 'video')
+            # Only extract description from content if not already in front matter
+            if !doc.data['extracted_description'] || doc.data['extracted_description'].empty?
+              doc.data['extracted_description'] = extract_description_from_content(content)
+            end
+            # Extract abstract from content if not in front matter
+            if !doc.data['extracted_abstract'] || doc.data['extracted_abstract'].empty?
+              doc.data['extracted_abstract'] = extract_abstract_from_content(content)
+            end
+            doc.data['extracted_resources'] = extract_resources_from_content(content)
+            doc.data['extracted_presentation_context'] = extract_and_process_presentation_context(content, site)
+            
+            Jekyll.logger.debug "MarkdownTalkProcessor:", "Extracted title: #{doc.data['extracted_title']}"
+            Jekyll.logger.debug "MarkdownTalkProcessor:", "Extracted conference: #{doc.data['extracted_conference']}"
+          rescue => e
+            Jekyll.logger.error "MarkdownTalkProcessor:", "Failed to process #{doc.path}: #{e.message}"
+            Jekyll.logger.error "MarkdownTalkProcessor:", e.backtrace.join("\n")
+            
+            # Set fallback values to prevent template errors
+            doc.data['extracted_title'] ||= doc.data['title'] || 'Untitled Talk'
+            doc.data['extracted_conference'] ||= 'Unknown Conference'
+            doc.data['extracted_date'] ||= ''
+            doc.data['extracted_slides'] ||= ''
+            doc.data['extracted_video'] ||= ''
+            doc.data['extracted_description'] ||= ''
+            doc.data['extracted_abstract'] ||= ''
+            doc.data['extracted_resources'] ||= ''
+            doc.data['extracted_presentation_context'] ||= ''
           end
-          # Extract abstract from content if not in front matter
-          if !doc.data['extracted_abstract'] || doc.data['extracted_abstract'].empty?
-            doc.data['extracted_abstract'] = extract_abstract_from_content(content)
-          end
-          doc.data['extracted_resources'] = extract_resources_from_content(content)
-          doc.data['extracted_presentation_context'] = extract_and_process_presentation_context(content, site)
         end
+        
+        Jekyll.logger.info "MarkdownTalkProcessor:", "Successfully processed #{talks_collection.docs.size} talks"
+      else
+        Jekyll.logger.warn "MarkdownTalkProcessor:", "No talks collection found or collection is empty"
       end
 
       # Add convenience method for accessing talks collection
