@@ -11,6 +11,9 @@ class UserWorkflowTest < Minitest::Test
   include Capybara::Minitest::Assertions
 
   def setup
+    # Skip all E2E tests if no talks exist (template state)
+    skip_if_no_talks
+    
     setup_capybara
     start_test_server
   end
@@ -180,6 +183,16 @@ class UserWorkflowTest < Minitest::Test
   end
 
   private
+
+  def skip_if_no_talks
+    # Check if any talks exist in _talks directory
+    talks_dir = File.join(File.dirname(__FILE__), '..', '..', '..', '_talks')
+    talk_files = Dir.glob(File.join(talks_dir, '*.md'))
+    
+    if talk_files.empty?
+      skip "No talks found in _talks/ directory. E2E tests require at least one talk. This is expected for the template repository."
+    end
+  end
 
   def setup_capybara
     # Configure Capybara for browser automation with fallback
