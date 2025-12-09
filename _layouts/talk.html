@@ -7,37 +7,62 @@ layout: default
     <nav class="breadcrumb" role="navigation" aria-label="Breadcrumb">
         <ol>
             <li><a href="{{ '/' | relative_url }}">Home</a></li>
-            <li aria-current="page">{{ page.extracted_title | default: page.title }}</li>
+            {% if page.extracted_title %}
+            <li aria-current="page">{{ page.extracted_title }}</li>
+            {% else %}
+            {% comment %}Humanize slugified title as fallback{% endcomment %}
+            <li aria-current="page">{{ page.title | replace: "-", " " | capitalize }}</li>
+            {% endif %}
         </ol>
     </nav>
 
     <!-- Talk header -->
     <header class="talk-header">
-        <h1 class="talk-title" itemprop="name">{{ page.extracted_title | default: page.title }}</h1>
-        
+        {% comment %}
+        WARNING: If extracted_title is missing, falling back to page.title (slugified filename).
+        This indicates the markdown parser plugin may not be running correctly.
+        {% endcomment %}
+        {% assign display_title = page.extracted_title | default: page.title %}
+        {% if page.extracted_title %}
+        <h1 class="talk-title" itemprop="name">{{ display_title }}</h1>
+        {% else %}
+        {% comment %}Humanize slugified title as fallback{% endcomment %}
+        <h1 class="talk-title" itemprop="name">{{ display_title | replace: "-", " " | capitalize }}</h1>
+        {% endif %}
+
         <div class="talk-meta">
-                                    {% if page.extracted_conference %}
-                        <span class="meta-item conference-name">
-                            📍 {{ page.extracted_conference }}
-                        </span>
-                        {% endif %}
-                        {% if page.extracted_date %}
-                        <time class="meta-item date" datetime="{{ page.extracted_date | date_to_xmlschema }}">
-                            📅 {{ page.extracted_date | date: "%B %d, %Y" }}
-                        </time>
-                        {% endif %}
-                        {% comment %} Video publication status - consistent across all views {% endcomment %}
-                        {% if page.extracted_video %}
-                            <span class="meta-item status-badge video-published">
-                                🎥 Video Available
-                            </span>
-                        {% else %}
-                            <span class="meta-item status-badge video-pending">
-                                ⏳ Video Coming Soon
-                            </span>
-                        {% endif %}
+            {% if page.extracted_conference %}
+            <span class="meta-item conference-name">
+                📍 {{ page.extracted_conference }}
+            </span>
+            {% elsif page.conference %}
+            {% comment %}WARNING: Using frontmatter conference as fallback{% endcomment %}
+            <span class="meta-item conference-name">
+                📍 {{ page.conference }}
+            </span>
+            {% endif %}
+            {% if page.extracted_date %}
+            <time class="meta-item date" datetime="{{ page.extracted_date | date_to_xmlschema }}">
+                📅 {{ page.extracted_date | date: "%B %d, %Y" }}
+            </time>
+            {% elsif page.date %}
+            {% comment %}WARNING: Using page date as fallback{% endcomment %}
+            <time class="meta-item date" datetime="{{ page.date | date_to_xmlschema }}">
+                📅 {{ page.date | date: "%B %d, %Y" }}
+            </time>
+            {% endif %}
+            {% comment %} Video publication status - consistent across all views {% endcomment %}
+            {% if page.extracted_video %}
+            <span class="meta-item status-badge video-published">
+                🎥 Video Available
+            </span>
+            {% else %}
+            <span class="meta-item status-badge video-pending">
+                ⏳ Video Coming Soon
+            </span>
+            {% endif %}
         </div>
-        
+
     </header>
 
 
@@ -67,25 +92,25 @@ layout: default
     <!-- Talk content -->
     <section class="talk-content">
         {% if page.extracted_presentation_context %}
-            <div class="talk-presentation-context">
-                {{ page.extracted_presentation_context }}
-            </div>
+        <div class="talk-presentation-context">
+            {{ page.extracted_presentation_context }}
+        </div>
         {% endif %}
-        
+
         {% if page.extracted_abstract %}
-            <div class="talk-abstract">
-                <h2>Abstract</h2>
-                {{ page.extracted_abstract | markdownify }}
-            </div>
+        <div class="talk-abstract">
+            <h2>Abstract</h2>
+            {{ page.extracted_abstract | markdownify }}
+        </div>
         {% endif %}
-        
+
         {% if page.extracted_resources and page.extracted_resources != "" %}
-            <div class="talk-resources">
-                <h2>Resources</h2>
-                <div class="resources-list">
-                    {{ page.extracted_resources | markdownify }}
-                </div>
+        <div class="talk-resources">
+            <h2>Resources</h2>
+            <div class="resources-list">
+                {{ page.extracted_resources | markdownify }}
             </div>
+        </div>
         {% endif %}
     </section>
 
@@ -113,64 +138,64 @@ layout: default
 
 <!-- Resource enhancement script -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add target="_blank" to external links
-    const links = document.querySelectorAll('a[href^="http"]');
-    links.forEach(link => {
-        if (!link.hasAttribute('target')) {
-            link.setAttribute('target', '_blank');
-            link.setAttribute('rel', 'noopener');
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add target="_blank" to external links
+        const links = document.querySelectorAll('a[href^="http"]');
+        links.forEach(link => {
+            if (!link.hasAttribute('target')) {
+                link.setAttribute('target', '_blank');
+                link.setAttribute('rel', 'noopener');
+            }
+        });
+
+        // Enhance resources section formatting
+        const resourcesSection = document.querySelector('#resources');
+        if (resourcesSection && resourcesSection.nextElementSibling) {
+            const ul = resourcesSection.nextElementSibling;
+            if (ul.tagName === 'UL') {
+                // Wrap resources in proper container
+                const container = document.createElement('div');
+                container.className = 'talk-resources';
+
+                const title = document.createElement('h2');
+                title.textContent = 'Resources';
+
+                const resourcesList = document.createElement('ul');
+                resourcesList.className = 'resources-list';
+
+                // Convert existing list items
+                Array.from(ul.children).forEach(li => {
+                    const newLi = document.createElement('li');
+                    newLi.className = 'resource-link-item';
+
+                    const link = li.querySelector('a');
+                    if (link) {
+                        const newLink = document.createElement('a');
+                        newLink.href = link.href;
+                        newLink.target = '_blank';
+                        newLink.rel = 'noopener';
+                        newLink.className = 'resource-link';
+
+                        const titleDiv = document.createElement('div');
+                        titleDiv.className = 'resource-title';
+                        titleDiv.textContent = link.textContent;
+
+                        newLink.appendChild(titleDiv);
+                        newLi.appendChild(newLink);
+                    } else {
+                        newLi.innerHTML = li.innerHTML;
+                    }
+
+                    resourcesList.appendChild(newLi);
+                });
+
+                container.appendChild(title);
+                container.appendChild(resourcesList);
+
+                // Replace the original section
+                resourcesSection.parentNode.replaceChild(container, resourcesSection);
+                ul.remove();
+            }
         }
     });
-    
-    // Enhance resources section formatting
-    const resourcesSection = document.querySelector('#resources');
-    if (resourcesSection && resourcesSection.nextElementSibling) {
-        const ul = resourcesSection.nextElementSibling;
-        if (ul.tagName === 'UL') {
-            // Wrap resources in proper container
-            const container = document.createElement('div');
-            container.className = 'talk-resources';
-            
-            const title = document.createElement('h2');
-            title.textContent = 'Resources';
-            
-            const resourcesList = document.createElement('ul');
-            resourcesList.className = 'resources-list';
-            
-            // Convert existing list items
-            Array.from(ul.children).forEach(li => {
-                const newLi = document.createElement('li');
-                newLi.className = 'resource-link-item';
-                
-                const link = li.querySelector('a');
-                if (link) {
-                    const newLink = document.createElement('a');
-                    newLink.href = link.href;
-                    newLink.target = '_blank';
-                    newLink.rel = 'noopener';
-                    newLink.className = 'resource-link';
-                    
-                    const titleDiv = document.createElement('div');
-                    titleDiv.className = 'resource-title';
-                    titleDiv.textContent = link.textContent;
-                    
-                    newLink.appendChild(titleDiv);
-                    newLi.appendChild(newLink);
-                } else {
-                    newLi.innerHTML = li.innerHTML;
-                }
-                
-                resourcesList.appendChild(newLi);
-            });
-            
-            container.appendChild(title);
-            container.appendChild(resourcesList);
-            
-            // Replace the original section
-            resourcesSection.parentNode.replaceChild(container, resourcesSection);
-            ul.remove();
-        }
-    }
-});
 </script>

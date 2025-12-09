@@ -111,3 +111,6 @@ test_downloads/
 # Test output files (baseline comparisons, coverage reports)
 test_baseline_output.txt
 *_baseline_output.txt
+
+# Template files (not for production)
+_talks/sample-talk.md
