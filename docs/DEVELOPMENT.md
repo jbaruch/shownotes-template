@@ -235,6 +235,80 @@ bundle exec ruby test/run_tests.rb
 - Verify test data is current and valid
 - Review test logs for specific failure causes
 
+**Markdown Parser Plugin Issues**
+
+The markdown parser plugin (`_plugins/markdown_parser.rb`) extracts metadata from talk markdown files. If production shows slugified filenames instead of proper titles, the plugin may not be executing correctly.
+
+**Symptoms**:
+- Talk titles show as "2025-10-01-conference-talk-name" instead of "Proper Talk Title"
+- Missing conference names, dates, or video status on talk cards
+- Missing "Highlighted Presentations" section on homepage
+- Talk pages show only title and "Video Coming Soon" with no content
+
+**Diagnosis Steps**:
+
+1. **Verify plugin file exists**:
+   ```bash
+   ls -la _plugins/markdown_parser.rb
+   ```
+
+2. **Check plugin syntax**:
+   ```bash
+   ruby -c _plugins/markdown_parser.rb
+   # Should output: Syntax OK
+   ```
+
+3. **Test plugin extraction locally**:
+   ```bash
+   bundle exec ruby test/impl/unit/markdown_parser_test.rb
+   ```
+
+4. **Build with verbose output**:
+   ```bash
+   bundle exec jekyll build --verbose 2>&1 | grep "MarkdownTalkProcessor"
+   # Should show: "DEBUG: MarkdownTalkProcessor running in development environment"
+   # Should show: "DEBUG: Found X talks"
+   ```
+
+5. **Check production build logs**:
+   - Go to GitHub Actions → Latest deploy workflow
+   - Check "Build with Jekyll" step for plugin output
+   - Look for "MarkdownTalkProcessor" debug messages
+
+**Common Causes and Fixes**:
+
+1. **Plugin priority too low**:
+   - Check `_plugins/markdown_parser.rb` has `priority :highest`
+   - Lower priorities may cause plugin to run after templates render
+
+2. **Plugin has syntax errors**:
+   - Run `ruby -c _plugins/markdown_parser.rb` to check
+   - Fix any syntax errors and redeploy
+
+3. **Talk files missing required structure**:
+   - Ensure talk files have H1 heading: `# Talk Title`
+   - Ensure metadata uses bold format: `**Conference:** Name`
+   - See `docs/templates/sample-talk.md` for correct format
+
+4. **Jekyll not loading custom plugins**:
+   - Verify `_plugins/` directory is not in `_config.yml` exclude list
+   - Check that `safe: false` is not set in config (would disable custom plugins)
+   - Ensure GitHub Actions workflow doesn't override plugin loading
+
+5. **Production environment differences**:
+   - Check if `JEKYLL_ENV=production` affects plugin behavior
+   - Verify `--baseurl` flag in deploy workflow doesn't interfere
+   - Test locally with production-like settings:
+     ```bash
+     JEKYLL_ENV=production bundle exec jekyll build --baseurl ""
+     ```
+
+**Prevention**:
+- Run production health tests after deployments: `bundle exec ruby test/impl/e2e/production_health_test.rb`
+- Monitor GitHub Actions logs for plugin execution
+- Keep plugin debugging output for troubleshooting
+- Test locally with production environment settings before deploying
+
 #### Debugging Procedures
 
 1. **Reproduce Issue**: Create minimal reproduction case

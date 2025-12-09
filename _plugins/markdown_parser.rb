@@ -30,7 +30,6 @@ module Jekyll
         
         talks_collection.docs.each do |doc|
           begin
-            Jekyll.logger.debug "MarkdownTalkProcessor:", "Processing #{doc.path}"
             content = doc.content
             
             # Extract metadata from markdown content
@@ -49,9 +48,6 @@ module Jekyll
             end
             doc.data['extracted_resources'] = extract_resources_from_content(content)
             doc.data['extracted_presentation_context'] = extract_and_process_presentation_context(content, site)
-            
-            Jekyll.logger.debug "MarkdownTalkProcessor:", "Extracted title: #{doc.data['extracted_title']}"
-            Jekyll.logger.debug "MarkdownTalkProcessor:", "Extracted conference: #{doc.data['extracted_conference']}"
           rescue => e
             Jekyll.logger.error "MarkdownTalkProcessor:", "Failed to process #{doc.path}: #{e.message}"
             Jekyll.logger.error "MarkdownTalkProcessor:", e.backtrace.join("\n")

@@ -28,7 +28,12 @@ bundle exec ruby test/run_tests.rb --category external
 
 # Integration tests (full workflow)
 bundle exec ruby test/run_tests.rb --category integration
+
+# Production health tests (verify production site)
+bundle exec ruby test/impl/e2e/production_health_test.rb
 ```
+
+**Note**: Production health tests skip automatically in CI environments due to SSL certificate verification issues. They're designed to run manually when verifying production deployments.
 
 ## Test Organization
 
@@ -42,12 +47,49 @@ test/
 │   └── *_test.rb            # Additional migration tests
 ├── impl/                     # Implementation tests
 │   ├── unit/                 # Fast unit tests
+│   │   └── markdown_parser_test.rb  # Plugin extraction tests
 │   ├── integration/          # Integration tests  
 │   ├── e2e/                  # End-to-end tests
+│   │   └── production_health_test.rb  # Production site validation
 │   └── performance/          # Performance tests
 ├── external/                 # External service tests
 └── tools/                    # Build and utility tests
 ```
+
+### Production Health Tests
+
+The production health tests (`test/impl/e2e/production_health_test.rb`) validate that the live production site is working correctly. These tests were added to catch deployment issues before users encounter them, particularly issues with the markdown parser plugin not executing properly in production.
+
+**What These Tests Validate**:
+
+- **Homepage Health**: Verifies homepage loads with HTTP 200, CSS is present, "Highlighted Presentations" section exists with talks
+- **Talk Page Health**: Validates proper titles (extracted from H1, not slugified filenames), conference names, dates, video status, abstract and resources sections
+- **Sample Talk Exclusion**: Ensures template files (like `sample-talk.md`) don't appear on production
+- **Production Parity**: Compares production to local build for consistency in talk count and titles
+- **Metadata Extraction**: Confirms the markdown parser plugin is extracting metadata correctly
+
+**Running Production Health Tests**:
+```bash
+# Run all production health tests
+bundle exec ruby test/impl/e2e/production_health_test.rb
+
+# Run specific test
+bundle exec ruby test/impl/e2e/production_health_test.rb -n test_production_homepage_loads
+
+# Tests automatically skip in CI environments due to SSL verification
+# Run manually after deployments to verify production
+```
+
+**When to Run**:
+- After deploying changes to production
+- When verifying plugin execution on production
+- After modifying Jekyll configuration or deploy workflow
+- When investigating production vs local build differences
+
+**Expected Results**:
+- All tests should pass if production matches local build
+- Failures indicate deployment issues or plugin execution problems
+- Check GitHub Actions logs if tests fail to see plugin debugging output
 
 ## Common Test Scenarios
 
@@ -128,6 +170,30 @@ ls -la "Google API.json"
 bundle exec ruby test/external/notist_api_test.rb
 ```
 
+#### Plugin Not Extracting Metadata
+
+If talk pages show slugified filenames instead of proper titles:
+
+```bash
+# Check plugin is present
+ls -la _plugins/markdown_parser.rb
+
+# Test plugin extraction methods
+bundle exec ruby test/impl/unit/markdown_parser_test.rb
+
+# Build with verbose output to see plugin execution
+bundle exec jekyll build --verbose
+
+# Check for plugin errors in build output
+bundle exec jekyll build 2>&1 | grep "MarkdownTalkProcessor"
+```
+
+**Common causes**:
+- Plugin priority too low (should be `:highest`)
+- Plugin has syntax errors (check with `ruby -c _plugins/markdown_parser.rb`)
+- Talk files missing H1 headings or metadata
+- Jekyll not loading custom plugins (check `_config.yml` exclude list)
+
 ### Common Issues
 
 #### Bundler Problems
@@ -153,6 +219,28 @@ chmod +x migrate_talk.rb
 # Check Google Drive API file
 chmod 600 "Google API.json"
 ```
+
+## Sample Talk Template
+
+The sample talk template file is located at `docs/templates/sample-talk.md`. This file serves as a reference for creating new talk files but is excluded from production builds.
+
+**Location**: `docs/templates/sample-talk.md`
+
+**Purpose**:
+- Provides a template for creating new talk files
+- Documents the expected talk file structure
+- Shows examples of all metadata fields
+- Excluded from Jekyll builds (docs/ is in exclude list)
+
+**Usage**:
+```bash
+# Copy template to create a new talk
+cp docs/templates/sample-talk.md _talks/YYYY-MM-DD-conference-talk-title.md
+
+# Edit the new file with your talk details
+```
+
+**Important**: Never create talk files directly in `_talks/` named `sample-talk.md` as this will cause them to appear on production. Always use the template from `docs/templates/` and rename appropriately.
 
 ## Test Development
 

@@ -126,16 +126,32 @@ layout: default
                     </div>
 
                     <div class="featured-info">
-                        <h3>{{ talk.extracted_title | default: talk.title }}</h3>
+                        {% comment %}WARNING: If extracted_title is missing, plugin may not be running{% endcomment %}
+                        {% if talk.extracted_title %}
+                        <h3>{{ talk.extracted_title }}</h3>
+                        {% else %}
+                        {% comment %}Humanize slugified title as fallback{% endcomment %}
+                        <h3>{{ talk.title | replace: "-", " " | capitalize }}</h3>
+                        {% endif %}
                         <div class="talk-meta">
                             {% if talk.extracted_conference %}
                             <span class="meta-item conference-name">
                                 📍 {{ talk.extracted_conference }}
                             </span>
+                            {% elsif talk.conference %}
+                            {% comment %}WARNING: Using frontmatter conference as fallback{% endcomment %}
+                            <span class="meta-item conference-name">
+                                📍 {{ talk.conference }}
+                            </span>
                             {% endif %}
                             {% if talk.extracted_date %}
                             <time class="meta-item date" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
                                 📅 {{ talk.extracted_date | date: "%B %d, %Y" }}
+                            </time>
+                            {% elsif talk.date %}
+                            {% comment %}WARNING: Using page date as fallback{% endcomment %}
+                            <time class="meta-item date" datetime="{{ talk.date | date_to_xmlschema }}">
+                                📅 {{ talk.date | date: "%B %d, %Y" }}
                             </time>
                             {% endif %}
                             {% if talk.extracted_video %}
@@ -179,16 +195,32 @@ layout: default
                         </div>
                         
                         <div class="talk-info">
-                            <h3>{{ talk.extracted_title | default: talk.title }}</h3>
+                            {% comment %}WARNING: If extracted_title is missing, plugin may not be running{% endcomment %}
+                            {% if talk.extracted_title %}
+                            <h3>{{ talk.extracted_title }}</h3>
+                            {% else %}
+                            {% comment %}Humanize slugified title as fallback{% endcomment %}
+                            <h3>{{ talk.title | replace: "-", " " | capitalize }}</h3>
+                            {% endif %}
                             <div class="talk-meta">
                                 {% if talk.extracted_conference %}
                                 <span class="meta-item conference-name">
                                     📍 {{ talk.extracted_conference }}
                                 </span>
+                                {% elsif talk.conference %}
+                                {% comment %}WARNING: Using frontmatter conference as fallback{% endcomment %}
+                                <span class="meta-item conference-name">
+                                    📍 {{ talk.conference }}
+                                </span>
                                 {% endif %}
                                 {% if talk.extracted_date %}
                                 <time class="meta-item date" datetime="{{ talk.extracted_date | date_to_xmlschema }}">
                                     📅 {{ talk.extracted_date | date: "%B %d, %Y" }}
+                                </time>
+                                {% elsif talk.date %}
+                                {% comment %}WARNING: Using page date as fallback{% endcomment %}
+                                <time class="meta-item date" datetime="{{ talk.date | date_to_xmlschema }}">
+                                    📅 {{ talk.date | date: "%B %d, %Y" }}
                                 </time>
                                 {% endif %}
                                 {% comment %} Video publication status - moved to metadata section {% endcomment %}
