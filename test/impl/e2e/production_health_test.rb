@@ -3,7 +3,9 @@ require 'net/http'
 require 'uri'
 
 class ProductionHealthTest < Minitest::Test
-  PRODUCTION_URL = 'https://speaking.jbaru.ch'
+  # Configure this to your production URL
+  # Examples: 'https://username.github.io/shownotes' or 'https://yourdomain.com'
+  PRODUCTION_URL = ENV['PRODUCTION_URL'] || 'https://jbaruch.github.io/shownotes'
   
   # Helper method to fetch HTML from production
   def fetch_production_html(path = '/')
