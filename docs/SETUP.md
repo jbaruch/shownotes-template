@@ -163,9 +163,17 @@ shownotes/
 ├── _talks/                     # Your talk files
 ├── assets/images/thumbnails/   # Talk thumbnails
 ├── docs/                       # Documentation
+│   └── templates/              # Template files
+│       └── sample-talk.md      # Talk file template
 ├── test/                       # Test suite
 └── README.md                   # Project overview
 ```
+
+**Important Files**:
+- `_config.yml`: Site and speaker configuration
+- `_talks/`: Your conference talk markdown files
+- `docs/templates/sample-talk.md`: Template for creating new talks
+- `assets/images/thumbnails/`: Talk thumbnail images
 
 ## Environment Setup
 
@@ -247,7 +255,27 @@ bundle exec ruby test/impl/unit/speaker_config_test.rb
 
 # Test Jekyll build
 bundle exec ruby test/impl/integration/jekyll_build_test.rb
+
+# Test markdown parser plugin
+bundle exec ruby test/impl/unit/markdown_parser_test.rb
 ```
+
+### Verifying Production Deployment
+
+After deploying to production, verify everything works correctly:
+
+```bash
+# Run production health tests (requires deployed site)
+bundle exec ruby test/impl/e2e/production_health_test.rb
+
+# These tests verify:
+# - Homepage loads correctly
+# - Talk titles are properly extracted (not slugified)
+# - Metadata displays correctly
+# - Sample talk template doesn't appear on production
+```
+
+**Note**: Production health tests will skip automatically in CI environments. Run them manually after deployments to verify the live site.
 
 ## Next Steps
 
