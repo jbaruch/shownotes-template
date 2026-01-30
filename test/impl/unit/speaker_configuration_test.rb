@@ -137,7 +137,8 @@ class SpeakerConfigurationTest < Minitest::Test
     rendered_index = render_index_page
     
     # Check speaker name and bio are displayed
-    assert_includes rendered_index, 'Presentations by Test Speaker Display'
+    # The new design shows just the name in h1, not "Presentations by Name"
+    assert_includes rendered_index, 'Test Speaker Display'
     assert_includes rendered_index, 'This is a test bio for the speaker'
   end
 
@@ -425,29 +426,29 @@ class SpeakerConfigurationTest < Minitest::Test
     # Simple template rendering simulation
     config = YAML.load_file(@config_file)
     template = File.read(@index_file)
-    
+
     # Basic Liquid template simulation
     rendered = template.dup
-    
-    # Handle conditional title logic first
-    title_pattern = /{% if site\.speaker and site\.speaker\.display_name and site\.speaker\.display_name != "" %}.*?<h1>Presentations by {{ site\.speaker\.display_name }}<\/h1>.*?{% elsif site\.speaker and site\.speaker\.name and site\.speaker\.name != "" %}.*?<h1>Presentations by {{ site\.speaker\.name }}<\/h1>.*?{% else %}.*?<h1>Presentations<\/h1>.*?{% endif %}/m
-    
+
+    # Handle conditional title logic first - template now shows just name, not "Presentations by Name"
+    title_pattern = /{% if site\.speaker and site\.speaker\.display_name and site\.speaker\.display_name != "" %}.*?<h1>{{ site\.speaker\.display_name }}<\/h1>.*?{% elsif site\.speaker and site\.speaker\.name and site\.speaker\.name != "" %}.*?<h1>{{ site\.speaker\.name }}<\/h1>.*?{% else %}.*?<h1>Speaker<\/h1>.*?{% endif %}/m
+
     if config['speaker']
       speaker = config['speaker']
-      
+
       if speaker['display_name'] && !speaker['display_name'].empty?
         # Use display_name
-        rendered.gsub!(title_pattern, "<h1>Presentations by #{speaker['display_name']}</h1>")
+        rendered.gsub!(title_pattern, "<h1>#{speaker['display_name']}</h1>")
       elsif speaker['name'] && !speaker['name'].empty?
         # Use name
-        rendered.gsub!(title_pattern, "<h1>Presentations by #{speaker['name']}</h1>")
+        rendered.gsub!(title_pattern, "<h1>#{speaker['name']}</h1>")
       else
         # No valid speaker name
-        rendered.gsub!(title_pattern, '<h1>Presentations</h1>')
+        rendered.gsub!(title_pattern, '<h1>Speaker</h1>')
       end
     else
       # No speaker configured at all
-      rendered.gsub!(title_pattern, '<h1>Presentations</h1>')
+      rendered.gsub!(title_pattern, '<h1>Speaker</h1>')
     end
     
     if config['speaker']
