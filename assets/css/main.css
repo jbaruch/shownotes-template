@@ -1049,10 +1049,18 @@ a:hover {
         flex-direction: column;
     }
 
+    .talk-list-item-link {
+        flex-direction: column;
+    }
+
     .talk-thumbnail {
         width: 100%;
         height: auto;
         aspect-ratio: 16 / 9;
+    }
+
+    .talk-info {
+        width: 100%;
     }
 
     .media-container {
