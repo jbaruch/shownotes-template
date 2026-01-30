@@ -705,9 +705,10 @@ a:hover {
 }
 
 .meta-item.status-badge.video-published {
-    color: var(--color-text-secondary);
+    color: var(--color-text-primary);
     background: none;
     border: none;
+    font-weight: 500;
 }
 
 [data-theme="dark"] .meta-item.status-badge.video-published {
