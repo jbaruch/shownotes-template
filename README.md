@@ -23,14 +23,23 @@ speaker:
   name: "Your Full Name"
   bio: "Your professional bio..."
   social:
-    linkedin: "your-username"      
-    github: "your-username"       
-    x: "your-username"            
+    linkedin: "your-username"
+    github: "your-username"
+    x: "your-username"
 
 # Site settings
 title: "Your Conference Talks"
 url: "https://YOUR-USERNAME.github.io"
 baseurl: "/shownotes"  # Or your repo name
+
+# Featured conferences for "Featured at" logo strip (optional)
+# Shows these specific conferences in order on your homepage
+# If empty or not set, defaults to most recent unique conferences
+featured_conferences:
+  - "Devoxx"
+  - "QCon"
+  - "DevNexus"
+  - "KubeCon"
 ```
 
 ### 3. Add Your First Talk
