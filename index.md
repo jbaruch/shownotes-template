@@ -119,15 +119,25 @@ layout: default
     </header>
 
     {% assign talks = site.talks | default: empty %}
-    {% comment %} Conference logo strip - extract unique conferences {% endcomment %}
+    {% unless talks == empty %}
+      {% assign talks = talks | sort: 'extracted_date' | reverse %}
+    {% endunless %}
+
+    {% comment %} Conference logo strip - use curated list or fall back to most recent {% endcomment %}
     {% assign conferences = "" | split: "" %}
-    {% for talk in talks %}
-        {% if talk.extracted_conference %}
-            {% unless conferences contains talk.extracted_conference %}
-                {% assign conferences = conferences | push: talk.extracted_conference %}
-            {% endunless %}
-        {% endif %}
-    {% endfor %}
+    {% if site.featured_conferences and site.featured_conferences.size > 0 %}
+        {% comment %} Use manually curated conference list {% endcomment %}
+        {% assign conferences = site.featured_conferences %}
+    {% else %}
+        {% comment %} Fall back to unique conferences from most recent talks {% endcomment %}
+        {% for talk in talks %}
+            {% if talk.extracted_conference %}
+                {% unless conferences contains talk.extracted_conference %}
+                    {% assign conferences = conferences | push: talk.extracted_conference %}
+                {% endunless %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 
     {% if conferences.size > 0 %}
     <div class="logo-strip">
@@ -139,11 +149,6 @@ layout: default
         </div>
     </div>
     {% endif %}
-
-    {% assign talks = site.talks | default: empty %}
-    {% unless talks == empty %}
-      {% assign talks = talks | sort: 'extracted_date' | reverse %}
-    {% endunless %}
     {% if talks.size > 0 %}
         {% comment %} Filter for talks with preview resources to feature them {% endcomment %}
         {% assign talks_with_previews = '' | split: '' %}
