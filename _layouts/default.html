@@ -4,7 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
+
+    <!-- Theme Detection Script - Inline to prevent flash (T007, FR-014, T031) -->
+    <script>
+      (function() {
+        var STORAGE_KEY = 'theme';
+        var defaultTheme = '{{ site.ui_theme.default_theme | default: "system" }}';
+        var theme;
+        try {
+          theme = localStorage.getItem(STORAGE_KEY);
+        } catch (e) {
+          // localStorage unavailable (private browsing)
+        }
+        if (theme !== 'dark' && theme !== 'light') {
+          // No stored preference - use config default or system preference
+          if (defaultTheme === 'dark') {
+            theme = 'dark';
+          } else if (defaultTheme === 'light') {
+            theme = 'light';
+          } else {
+            // "system" - detect from OS preference
+            theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+
+    {% comment %} Custom primary color override from _config.yml (T032) {% endcomment %}
+    {% if site.ui_theme.primary_color and site.ui_theme.primary_color != "#6366f1" %}
+    <style>
+      :root {
+        --color-primary: {{ site.ui_theme.primary_color }};
+        --color-primary-dark: {{ site.ui_theme.primary_color }};
+        --primary-color: {{ site.ui_theme.primary_color }};
+        --primary-dark: {{ site.ui_theme.primary_color }};
+      }
+    </style>
+    {% endif %}
+
     <!-- SEO -->
     <title>{% if page.title %}{{ page.title | escape }} - {% endif %}{% if site.speaker.display_name and site.speaker.display_name != "" %}Presentations by {{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}Presentations by {{ site.speaker.name }}{% else %}Presentations{% endif %}</title>
     <meta name="description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.speaker.bio }}{% endif %}">
@@ -30,23 +68,29 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Skip navigation link -->
+    <!-- Favicon -->
     <link rel="icon" href="{{ '/favicon.svg' | relative_url }}" type="image/svg+xml">
-    <a class="skip-link" href="#main-content">Skip to main content</a>
 </head>
 <body>
+    <!-- Skip navigation link (T037) -->
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <!-- Header -->
     <header class="site-header" role="banner">
         <div class="wrapper">
             <a class="site-title" href="{{ '/' | relative_url }}" rel="home">{% if site.speaker.display_name and site.speaker.display_name != "" %}{{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}{{ site.speaker.name }}{% else %}Speaker{% endif %} - Presentations</a>
-            
-            {% unless page.url == "/" %}
-            <nav class="site-nav" role="navigation" aria-label="Main navigation">
-                <ul>
-                    <li><a href="{{ '/' | relative_url }}">Home</a></li>
-                </ul>
-            </nav>
-            {% endunless %}
+
+            <div class="site-header__actions">
+                {% unless page.url == "/" %}
+                <nav class="site-nav" role="navigation" aria-label="Main navigation">
+                    <ul>
+                        <li><a href="{{ '/' | relative_url }}">Home</a></li>
+                    </ul>
+                </nav>
+                {% endunless %}
+                {% if site.ui_theme.show_theme_toggle != false %}
+                {% include theme-toggle.html %}
+                {% endif %}
+            </div>
         </div>
     </header>
 
@@ -63,5 +107,8 @@
             <p>&copy; {{ 'now' | date: '%Y' }} {% if site.speaker.display_name and site.speaker.display_name != "" %}{{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}{{ site.speaker.name }}{% else %}Speaker{% endif %}. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Theme Toggle Script (T008) -->
+    <script src="{{ '/assets/js/theme.js' | relative_url }}"></script>
 </body>
 </html>

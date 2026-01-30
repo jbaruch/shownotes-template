@@ -66,6 +66,17 @@ description: "Conference talk show notes and resources"
 # Featured talks configuration
 featured_talks_count: 3
 
+# UI Theme customization (all optional) - FR-011, US3
+# See specs/001-ui-ux-redesign/data-model.md for details
+# Note: Using 'ui_theme' to avoid conflict with Jekyll's built-in 'theme' setting
+ui_theme:
+  # Primary brand color (hex) - overrides --color-primary
+  primary_color: "#6366f1"
+  # Default theme: "light", "dark", or "system"
+  default_theme: "system"
+  # Show theme toggle button in header
+  show_theme_toggle: true
+
 # SEO settings (will use speaker info dynamically)
 # No need for redundant author or twitter config since speaker section provides this
 
