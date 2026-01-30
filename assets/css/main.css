@@ -464,6 +464,7 @@ a:hover {
     justify-content: center;
     gap: var(--space-16);
     margin-bottom: var(--space-10);
+    flex-wrap: wrap;
 }
 
 .hero-stat {
@@ -1066,6 +1067,10 @@ a:hover {
 @media (max-width: 480px) {
     .site-nav ul {
         gap: var(--space-4);
+    }
+
+    .hero-stats {
+        gap: var(--space-8);
     }
 
     .speaker-social-links .social-link {
