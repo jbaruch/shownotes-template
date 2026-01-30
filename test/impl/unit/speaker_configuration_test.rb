@@ -137,7 +137,8 @@ class SpeakerConfigurationTest < Minitest::Test
     rendered_index = render_index_page
     
     # Check speaker name and bio are displayed
-    assert_includes rendered_index, 'Presentations by Test Speaker Display'
+    # The new design shows just the name in h1, not "Presentations by Name"
+    assert_includes rendered_index, 'Test Speaker Display'
     assert_includes rendered_index, 'This is a test bio for the speaker'
   end
 
