@@ -1,5 +1,8 @@
 require 'rake/testtask'
 
+# Set JEKYLL_ENV to production for all tests to ensure dev-test-prod parity
+ENV['JEKYLL_ENV'] = 'production'
+
 # Default task
 task default: :test
 

@@ -31,7 +31,7 @@ class VisualTest < Minitest::Test
     # Start Jekyll server if not running
     unless @@server_running
       puts "Building Jekyll site for visual tests..."
-      build_result = system('bundle exec jekyll build --config _config_test.yml --quiet')
+      build_result = system({'JEKYLL_ENV' => 'production'}, 'bundle exec jekyll build --config _config_test.yml --quiet')
       raise "Failed to build Jekyll site" unless build_result
       
       puts "Starting Jekyll server for visual tests..."

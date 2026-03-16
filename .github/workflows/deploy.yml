@@ -5,11 +5,15 @@ on:
     branches: [ main ]
     paths:
       - '_talks/**'
+      - '_plugins/**'
+      - '_layouts/**'
+      - '_includes/**'
       - 'assets/**'
       - 'index.md'
       - '_data/**'
       - 'pdfs/**'
       - '*.html'
+      - '_config.yml'
   workflow_dispatch:
 
 permissions:

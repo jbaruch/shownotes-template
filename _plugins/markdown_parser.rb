@@ -30,10 +30,23 @@ module Jekyll
         
         talks_collection.docs.each do |doc|
           begin
+            # Force content to be read if not already
+            doc.content
             content = doc.content
-            
+
             # Extract metadata from markdown content
-            doc.data['extracted_title'] = extract_title_from_content(content)
+            extracted_title = extract_title_from_content(content)
+            doc.data['extracted_title'] = extracted_title
+
+            # Check if title was explicitly set in frontmatter
+            # Read the raw file to check if title is in frontmatter
+            raw_content = File.read(doc.path)
+            has_frontmatter_title = raw_content.match?(/^---\s*\n.*^title:/m)
+
+            # Only override title if it wasn't explicitly set in frontmatter
+            unless has_frontmatter_title
+              doc.data['title'] = extracted_title
+            end
             doc.data['extracted_conference'] = extract_metadata_from_content(content, 'conference')
             doc.data['extracted_date'] = extract_metadata_from_content(content, 'date')
             doc.data['extracted_slides'] = extract_metadata_from_content(content, 'slides')
