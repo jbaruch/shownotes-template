@@ -158,7 +158,7 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
         </div>
       </div>
     {% else %}
-      <div class="embed-container video-embed"><iframe src="{{ embed_url }}" frameborder="0" allowfullscreen loading="lazy" title="{{ title | escape }}" class="responsive-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe></div>
+      <div class="embed-container video-embed"><iframe src="{{ embed_url }}" frameborder="0" allowfullscreen loading="lazy" title="{{ title | escape }}" class="responsive-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox"></iframe></div>
     {% endif %}
   {% else %}
     {% if not preview_mode %}<div class="resource-fallback"><a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">{{ title }}</a></div>{% endif %}

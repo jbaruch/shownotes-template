@@ -534,6 +534,94 @@ a:hover {
 }
 
 /* ===========================================
+   Speaker Bar - Compact speaker identity row
+   =========================================== */
+.speaker-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    margin-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+[data-theme="dark"] .speaker-bar {
+    border-bottom-color: var(--color-gray-700);
+}
+
+.speaker-bar__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.speaker-bar__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+.speaker-bar__name {
+    font-family: var(--font-display);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-black);
+    line-height: 1.2;
+}
+
+[data-theme="dark"] .speaker-bar__name {
+    color: var(--color-white);
+}
+
+.speaker-bar__bio {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+    line-height: 1.4;
+}
+
+[data-theme="dark"] .speaker-bar__bio {
+    color: var(--color-gray-400);
+}
+
+.speaker-bar__social {
+    display: flex;
+    gap: var(--space-1);
+    flex-shrink: 0;
+}
+
+.speaker-bar__social .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--color-gray-500);
+    transition: color var(--transition-base);
+}
+
+.speaker-bar__social .social-link:hover {
+    color: var(--color-black);
+}
+
+[data-theme="dark"] .speaker-bar__social .social-link {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .speaker-bar__social .social-link:hover {
+    color: var(--color-white);
+}
+
+.speaker-bar__social .social-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+/* ===========================================
    Logo Strip - Grayscale conference logos
    =========================================== */
 .logo-strip {
@@ -1033,6 +1121,15 @@ a:hover {
         font-size: var(--font-size-lg);
     }
 
+    .speaker-bar {
+        flex-wrap: wrap;
+    }
+
+    .speaker-bar__social {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
     .hero-section {
         padding: var(--space-12) var(--space-4);
     }
@@ -1047,21 +1144,26 @@ a:hover {
     }
 
     .talk-list-item {
-        flex-direction: column;
+        padding: var(--space-3) 0;
     }
 
     .talk-list-item-link {
-        flex-direction: column;
+        gap: var(--space-3);
     }
 
     .talk-thumbnail {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16 / 9;
+        width: 64px;
+        height: 36px;
     }
 
-    .talk-info {
-        width: 100%;
+    .talk-info h3 {
+        font-size: var(--font-size-sm);
+        margin: 0;
+    }
+
+    .talk-info .talk-meta,
+    .talk-info .talk-summary {
+        display: none;
     }
 
     .media-container {
