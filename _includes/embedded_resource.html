@@ -122,7 +122,7 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
     {% else %}
       <div class="embed-container pdf-embed">
         <div class="pdf-embed-attempt"><iframe src="{{ embed_url }}" frameborder="0" loading="lazy" title="{{ title | escape }}" class="responsive-iframe pdf-iframe" width="100%" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-        <div class="pdf-fallback" style="margin-top: var(--space-4);"><div class="fallback-content"><h4>Alternative Access:</h4><div class="pdf-actions"><a href="https://drive.google.com/file/d/{{ file_id }}/view" target="_blank" rel="noopener noreferrer" class="btn-primary">Open in Google Drive</a><a href="https://drive.google.com/uc?id={{ file_id }}" target="_blank" rel="noopener noreferrer" class="btn-secondary">Download PDF</a></div></div></div>
+        <div class="pdf-fallback" style="display:none; margin-top: var(--space-4);"><div class="fallback-content"><div class="pdf-actions"><a href="https://drive.google.com/file/d/{{ file_id }}/view" target="_blank" rel="noopener noreferrer" class="btn-primary">Open Slides in Google Drive</a></div></div></div>
       </div>
     {% endif %}
   {% else %}

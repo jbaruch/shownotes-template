@@ -136,6 +136,44 @@ layout: default
 }
 </script>
 
+<!-- Detect blocked Google Drive embeds and show fallback -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.pdf-iframe').forEach(function (iframe) {
+            var container = iframe.closest('.pdf-embed');
+            if (!container) return;
+            var fallback = container.querySelector('.pdf-fallback');
+            if (!fallback) return;
+            var attempt = iframe.closest('.pdf-embed-attempt');
+
+            function showFallback() {
+                attempt.style.display = 'none';
+                fallback.style.display = '';
+            }
+
+            function check() {
+                try {
+                    // Same-origin error page — contentDocument is readable
+                    if (iframe.contentDocument && iframe.contentDocument.body) {
+                        showFallback(); return;
+                    }
+                } catch (e) { /* cross-origin, expected */ }
+                try {
+                    // Google Drive preview has nested frames (length > 0).
+                    // Blocked/aborted loads have zero.
+                    if (iframe.contentWindow && iframe.contentWindow.length === 0) {
+                        showFallback();
+                    }
+                } catch (e) { /* can't access, leave iframe visible */ }
+            }
+            var loaded = false;
+            iframe.addEventListener('load', function () { loaded = true; check(); });
+            // Safety net: if load never fires (request aborted by extension)
+            setTimeout(function () { if (!loaded) check(); }, 5000);
+        });
+    });
+</script>
+
 <!-- Resource enhancement script -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
