@@ -22,7 +22,7 @@ gem 'bundler-audit'
 # For testing only - modern versions
 group :test do
   gem 'capybara', '~> 3.40'
-  gem 'nokogiri', '~> 1.18.0'  # Latest with security patches
+  gem 'nokogiri', '>= 1.19.1'  # Security fix for GHSA-wx95-c6cv-8532
   gem 'selenium-webdriver', '~> 4.35'
   gem 'simplecov', '~> 0.22', require: false  # Code coverage analysis
   gem 'minitest-reporters', '~> 1.7', require: false  # Better test output
