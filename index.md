@@ -19,8 +19,12 @@ layout: default
         {% endif %}
 
         <div class="speaker-bar__info">
-            {% if site.speaker and site.speaker.name and site.speaker.name != "" %}
-                <span class="speaker-bar__name">{{ site.speaker.name }}</span>
+            {% if site.speaker and site.speaker.display_name and site.speaker.display_name != "" %}
+                <h1>{{ site.speaker.display_name }}</h1>
+            {% elsif site.speaker and site.speaker.name and site.speaker.name != "" %}
+                <h1>{{ site.speaker.name }}</h1>
+            {% else %}
+                <h1>Speaker</h1>
             {% endif %}
             {% if site.speaker and site.speaker.bio and site.speaker.bio != "" %}
                 <span class="speaker-bar__bio">{{ site.speaker.bio }}</span>
