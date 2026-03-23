@@ -543,14 +543,15 @@ class SpeakerConfigurationTest < Minitest::Test
           rendered.gsub!(/{% endif %}$/, '')
         else
           # No social media links - remove entire social section
-          rendered.gsub!(/{% if has_social %}.*?<div class="speaker-social-links">.*?<\/div>.*?{% endif %}/m, '')
+          # Match the actual template class (speaker-bar__social)
+          rendered.gsub!(/{% if has_social %}.*?<div class="speaker-bar__social">.*?<\/div>\s*{% endif %}/m, '')
           rendered.gsub!(/{% assign has_social = (?:true|false) %}/, '')
           rendered.gsub!(/{% if site\.speaker\.social\.\w+ and site\.speaker\.social\.\w+ != "" %}.*?{% endif %}/m, '')
           rendered.gsub!(/{% assign \w+_exists = (?:true|false) %}/, '')
         end
-      else
-        # No social config - remove entire social section (match through the closing endif pair)
-        rendered.gsub!(/{% if site\.speaker and site\.speaker\.social %}.*?{% endif %}\s*{% endif %}/m, '')
+        # Remove the outer social conditional wrapper
+        rendered.gsub!(/{% if site\.speaker and site\.speaker\.social %}\s*/m, '')
+        rendered.gsub!(/\s*{% endif %}\s*{% endif %}\s*<\/header>/m, "\n    </header>")
       end
     else
       # No speaker configured - remove all speaker-related sections
