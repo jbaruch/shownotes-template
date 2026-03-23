@@ -549,8 +549,8 @@ class SpeakerConfigurationTest < Minitest::Test
           rendered.gsub!(/{% assign \w+_exists = (?:true|false) %}/, '')
         end
       else
-        # No social config - remove entire social section
-        rendered.gsub!(/{% if site\.speaker and site\.speaker\.social %}.*?{% endif %}/m, '')
+        # No social config - remove entire social section (match through the closing endif pair)
+        rendered.gsub!(/{% if site\.speaker and site\.speaker\.social %}.*?{% endif %}\s*{% endif %}/m, '')
       end
     else
       # No speaker configured - remove all speaker-related sections
