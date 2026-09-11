@@ -101,13 +101,13 @@
 
 ### Tests for User Story 4
 
-- [ ] T018 [US4] Add failing tests to `test/impl/integration/skill_section_test.rb`: on the DEMO skill talk page, `.talk-meta .status-badge.skill-available` exists with text `Skill Available` and its previous element sibling is the video `status-badge`; on `_test_site/index.html`, every card linking to `/talks/DEMO-ai-coding-assistants-2025/` contains `.skill-available` and cards linking to the other two DEMO talks contain none
+- [X] T018 [US4] Add failing tests to `test/impl/integration/skill_section_test.rb`: on the DEMO skill talk page, `.talk-meta .status-badge.skill-available` exists with text `Skill Available` and its previous element sibling is the video `status-badge`; on `_test_site/index.html`, every card linking to `/talks/DEMO-ai-coding-assistants-2025/` contains `.skill-available` and cards linking to the other two DEMO talks contain none
 
 ### Implementation for User Story 4
 
-- [ ] T019 [P] [US4] In `_layouts/talk.html` `.talk-meta`, after the video badge `{% endif %}`, add `{% if page.skill %}<span class="meta-item status-badge skill-available">Skill Available</span>{% endif %}`
-- [ ] T020 [P] [US4] In `index.md`, add the same badge keyed on `talk.skill` after the video badge in both the featured-talks loop and the all-talks loop
-- [ ] T021 [P] [US4] Add `.meta-item.status-badge.skill-available` (accent color, same weight/tracking as `.video-published`) and its `[data-theme="dark"]` variant to `assets/css/main.css` next to the video badge rules
+- [X] T019 [P] [US4] In `_layouts/talk.html` `.talk-meta`, after the video badge `{% endif %}`, add `{% if page.skill %}<span class="meta-item status-badge skill-available">Skill Available</span>{% endif %}`
+- [X] T020 [P] [US4] In `index.md`, add the same badge keyed on `talk.skill` after the video badge in both the featured-talks loop and the all-talks loop
+- [X] T021 [P] [US4] Add `.meta-item.status-badge.skill-available` (accent color, same weight/tracking as `.video-published`) and its `[data-theme="dark"]` variant to `assets/css/main.css` next to the video badge rules
 
 **Checkpoint**: T018 green.
 

@@ -61,6 +61,12 @@ layout: default
                 Video Coming Soon
             </span>
             {% endif %}
+            {% comment %} Agent skill availability (feature 002); nothing rendered when no skill file exists {% endcomment %}
+            {% if page.skill %}
+            <span class="meta-item status-badge skill-available">
+                Skill Available
+            </span>
+            {% endif %}
         </div>
 
     </header>

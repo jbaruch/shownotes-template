@@ -723,6 +723,20 @@ a:hover {
     border: none;
 }
 
+/* Skill availability (feature 002): same weight and tracking as the video badge, accent underline as the tell */
+.meta-item.status-badge.skill-available {
+    color: var(--color-text-primary);
+    background: none;
+    border: none;
+    border-bottom: 2px solid var(--color-accent);
+    font-weight: 500;
+}
+
+[data-theme="dark"] .meta-item.status-badge.skill-available {
+    color: var(--color-text-secondary);
+    border-bottom-color: var(--color-accent-light);
+}
+
 .talk-summary {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);

@@ -201,6 +201,36 @@ class RealSiteSkillSectionTest < Minitest::Test
                  'the section needs rules inside the 768px mobile block')
   end
 
+  # --- US4: Skill Available badge in header and listings ------------------
+
+  def test_header_badge_follows_the_video_status_on_the_skill_talk
+    badge = skill_page.css('.talk-header .talk-meta .status-badge.skill-available').first
+
+    refute_nil badge, 'skill talk header needs a Skill Available badge'
+    assert_equal 'Skill Available', badge.text.strip
+    previous = badge.previous_element
+    refute_nil previous
+    assert_includes previous['class'].to_s.split, 'status-badge', 'badge must follow the video status badge'
+    assert_match(/video-(published|pending)/, previous['class'].to_s)
+  end
+
+  def test_homepage_cards_show_the_badge_only_for_the_skill_talk
+    home = Nokogiri::HTML(File.read(File.join(REPO_ROOT, '_test_site', 'index.html')))
+    skill_cards = home.css('article').select { |a| a.css("a[href$=\"/talks/#{SKILL_STEM}/\"]").any? }
+    other_cards = home.css('article').select do |a|
+      OTHER_DEMO_STEMS.any? { |stem| a.css("a[href$=\"/talks/#{stem}/\"]").any? }
+    end
+
+    refute_empty skill_cards, 'homepage should list the skill talk'
+    refute_empty other_cards, 'homepage should list the other demo talks'
+    skill_cards.each do |card|
+      badge = card.css('.status-badge.skill-available').first
+      refute_nil badge, 'every card for the skill talk carries the badge'
+      assert_match(/video-(published|pending)/, badge.previous_element['class'].to_s)
+    end
+    other_cards.each { |card| assert_empty card.css('.skill-available') }
+  end
+
   def test_raw_file_is_served_byte_identical
     source = File.binread(File.join(REPO_ROOT, '_skills', SKILL_STEM, 'SKILL.md'))
     served = File.join(REPO_ROOT, '_test_site', 'skills', SKILL_STEM, 'SKILL.md')

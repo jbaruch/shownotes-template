@@ -214,6 +214,11 @@ layout: default
                                     Video Coming Soon
                                 </span>
                             {% endif %}
+                            {% if talk.skill %}
+                                <span class="meta-item status-badge skill-available">
+                                    Skill Available
+                                </span>
+                            {% endif %}
                         </div>
                         {% if talk.extracted_description %}
                             <p class="talk-summary">{{ talk.extracted_description | truncate: 100 }}</p>
@@ -282,6 +287,11 @@ layout: default
                                 {% else %}
                                     <span class="meta-item status-badge video-pending">
                                         Video Coming Soon
+                                    </span>
+                                {% endif %}
+                                {% if talk.skill %}
+                                    <span class="meta-item status-badge skill-available">
+                                        Skill Available
                                     </span>
                                 {% endif %}
                             </div>
