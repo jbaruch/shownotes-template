@@ -63,11 +63,11 @@
 
 ### Tests for User Story 2
 
-- [ ] T012 [US2] Add failing tests to `test/impl/integration/skill_section_test.rb`: `DEMO-devops-revolution-2025` and `DEMO-kubernetes-security-2024` pages contain no element matching `.talk-skill, .skill-available, script[src*="skill-install"]` (FR-004); temp-site build with `_skills/{stem}/SKILL.md` lacking `name` raises `Jekyll::Errors::FatalException` whose message includes `_skills/{stem}/SKILL.md` and `'name'` and leaves no `_site/talks/{stem}/index.html` (FR-009); temp-site build with a valid skill whose stem has no talk succeeds and creates no `_site/skills/` directory (FR-012); temp-site build with no `_skills/` directory at all succeeds (clean template state)
+- [X] T012 [US2] Add failing tests to `test/impl/integration/skill_section_test.rb`: `DEMO-devops-revolution-2025` and `DEMO-kubernetes-security-2024` pages contain no element matching `.talk-skill, .skill-available, script[src*="skill-install"]` (FR-004); temp-site build with `_skills/{stem}/SKILL.md` lacking `name` raises `Jekyll::Errors::FatalException` whose message includes `_skills/{stem}/SKILL.md` and `'name'` and leaves no `_site/talks/{stem}/index.html` (FR-009); temp-site build with a valid skill whose stem has no talk succeeds and creates no `_site/skills/` directory (FR-012); temp-site build with no `_skills/` directory at all succeeds (clean template state)
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Confirm the plugin's orphan and missing-directory paths from T005 satisfy T012 (adjust `_plugins/skill_processor.rb` only if a T012 test fails); run `bundle exec jekyll build --config _config_test.yml` twice, once with the demo skill and once with `_skills/` emptied, and confirm both complete with zero warnings
+- [X] T013 [US2] Confirm the plugin's orphan and missing-directory paths from T005 satisfy T012 (adjust `_plugins/skill_processor.rb` only if a T012 test fails); run `bundle exec jekyll build --config _config_test.yml` twice, once with the demo skill and once with `_skills/` emptied, and confirm both complete with zero warnings
 
 **Checkpoint**: T012 green; `git diff --stat -- test/` shows only new files (FR-014).
 
