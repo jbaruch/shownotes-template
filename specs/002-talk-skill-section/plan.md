@@ -130,7 +130,7 @@ Generator priority `:high` (runs after `MarkdownTalkProcessor` at `:highest`, be
 - `talk.html` header: after the video badge block, `{% if page.skill %}<span class="meta-item status-badge skill-available">Skill Available</span>{% endif %}`.
 - `talk.html` body: after the `talk-main-content` section (outside its `{% if %}`), `{% if page.skill %}{% include skill_section.html skill=page.skill %}{% endif %}`. With no slides and no video the section is therefore the first thing after the header (FR-016).
 - `index.md`: same badge in the featured loop and the all-talks loop, keyed on `talk.skill`.
-- `skill_section.html`: exact markup in [contracts/rendered-html.md](./contracts/rendered-html.md). Install command uses `include.skill.url | absolute_url`; download link uses `| relative_url`. Script tag is emitted by the include so it exists only on skill pages.
+- `skill_section.html`: exact markup in [contracts/rendered-html.md](./contracts/rendered-html.md). The `<details>` block is wrapped in `{% if include.skill.html != "" %}` so a metadata-only skill renders without an empty disclosure (FR-003). Install command uses `include.skill.url | absolute_url`; download link uses `| relative_url`. Script tag is emitted by the include so it exists only on skill pages.
 
 ### Styles
 
@@ -139,7 +139,8 @@ Generator priority `:high` (runs after `MarkdownTalkProcessor` at `:highest`, be
 - `.talk-skill__command`: `pre` with `overflow-x: auto`, monospace, `--color-surface-elevated` background, hard shadow in the accent color (this is the page's single call-to-action); button absolutely positioned top-right on wide screens, stacked below the `pre` under 480px; `min-width/min-height: 44px`.
 - `.talk-skill__summary`: cursor pointer, custom marker via `::before`, focus ring per existing `:focus-visible` rule.
 - `.status-badge.skill-available`: accent color text, same weight/tracking as `.video-published`; dark theme uses `--color-accent-light` (already redefined for dark).
-- Mobile: inside the existing `@media (max-width: 768px)` block, reduce padding to `--space-4` and let the button wrap.
+- Mobile: inside the existing `@media (max-width: 768px)` block, reduce padding to `--space-4` and let the button wrap; verified down to 320px (FR-010).
+- Motion: none. No transitions on the disclosure or the copy status, so the existing `prefers-reduced-motion` rule has nothing to override (FR-010).
 
 ### Script (`assets/js/skill-install.js`)
 

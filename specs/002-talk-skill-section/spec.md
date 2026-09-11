@@ -25,6 +25,23 @@ The talk page follows an established convention for optional assets: **omit, don
 - Q: Should the template ship a demo skill for one of the DEMO talks? -> A: Yes, exactly one, clearly marked as demo content and removed together with the other DEMO content.
 - Q: Keep the "Skill Available" header badge in scope? -> A: Yes, in scope now as a firm requirement, mirroring the existing video availability badge wherever that badge is shown.
 
+### Checklist gap resolutions (2026-09-11)
+
+Defaults applied while running the UX and integration requirement checklists; each is a spec addition, not a behaviour change already agreed elsewhere.
+
+- FR-002: `name` must be a lowercase slug (letters, digits, hyphens; max 64) because it becomes the install directory and slash-command name (CHK102, CHK110).
+- FR-003: disclosure is closed on every page load; a skill with an empty body renders name, description, and install block and omits the disclosure; the description is shown in full, never truncated (CHK009, CHK016, CHK017).
+- FR-004: talk pages without a skill load no additional assets (CHK011, CHK020).
+- FR-005: "stable" means derived only from the talk identifier and site address (CHK106).
+- FR-007: a failed copy action is reported and leaves the command selectable (CHK005).
+- FR-008: name and description are escaped as text (CHK018).
+- FR-010: phone width means down to 320px; interactive controls have 44×44 CSS px touch targets; any motion respects reduced-motion preferences (CHK007, CHK019, CHK022).
+- FR-011: headings inside the body sit below the section heading in the page outline (CHK003).
+- FR-013: documentation covers local preview (CHK116).
+- FR-015: the indicator sits immediately after the video status (CHK004).
+- FR-018 (new): adding or changing a skill file alone must trigger publication on the hosted site (CHK104).
+- SC-002 and SC-004 rewritten to be measurable (CHK013, CHK014).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Visitor reads and installs the talk's skill (Priority: P1)
@@ -109,27 +126,28 @@ A visitor browsing the talk header sees an indicator that this talk ships a skil
 ### Functional Requirements
 
 - **FR-001**: Each talk MAY have at most one associated skill, located at a predictable location derived solely from the talk page's identifier. Locating the skill MUST NOT require any edit to the talk page or to site configuration.
-- **FR-002**: The skill file MUST be in the SKILL.md shape: a metadata header carrying at least `name` and `description`, followed by a markdown body.
-- **FR-003**: When a talk's skill file exists, the talk page MUST render a Skill section containing, in this order: the skill's name, its description, install instructions, and the rendered body. The body MUST sit inside a disclosure that is closed by default, operable by keyboard, and whose open/closed state is announced to assistive technology; name, description, and install instructions MUST be visible without expanding anything.
-- **FR-004**: When a talk's skill file does not exist, the talk page MUST contain no Skill section, no placeholder, no empty heading, and no availability indicator.
-- **FR-005**: The Skill section MUST link to the raw skill file, served unmodified at a stable public address, and the link MUST resolve correctly when the site is hosted under a sub-path.
+- **FR-002**: The skill file MUST be in the SKILL.md shape: a metadata header carrying at least `name` and `description`, followed by a markdown body. `name` MUST be a lowercase slug (letters, digits, and single hyphens; at most 64 characters) because it becomes the install directory and therefore the assistant's command name. `description` MUST be non-empty text; it has no length limit and is never truncated on the page.
+- **FR-003**: When a talk's skill file exists, the talk page MUST render a Skill section containing, in this order: the skill's name, its description, install instructions, and the rendered body. The body MUST sit inside a disclosure that is closed on every page load, operable by keyboard, and whose open/closed state is announced to assistive technology; name, description, and install instructions MUST be visible without expanding anything. When the body is empty, the disclosure is omitted and the rest of the section still renders.
+- **FR-004**: When a talk's skill file does not exist, the talk page MUST contain no Skill section, no placeholder, no empty heading, no availability indicator, and MUST NOT load any additional asset introduced by this feature.
+- **FR-005**: The Skill section MUST link to the raw skill file, served byte-for-byte unmodified at a public address derived only from the talk identifier and the site's configured address (so it does not change across rebuilds), and the link MUST resolve correctly when the site is hosted under a sub-path.
 - **FR-006**: Install instructions MUST include at minimum: (a) a copy-paste command that places the skill in the visitor's personal (user-level) Claude Code skills location, and (b) a generic "download the file and place it where your assistant expects skills" path. Every address in the instructions MUST be derived from the site's configured address and the talk's identifier, never hardcoded.
-- **FR-007**: The install command MUST offer a copy control that copies the exact command text; when copying is unavailable, the command MUST remain readable and selectable.
-- **FR-008**: The rendered body MUST be sanitized with the same protections applied to other rendered talk content; no content from a skill file may execute in the visitor's browser.
+- **FR-007**: The install command MUST offer a copy control that copies the exact command text. When copying is unavailable, the control is not offered and the command MUST remain readable and selectable. When a copy attempt fails, the failure MUST be reported in the same announced manner as success, and the command MUST remain selectable.
+- **FR-008**: The rendered body MUST be sanitized with the same protections applied to other rendered talk content, and the name and description MUST be rendered as escaped text, never as markup; no content from a skill file may execute in the visitor's browser.
 - **FR-009**: A skill file with a missing or empty `name` or `description`, or an unparseable metadata header, MUST cause the site build to fail with a message that names the file and the problem. A page MUST NOT be published with a partial or fallback Skill section.
-- **FR-010**: The Skill section MUST render correctly in both light and dark themes and at phone widths, with no horizontal scrolling of the page body; only the command block may scroll within itself.
-- **FR-011**: The Skill section MUST meet the site's accessibility bar (WCAG 2.1 AA): correct heading hierarchy within the page, sufficient contrast, keyboard operability of every control, and assistive-technology announcements for the copy confirmation and any collapsed/expanded state.
+- **FR-010**: The Skill section MUST render correctly in both light and dark themes and at phone widths down to 320px, with no horizontal scrolling of the page body; only the command block may scroll within itself. Interactive controls MUST have touch targets of at least 44×44 CSS pixels. Any motion (disclosure, copy feedback) MUST respect the visitor's reduced-motion preference.
+- **FR-011**: The Skill section MUST meet the site's accessibility bar (WCAG 2.1 AA): correct heading hierarchy within the page (headings inside the skill body MUST sit below the section's own heading in the outline, whatever level the file uses), sufficient contrast, keyboard operability of every control, and assistive-technology announcements for the copy confirmation and any collapsed/expanded state.
 - **FR-012**: A skill file for a talk identifier that has no talk page MUST be ignored without failing the build.
-- **FR-013**: The feature MUST be documented for template users: where the file goes, the required metadata, what the page shows, what happens when the file is malformed, and the project-level install alternative for visitors. Sample content MUST be free of personal data and clearly marked as demo content, matching existing demo talks.
+- **FR-013**: The feature MUST be documented for template users: where the file goes, the required metadata, what the page shows, what happens when the file is malformed, how to preview locally, and the project-level install alternative for visitors. Sample content MUST be free of personal data and clearly marked as demo content, matching existing demo talks.
 - **FR-014**: Existing tests for talk pages without a skill MUST continue to pass unchanged; the feature MUST NOT alter the rendering of talks that have no skill.
-- **FR-015**: When a talk has a skill, a "Skill Available" indicator MUST appear alongside the existing video availability status, in every view where that status is shown (talk header and talk listings). When a talk has no skill, no indicator of any kind is present.
+- **FR-015**: When a talk has a skill, a "Skill Available" indicator MUST appear immediately after the existing video availability status, in every view where that status is shown (talk header and talk listings). When a talk has no skill, no indicator of any kind is present.
 - **FR-016**: The Skill section MUST appear immediately after the slides/video area and before the presentation context, abstract, and resources. On talks with no slides and no video, it MUST be the first section after the header.
 - **FR-017**: The template MUST ship exactly one demo skill, attached to one of the existing DEMO talks, so the Skill section is visible in a fresh checkout. The demo skill MUST be marked as demo content in the same way the DEMO talks are, MUST contain no personal data, and MUST be listed in the "delete demo content" instructions alongside the DEMO talks.
+- **FR-018**: On the hosted site, adding, changing, or removing a skill file alone MUST be sufficient to trigger publication of the updated pages and raw file, with no other change required.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Talk page**: an existing published talk, identified by its page identifier (stem). Already carries title, conference, date, slides, video, abstract, resources, and an optional thumbnail resolved by convention from the same identifier.
-- **Skill**: a single file associated with exactly one talk by convention. Attributes: `name` (short, human-readable), `description` (one line, what the skill does and when to use it), `body` (markdown instructions). Also has a public raw address once published.
+- **Skill**: a single file associated with exactly one talk by convention. Attributes: `name` (a short lowercase slug that doubles as the install directory and command name), `description` (what the skill does and when to use it; shown in full), `body` (markdown instructions; may be empty). Also has a public raw address once published.
 - **Install instruction**: a labelled, copyable recipe for one assistant, composed from the skill's public raw address and the assistant's expected skills location. The set of assistants is a small, extensible list; Claude Code and the generic download path are required.
 
 ## Success Criteria *(mandatory)*
@@ -137,9 +155,9 @@ A visitor browsing the talk header sees an indicator that this talk ships a skil
 ### Measurable Outcomes
 
 - **SC-001**: A speaker can add a skill to an existing talk by adding exactly one file and rebuilding; zero edits to talk pages or configuration are needed.
-- **SC-002**: A visitor can get from the talk page to a correctly placed skill file in their assistant in under one minute using only the on-page instructions, with a single copy-and-run for the named assistant.
+- **SC-002**: Starting from the open talk page with a terminal available and the named assistant already installed, a visitor can get a correctly placed skill file into that assistant in under one minute using only the on-page instructions, with a single copy-and-run.
 - **SC-003**: Talk pages without a skill render identically before and after this feature; the existing test suite passes without modification to those tests.
-- **SC-004**: The Skill section passes the site's existing accessibility checks and renders at phone width with no horizontal page scrolling.
+- **SC-004**: The Skill section passes automated structural accessibility checks in the feature's own tests (one section heading at the correct level, body headings below it, a labelled copy control with an announced status region, a native keyboard-operable disclosure closed by default) and a manual keyboard, contrast, and 320px-width pass in light and dark themes with no horizontal page scrolling.
 - **SC-005**: 100% of malformed skill files (missing/empty name or description, unparseable header) are caught at build time with a message naming the file, before anything is published.
 - **SC-006**: A new template user, following the documentation alone, can add a skill to a talk and see it rendered on the first attempt; a fresh checkout already shows one working Skill section on a DEMO talk.
 

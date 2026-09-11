@@ -31,7 +31,7 @@ Other front-matter keys are preserved in the raw file and ignored by the page.
 |---|---|---|
 | `name` | String | `SkillFile.name` |
 | `description` | String | `SkillFile.description` (trimmed) |
-| `html` | String | Body rendered by the site's markdown converter, passed through `HtmlSanitizer#sanitize_html`, headings demoted two levels |
+| `html` | String | Body rendered by the site's markdown converter, passed through `HtmlSanitizer#sanitize_html`, headings demoted two levels; empty string when the body is blank (the include then omits the disclosure) |
 | `url` | String | `/skills/{stem}/SKILL.md` (site-root-relative; templates apply `relative_url` / `absolute_url`) |
 | `source_path` | String | `_skills/{stem}/SKILL.md` (for error messages and tests) |
 | `install_dir` | String | `~/.claude/skills/{name}` |
