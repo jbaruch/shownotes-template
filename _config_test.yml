@@ -8,6 +8,7 @@ highlighter: rouge
 permalink: /:categories/:title/
 encoding: utf-8
 timezone: UTC
+future: true
 
 # Kramdown configuration
 kramdown:
