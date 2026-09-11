@@ -1,0 +1,38 @@
+{% comment %}
+Skill section for a talk page (feature 002-talk-skill-section).
+Usage: {% include skill_section.html skill=page.skill %}
+`skill` is the hash attached by _plugins/skill_processor.rb:
+  name, description, html (sanitized, headings demoted), url, install_dir, source_path
+DOM contract: specs/002-talk-skill-section/contracts/rendered-html.md
+{% endcomment %}
+{% assign skill = include.skill %}
+{% assign raw_relative = skill.url | relative_url %}
+{% assign raw_absolute = skill.url | absolute_url %}
+<section class="talk-skill" aria-labelledby="talk-skill-heading">
+    <h2 id="talk-skill-heading" class="talk-skill__heading">
+        <span class="talk-skill__label">Skill</span>
+        <span class="talk-skill__name">{{ skill.name | escape }}</span>
+    </h2>
+    <p class="talk-skill__description">{{ skill.description | escape }}</p>
+
+    <div class="talk-skill__install">
+        <h3 class="talk-skill__install-heading">Install</h3>
+        <p class="talk-skill__install-label">Claude Code, personal skills folder:</p>
+        <div class="talk-skill__command">
+            <pre><code id="talk-skill-command">mkdir -p {{ skill.install_dir | escape }} &amp;&amp; curl -fsSL {{ raw_absolute }} -o {{ skill.install_dir | escape }}/SKILL.md</code></pre>
+            <button type="button" class="talk-skill__copy" data-copy-target="talk-skill-command" aria-label="Copy install command" aria-describedby="talk-skill-copy-status">Copy</button>
+        </div>
+        <p id="talk-skill-copy-status" class="talk-skill__copy-status" aria-live="polite"></p>
+        <p class="talk-skill__generic">Other assistants: <a class="talk-skill__raw" href="{{ raw_relative }}" download>download SKILL.md</a> and place it where your assistant looks for skills.</p>
+    </div>
+
+    {% if skill.html != "" %}
+    <details class="talk-skill__body">
+        <summary class="talk-skill__summary">Show skill instructions</summary>
+        <div class="talk-skill__content">
+{{ skill.html }}
+        </div>
+    </details>
+    {% endif %}
+</section>
+<script src="{{ '/assets/js/skill-install.js' | relative_url }}" defer></script>

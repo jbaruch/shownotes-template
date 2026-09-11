@@ -89,6 +89,11 @@ layout: default
     </section>
     {% endif %}
 
+    <!-- Agent skill distilled from the talk (feature 002); omitted entirely when no skill file exists -->
+    {% if page.skill %}
+    {% include skill_section.html skill=page.skill %}
+    {% endif %}
+
     <!-- Talk content -->
     <section class="talk-content">
         {% if page.extracted_presentation_context %}
