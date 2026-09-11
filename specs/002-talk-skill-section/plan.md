@@ -62,6 +62,7 @@ _plugins/
   skill_processor.rb          # NEW: SkillRawFile (StaticFile subclass) + SkillProcessor (Generator)
 
 _skills/                      # NEW convention directory (invisible to Jekyll's reader)
+  .gitkeep                    # NEW: keeps the directory in a clean template checkout
   DEMO-ai-coding-assistants-2025/
     SKILL.md                  # NEW: demo skill for the DEMO talk of the same stem
 

@@ -38,7 +38,7 @@ Rendered only when `page.skill` is truthy. Position: the first child of `<articl
 
 Invariants:
 - `{name}` and `{description}` are Liquid-`escape`d. `{html}` is inserted as-is (already sanitized by the plugin).
-- `{absolute raw url}` = `skill.url | absolute_url`; `{relative raw url}` = `skill.url | relative_url`.
+- `{absolute raw url}` = `skill.url | absolute_url`; `{relative raw url}` = `skill.url | relative_url`; `~/.claude/skills/{name}` in the command is `skill.install_dir` from the plugin, not recomputed in Liquid.
 - Headings: exactly one `h2` in the section; `h3` for Install; body headings start at `h3`.
 - `<details>` has no `open` attribute in the build output. When the rendered body is empty (whitespace only), the whole `<details class="talk-skill__body">` element is omitted.
 - No CSS transitions or animations are used in the section, so there is nothing to gate on `prefers-reduced-motion`.
