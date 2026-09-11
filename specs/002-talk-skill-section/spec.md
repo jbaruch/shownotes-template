@@ -11,13 +11,25 @@ A talk page today carries slides, video, abstract, and resources. This feature a
 
 The skill is a single self-describing file in the widely used SKILL.md shape: a metadata header with at least a `name` and a `description`, followed by a markdown body with the instructions. The file is produced elsewhere (the speaker's publishing tooling generates it from the transcript when the video is published). This repository only has to notice the file, show it well, and make it easy to install.
 
+For visitors who work through a coding agent, the skill is the primary takeaway: it stands in for the resources list, and arguably for the video and slides themselves. It therefore sits directly under the media row, not at the bottom of the page.
+
 The talk page follows an established convention for optional assets: **omit, don't placeholder**. A talk without slides shows no slides block; a talk without a video shows "Video Coming Soon" only because that state is deliberately meaningful. The skill follows the stricter form: no file, no section, no hint.
+
+## Clarifications
+
+### Session 2026-09-11
+
+- Q: Where should the copy-paste Claude Code install command put the skill? -> A: The visitor's personal (user-level) skills location; the project-level variant is described in the docs as an alternative.
+- Q: How should the skill's body be presented on the page? -> A: Collapsed by default behind a keyboard-operable disclosure; name, description, and install block always visible.
+- Q: Where on the talk page does the Skill section go? -> A: Directly under the slides/video row, before the presentation context, abstract, and resources. For visitors who work through an agent the skill stands in for the resources (and arguably for the slides and video), so it gets top placement while the media panels keep the very top.
+- Q: Should the template ship a demo skill for one of the DEMO talks? -> A: Yes, exactly one, clearly marked as demo content and removed together with the other DEMO content.
+- Q: Keep the "Skill Available" header badge in scope? -> A: Yes, in scope now as a firm requirement, mirroring the existing video availability badge wherever that badge is shown.
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Visitor reads and installs the talk's skill (Priority: P1)
 
-A developer opens a talk page after watching the video. Below the talk content they find a "Skill" section showing the skill's name, a one-line description of what it does, and the skill's full instructions. They copy a single install command for their assistant, run it, and the skill is available in their next coding session. If they use an assistant the page doesn't name, they download the raw file and place it wherever their tool expects.
+A developer opens a talk page after watching the video. Directly under the slides and video they find a "Skill" section showing the skill's name, a one-line description of what it does, and the skill's full instructions. They copy a single install command for their assistant, run it, and the skill is available in their next coding session. If they use an assistant the page doesn't name, they download the raw file and place it wherever their tool expects.
 
 **Why this priority**: This is the whole point of the feature. Without the visitor being able to read and install the skill, nothing else matters.
 
@@ -70,14 +82,14 @@ A visitor scanned the QR code from the slides and is reading the talk page on a 
 
 A visitor browsing the talk header sees an indicator that this talk ships a skill, next to the existing "Video Available" status, so they know to scroll down for it.
 
-**Why this priority**: Nice to have. The section is useful without it, but discoverability at the top of the page is cheap and consistent with how video availability is already surfaced. This story can be cut without affecting the others.
+**Why this priority**: In scope, but the section works without it. Discoverability is cheap and consistent with how video availability is already surfaced, and listings gain a way to tell which talks ship a skill.
 
-**Independent Test**: Build with one talk with a skill and one without. Confirm the header of the first carries a skill indicator and the header of the second does not.
+**Independent Test**: Build with one talk with a skill and one without. Confirm the header and the listing entry of the first carry a skill indicator and those of the second do not.
 
 **Acceptance Scenarios**:
 
-1. **Given** a talk with a skill, **When** the visitor views the talk header, **Then** an indicator states that a skill is available.
-2. **Given** a talk without a skill, **When** the visitor views the talk header, **Then** no skill indicator of any kind is present.
+1. **Given** a talk with a skill, **When** the visitor views the talk header or a talk listing, **Then** an indicator states that a skill is available, next to the video status.
+2. **Given** a talk without a skill, **When** the visitor views the talk header or a talk listing, **Then** no skill indicator of any kind is present.
 
 ---
 
@@ -85,7 +97,7 @@ A visitor browsing the talk header sees an indicator that this talk ships a skil
 
 - **Malformed metadata**: header present but unparseable, or name/description empty. The build fails visibly with the file path and reason. Silent fallbacks are not acceptable (a page showing "Untitled Skill" is worse than a failed build).
 - **Body contains markup or scripts**: the rendered body must be sanitized with the same protections applied to other rendered talk content. Nothing in a skill file may execute in the visitor's browser.
-- **Very long body**: the name, description, and install instructions are always immediately visible; the body may be presented in a collapsed form that the visitor expands, so the section does not bury the rest of the page. The collapsed state must be operable by keyboard and announced to assistive technology.
+- **Very long body**: the name, description, and install instructions are always immediately visible; the body is collapsed by default (FR-003) so the section does not bury the rest of the page. A body of any length must expand fully; no truncation.
 - **Legacy talk identifiers**: talks whose page identifier carries a date prefix use that full identifier in the convention, exactly as thumbnails do. Renaming published talks is never required.
 - **Orphan skill file**: a skill file for a talk identifier with no page is ignored, not an error.
 - **Sub-path hosting**: raw-file links and install commands must respect the site's configured base path.
@@ -98,19 +110,21 @@ A visitor browsing the talk header sees an indicator that this talk ships a skil
 
 - **FR-001**: Each talk MAY have at most one associated skill, located at a predictable location derived solely from the talk page's identifier. Locating the skill MUST NOT require any edit to the talk page or to site configuration.
 - **FR-002**: The skill file MUST be in the SKILL.md shape: a metadata header carrying at least `name` and `description`, followed by a markdown body.
-- **FR-003**: When a talk's skill file exists, the talk page MUST render a Skill section containing, in this order: the skill's name, its description, install instructions, and the rendered body.
+- **FR-003**: When a talk's skill file exists, the talk page MUST render a Skill section containing, in this order: the skill's name, its description, install instructions, and the rendered body. The body MUST sit inside a disclosure that is closed by default, operable by keyboard, and whose open/closed state is announced to assistive technology; name, description, and install instructions MUST be visible without expanding anything.
 - **FR-004**: When a talk's skill file does not exist, the talk page MUST contain no Skill section, no placeholder, no empty heading, and no availability indicator.
 - **FR-005**: The Skill section MUST link to the raw skill file, served unmodified at a stable public address, and the link MUST resolve correctly when the site is hosted under a sub-path.
-- **FR-006**: Install instructions MUST include at minimum: (a) a copy-paste command that places the skill in the Claude Code skills location, and (b) a generic "download the file and place it where your assistant expects skills" path. Every address in the instructions MUST be derived from the site's configured address and the talk's identifier, never hardcoded.
+- **FR-006**: Install instructions MUST include at minimum: (a) a copy-paste command that places the skill in the visitor's personal (user-level) Claude Code skills location, and (b) a generic "download the file and place it where your assistant expects skills" path. Every address in the instructions MUST be derived from the site's configured address and the talk's identifier, never hardcoded.
 - **FR-007**: The install command MUST offer a copy control that copies the exact command text; when copying is unavailable, the command MUST remain readable and selectable.
 - **FR-008**: The rendered body MUST be sanitized with the same protections applied to other rendered talk content; no content from a skill file may execute in the visitor's browser.
 - **FR-009**: A skill file with a missing or empty `name` or `description`, or an unparseable metadata header, MUST cause the site build to fail with a message that names the file and the problem. A page MUST NOT be published with a partial or fallback Skill section.
 - **FR-010**: The Skill section MUST render correctly in both light and dark themes and at phone widths, with no horizontal scrolling of the page body; only the command block may scroll within itself.
 - **FR-011**: The Skill section MUST meet the site's accessibility bar (WCAG 2.1 AA): correct heading hierarchy within the page, sufficient contrast, keyboard operability of every control, and assistive-technology announcements for the copy confirmation and any collapsed/expanded state.
 - **FR-012**: A skill file for a talk identifier that has no talk page MUST be ignored without failing the build.
-- **FR-013**: The feature MUST be documented for template users: where the file goes, the required metadata, what the page shows, and what happens when the file is malformed. Sample content MUST be free of personal data and clearly marked as demo content, matching existing demo talks.
+- **FR-013**: The feature MUST be documented for template users: where the file goes, the required metadata, what the page shows, what happens when the file is malformed, and the project-level install alternative for visitors. Sample content MUST be free of personal data and clearly marked as demo content, matching existing demo talks.
 - **FR-014**: Existing tests for talk pages without a skill MUST continue to pass unchanged; the feature MUST NOT alter the rendering of talks that have no skill.
-- **FR-015** *(P3, optional)*: When a talk has a skill, the talk header MAY carry a "Skill Available" indicator alongside the existing video status; when it does not, no indicator is present.
+- **FR-015**: When a talk has a skill, a "Skill Available" indicator MUST appear alongside the existing video availability status, in every view where that status is shown (talk header and talk listings). When a talk has no skill, no indicator of any kind is present.
+- **FR-016**: The Skill section MUST appear immediately after the slides/video area and before the presentation context, abstract, and resources. On talks with no slides and no video, it MUST be the first section after the header.
+- **FR-017**: The template MUST ship exactly one demo skill, attached to one of the existing DEMO talks, so the Skill section is visible in a fresh checkout. The demo skill MUST be marked as demo content in the same way the DEMO talks are, MUST contain no personal data, and MUST be listed in the "delete demo content" instructions alongside the DEMO talks.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -127,13 +141,12 @@ A visitor browsing the talk header sees an indicator that this talk ships a skil
 - **SC-003**: Talk pages without a skill render identically before and after this feature; the existing test suite passes without modification to those tests.
 - **SC-004**: The Skill section passes the site's existing accessibility checks and renders at phone width with no horizontal page scrolling.
 - **SC-005**: 100% of malformed skill files (missing/empty name or description, unparseable header) are caught at build time with a message naming the file, before anything is published.
-- **SC-006**: A new template user, following the documentation alone, can add a skill to a demo talk and see it rendered on the first attempt.
+- **SC-006**: A new template user, following the documentation alone, can add a skill to a talk and see it rendered on the first attempt; a fresh checkout already shows one working Skill section on a DEMO talk.
 
 ## Assumptions
 
 - The proposed convention location is a per-talk folder keyed by the talk page identifier containing the skill file (the user suggested `skills/{talk-stem}/SKILL.md`). The exact location and how the raw file is served are fixed during planning; the spec only requires that it be derived from the identifier alone.
-- Placement: the Skill section appears after the Resources section, so the resources a QR-scanning attendee came for stay where they are today. The body is collapsed by default with name, description, and install block always visible.
-- Install instructions target Claude Code first because it is the assistant with a documented skills directory convention that maps one-to-one onto a SKILL.md file. Other assistants can be added later as further entries in the same list without changing the feature.
+- Install instructions target Claude Code first because it is the assistant with a documented skills directory convention that maps one-to-one onto a SKILL.md file. The on-page command installs to the personal (user-level) location; the documentation describes the project-level location as an alternative for visitors who want the skill to travel with a repository. Other assistants can be added later as further entries in the same list without changing the feature.
 - Skill generation, transcript handling, and publishing to any skill registry are the publishing tooling's job and are outside this repository.
 - The site's existing content sanitization is sufficient for the skill body; the body is treated exactly like resources content.
 

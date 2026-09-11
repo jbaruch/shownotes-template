@@ -32,4 +32,4 @@
 ## Notes
 
 - Items marked incomplete require spec updates before `/speckit-02-clarify` or `/speckit-03-plan`
-- Assumptions worth challenging in `/speckit-02-clarify`: section placement (after Resources), collapsed-by-default body, Claude Code as the only named assistant, and the P3 header indicator.
+- Clarified 2026-09-11 (5 questions): install target (personal skills folder), body display (collapsed disclosure), placement (directly under the media row), demo skill (one, on a DEMO talk), header badge (in scope, all views).
