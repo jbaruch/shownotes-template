@@ -9,6 +9,7 @@ on:
       - 'lib/**'
       - 'test/**'
       - '_plugins/**'
+      - '_skills/**'
       - '_config.yml'
       - 'Gemfile*'
       - '_layouts/**'

@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - '_talks/**'
+      - '_skills/**'
       - '_plugins/**'
       - '_layouts/**'
       - '_includes/**'

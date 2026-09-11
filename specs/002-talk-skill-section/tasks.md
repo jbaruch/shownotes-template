@@ -16,9 +16,9 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Create `_skills/.gitkeep` so the convention directory exists in a clean template checkout (mirrors `_talks/.gitkeep`)
-- [ ] T002 [P] Add `'_skills/**'` to the `paths:` list under `on.push` in `.github/workflows/deploy.yml` (FR-018)
-- [ ] T003 [P] Add `'_skills/**'` to the `paths:` list under `on.push` in `.github/workflows/ci.yml`
+- [X] T001 Create `_skills/.gitkeep` so the convention directory exists in a clean template checkout (mirrors `_talks/.gitkeep`)
+- [X] T002 [P] Add `'_skills/**'` to the `paths:` list under `on.push` in `.github/workflows/deploy.yml` (FR-018)
+- [X] T003 [P] Add `'_skills/**'` to the `paths:` list under `on.push` in `.github/workflows/ci.yml`
 
 ---
 
