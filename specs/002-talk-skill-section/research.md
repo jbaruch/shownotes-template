@@ -71,22 +71,28 @@ Every decision below was checked against the installed toolchain (Ruby 3.4.5, Je
 
 ## R5. Install instructions
 
-**Decision**: One primary copy-paste command targeting the personal skills folder, plus a generic download path:
+**Decision** (revised mid-implementation on the speaker's prompt): one universal copy-paste command using the open Agent Skills CLI, personal scope:
 
 ```bash
-mkdir -p ~/.claude/skills/{name} && curl -fsSL {site.url}{baseurl}/skills/{stem}/SKILL.md -o ~/.claude/skills/{name}/SKILL.md
+npx skills add {site.url}{baseurl}/skills/{stem}/SKILL.md -g
 ```
 
-The generic path is a `download`-attributed link to the raw file with one sentence: place it where your assistant looks for skills. The docs mention the project-level alternative (`.claude/skills/{name}/SKILL.md` inside a repository).
+Fallback for visitors without Node.js: a `download`-attributed link to the raw file plus the layout to place it in, `{name}/SKILL.md` inside the agent's skills folder, with Claude Code's `~/.claude/skills/{name}/SKILL.md` as the worked example. Docs mention dropping `-g` for project scope.
+
+**Evidence**:
+- Agent Skills is an open specification (`https://agentskills.io/specification`, read 2026-09-11): `name` is 1–64 lowercase alphanumerics and hyphens, no leading/trailing/consecutive hyphens, and must match the parent directory name; `description` is 1–1024 characters. Our validation now matches both rules exactly. The spec defines the format, not an install location; each agent scans its own well-known directories.
+- The `npx skills` CLI (`https://github.com/vercel-labs/skills`, README read 2026-09-11) accepts direct download URLs to a SKILL.md, installs into every supported agent it detects (75+ listed, including Claude Code, Codex, Cursor, Gemini CLI, Copilot, OpenCode), and `-g` selects the user directory over the project directory.
+- **Verified empirically**: against the local test build, `HOME=<throwaway> npx skills add http://127.0.0.1:4001/skills/DEMO-ai-coding-assistants-2025/SKILL.md -g -y -a claude-code` installed `~/.agents/skills/evaluate-ai-assistant-claims` and copied it to `~/.claude/skills/evaluate-ai-assistant-claims/SKILL.md`, byte-identical to the served file. The directory name came from the `name` field, so the command never needs the name.
 
 **Rationale**:
-- Verified against `https://code.claude.com/docs/en/skills.md` (2026-09-11): personal skills live at `~/.claude/skills/<dir>/SKILL.md`, project skills at `.claude/skills/<dir>/SKILL.md`, and a newly dropped directory is picked up within the running session (a restart is needed only if the top-level skills directory did not exist at session start; the docs will say so).
-- `curl -fsSL` fails loudly on 404 rather than writing an HTML error page into the skills folder. `mkdir -p` is idempotent, so re-running updates in place.
-- The absolute URL is built with `absolute_url`, so it is derived from `site.url` + `site.baseurl` (FR-006: nothing hardcoded). In `_config_test.yml` both are empty, so the test build produces a root-relative command; tests assert on the path, not the host.
+- One command that works for every supporting agent beats one command that works for one agent plus a "figure out your own path" sentence. Personal scope (`-g`) keeps clarification Q1's intent.
+- The Claude Code fallback path is kept because it is verified (`https://code.claude.com/docs/en/skills.md`, 2026-09-11: personal skills at `~/.claude/skills/<dir>/SKILL.md`, project skills at `.claude/skills/<dir>/SKILL.md`, picked up within the running session).
+- The absolute URL is built with `absolute_url`, so it is derived from `site.url` + `site.baseurl` (FR-006: nothing hardcoded). Under `jekyll serve`, Jekyll substitutes the local server address, which is why the empirical test above worked against localhost.
 
 **Alternatives considered**:
-- Two commands (personal + project). Rejected by clarification Q1: one command on the page, the alternative in docs.
-- A third-party installer CLI. Rejected: out of scope, adds a moving dependency the page cannot verify.
+- `mkdir -p ~/.claude/skills/{name} && curl -fsSL {url} -o …` as the primary (the original plan). Correct for Claude Code only; demoted to the worked example in the fallback sentence.
+- Two copyable commands (CLI + curl). Rejected: doubles the install block on a phone (clarification Q1 reasoning still applies).
+- A per-agent path picker. Rejected: the CLI already knows the paths; a picker would duplicate its table and drift.
 
 ## R6. Copy control and disclosure
 

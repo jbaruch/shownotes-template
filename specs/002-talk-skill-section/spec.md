@@ -42,6 +42,10 @@ Defaults applied while running the UX and integration requirement checklists; ea
 - FR-018 (new): adding or changing a skill file alone must trigger publication on the hosted site (CHK104).
 - SC-002 and SC-004 rewritten to be measurable (CHK013, CHK014).
 
+### Mid-implementation (2026-09-11)
+
+- Q: "Show skill instructions" reads like "how to install"; and isn't installation universal now? -> A: Disclosure label is "Show skill content". Installation is universal: Agent Skills is an open format (agentskills.io) and the `npx skills` CLI installs a SKILL.md from a direct URL into every supported agent it detects. The primary copy-paste command is therefore `npx skills add {raw url} -g` (personal scope); the fallback is download-and-place with the `{name}/SKILL.md` layout and the Claude Code folder as the worked example. Clarification Q1's "personal scope" still holds; "Claude Code first" no longer does. FR-002 also adopts the specification's 1024-character description limit.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Visitor reads and installs the talk's skill (Priority: P1)
@@ -56,7 +60,7 @@ A developer opens a talk page after watching the video. Directly under the slide
 
 1. **Given** a talk with a skill file at the convention location, **When** a visitor opens the talk page, **Then** a "Skill" section is present showing the skill's name, description, and rendered body.
 2. **Given** the Skill section is shown, **When** the visitor follows the raw-file link, **Then** they receive the skill file unchanged (same bytes as committed).
-3. **Given** the Skill section is shown, **When** the visitor copies the install instructions for the named assistant and runs them, **Then** the skill file lands in that assistant's skills location without manual edits to the command.
+3. **Given** the Skill section is shown, **When** the visitor copies the install command and runs it, **Then** the skill file lands in the skills location of every supporting agent on their machine without manual edits to the command.
 4. **Given** the site is hosted under a sub-path (not at the domain root), **When** the visitor uses the raw-file link or the install command, **Then** the address still resolves correctly.
 5. **Given** the site's theme is dark, **When** the visitor views the Skill section, **Then** text, code, links, and controls remain readable with adequate contrast, and likewise in light theme.
 
@@ -126,15 +130,15 @@ A visitor browsing the talk header sees an indicator that this talk ships a skil
 ### Functional Requirements
 
 - **FR-001**: Each talk MAY have at most one associated skill, located at a predictable location derived solely from the talk page's identifier. Locating the skill MUST NOT require any edit to the talk page or to site configuration.
-- **FR-002**: The skill file MUST be in the SKILL.md shape: a metadata header carrying at least `name` and `description`, followed by a markdown body. `name` MUST be a lowercase slug (letters, digits, and single hyphens; at most 64 characters) because it becomes the install directory and therefore the assistant's command name. `description` MUST be non-empty text; it has no length limit and is never truncated on the page.
+- **FR-002**: The skill file MUST be in the SKILL.md shape: a metadata header carrying at least `name` and `description`, followed by a markdown body. `name` MUST be a lowercase slug (letters, digits, and single hyphens; at most 64 characters) because it becomes the install directory and therefore the assistant's command name. `description` MUST be non-empty text of at most 1024 characters (the Agent Skills specification limit) and is never truncated on the page.
 - **FR-003**: When a talk's skill file exists, the talk page MUST render a Skill section containing, in this order: the skill's name, its description, install instructions, and the rendered body. The body MUST sit inside a disclosure that is closed on every page load, operable by keyboard, and whose open/closed state is announced to assistive technology; name, description, and install instructions MUST be visible without expanding anything. When the body is empty, the disclosure is omitted and the rest of the section still renders.
 - **FR-004**: When a talk's skill file does not exist, the talk page MUST contain no Skill section, no placeholder, no empty heading, no availability indicator, and MUST NOT load any additional asset introduced by this feature.
 - **FR-005**: The Skill section MUST link to the raw skill file, served byte-for-byte unmodified at a public address derived only from the talk identifier and the site's configured address (so it does not change across rebuilds), and the link MUST resolve correctly when the site is hosted under a sub-path.
-- **FR-006**: Install instructions MUST include at minimum: (a) a copy-paste command that places the skill in the visitor's personal (user-level) Claude Code skills location, and (b) a generic "download the file and place it where your assistant expects skills" path. Every address in the instructions MUST be derived from the site's configured address and the talk's identifier, never hardcoded.
+- **FR-006**: Install instructions MUST include at minimum: (a) one copy-paste command, using the open Agent Skills CLI, that installs the skill in personal (user-level) scope into every supporting agent on the visitor's machine, and (b) a fallback that links to the raw file and states the `{name}/SKILL.md` layout to place inside an agent's skills folder, with the Claude Code personal folder as the worked example. Every address in the instructions MUST be derived from the site's configured address and the talk's identifier, never hardcoded.
 - **FR-007**: The install command MUST offer a copy control that copies the exact command text. When copying is unavailable, the control is not offered and the command MUST remain readable and selectable. When a copy attempt fails, the failure MUST be reported in the same announced manner as success, and the command MUST remain selectable.
 - **FR-008**: The rendered body MUST be sanitized with the same protections applied to other rendered talk content, and the name and description MUST be rendered as escaped text, never as markup; no content from a skill file may execute in the visitor's browser.
 - **FR-009**: A skill file with a missing or empty `name` or `description`, or an unparseable metadata header, MUST cause the site build to fail with a message that names the file and the problem. A page MUST NOT be published with a partial or fallback Skill section.
-- **FR-010**: The Skill section MUST render correctly in both light and dark themes and at phone widths down to 320px, with no horizontal scrolling of the page body; only the command block may scroll within itself. Interactive controls MUST have touch targets of at least 44×44 CSS pixels. Any motion (disclosure, copy feedback) MUST respect the visitor's reduced-motion preference.
+- **FR-010**: The Skill section MUST render correctly in both light and dark themes and at phone widths down to 320px, with no horizontal scrolling of the page body; only the command block and code or table blocks inside the skill body may scroll within themselves. Interactive controls MUST have touch targets of at least 44×44 CSS pixels. Any motion (disclosure, copy feedback) MUST respect the visitor's reduced-motion preference.
 - **FR-011**: The Skill section MUST meet the site's accessibility bar (WCAG 2.1 AA): correct heading hierarchy within the page (headings inside the skill body MUST sit below the section's own heading in the outline, whatever level the file uses), sufficient contrast, keyboard operability of every control, and assistive-technology announcements for the copy confirmation and any collapsed/expanded state.
 - **FR-012**: A skill file for a talk identifier that has no talk page MUST be ignored without failing the build.
 - **FR-013**: The feature MUST be documented for template users: where the file goes, the required metadata, what the page shows, what happens when the file is malformed, how to preview locally, and the project-level install alternative for visitors. Sample content MUST be free of personal data and clearly marked as demo content, matching existing demo talks.
@@ -148,14 +152,14 @@ A visitor browsing the talk header sees an indicator that this talk ships a skil
 
 - **Talk page**: an existing published talk, identified by its page identifier (stem). Already carries title, conference, date, slides, video, abstract, resources, and an optional thumbnail resolved by convention from the same identifier.
 - **Skill**: a single file associated with exactly one talk by convention. Attributes: `name` (a short lowercase slug that doubles as the install directory and command name), `description` (what the skill does and when to use it; shown in full), `body` (markdown instructions; may be empty). Also has a public raw address once published.
-- **Install instruction**: a labelled, copyable recipe for one assistant, composed from the skill's public raw address and the assistant's expected skills location. The set of assistants is a small, extensible list; Claude Code and the generic download path are required.
+- **Install instruction**: one copyable command composed from the skill's public raw address that installs into every supporting agent (personal scope), plus a fallback naming the `{name}/SKILL.md` layout with the Claude Code personal folder as the example.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
 - **SC-001**: A speaker can add a skill to an existing talk by adding exactly one file and rebuilding; zero edits to talk pages or configuration are needed.
-- **SC-002**: Starting from the open talk page with a terminal available and the named assistant already installed, a visitor can get a correctly placed skill file into that assistant in under one minute using only the on-page instructions, with a single copy-and-run.
+- **SC-002**: Starting from the open talk page with a terminal, Node.js, and at least one supporting agent installed, a visitor can get a correctly placed skill file into that agent in under one minute using only the on-page instructions, with a single copy-and-run.
 - **SC-003**: Talk pages without a skill render identically before and after this feature; the existing test suite passes without modification to those tests.
 - **SC-004**: The Skill section passes automated structural accessibility checks in the feature's own tests (one section heading at the correct level, body headings below it, a labelled copy control with an announced status region, a native keyboard-operable disclosure closed by default) and a manual keyboard, contrast, and 320px-width pass in light and dark themes with no horizontal page scrolling.
 - **SC-005**: 100% of malformed skill files (missing/empty name or description, unparseable header) are caught at build time with a message naming the file, before anything is published.
@@ -164,7 +168,7 @@ A visitor browsing the talk header sees an indicator that this talk ships a skil
 ## Assumptions
 
 - The proposed convention location is a per-talk folder keyed by the talk page identifier containing the skill file (the user suggested `skills/{talk-stem}/SKILL.md`). The exact location and how the raw file is served are fixed during planning; the spec only requires that it be derived from the identifier alone.
-- Install instructions target Claude Code first because it is the assistant with a documented skills directory convention that maps one-to-one onto a SKILL.md file. The on-page command installs to the personal (user-level) location; the documentation describes the project-level location as an alternative for visitors who want the skill to travel with a repository. Other assistants can be added later as further entries in the same list without changing the feature.
+- The on-page command installs to the personal (user-level) scope via the Agent Skills CLI; the documentation describes dropping the `-g` flag for project scope, and the per-agent manual placement for visitors without Node.js. The fallback names Claude Code's folder as the worked example because it is verified; other agents' folders are documented by the CLI itself.
 - Skill generation, transcript handling, and publishing to any skill registry are the publishing tooling's job and are outside this repository.
 - The site's existing content sanitization is sufficient for the skill body; the body is treated exactly like resources content.
 
@@ -174,4 +178,4 @@ A visitor browsing the talk header sees an indicator that this talk ships a skil
 - Publishing the skill to any external registry or marketplace.
 - More than one skill per talk, skill versioning, or changelogs.
 - An index page listing all skills across talks.
-- Per-assistant install instructions beyond Claude Code and the generic download path (may be added later as data, not as new behaviour).
+- A per-agent picker for manual install paths (the CLI already targets every supporting agent; the fallback names one example folder).

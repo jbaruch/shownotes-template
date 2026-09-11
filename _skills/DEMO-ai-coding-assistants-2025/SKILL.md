@@ -22,7 +22,11 @@ When a productivity claim about an AI coding assistant lands in front of you ("4
 
 ## Output format
 
-Reply with a short table: **Claim** | **What it measured** | **Applies to us?** | **Pilot?**
+Reply with a short table:
+
+| Claim | What it measured | Applies to us? | Pilot? |
+|---|---|---|---|
+| (quote it) | task type, baseline, reviewer | yes / partly / no | yes / no |
 
 ## Example
 

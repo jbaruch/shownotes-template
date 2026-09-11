@@ -38,6 +38,7 @@ module Jekyll
     SKILL_FILENAME = 'SKILL.md'
     NAME_PATTERN = /\A[a-z0-9]+(-[a-z0-9]+)*\z/
     NAME_MAX_LENGTH = 64
+    DESCRIPTION_MAX_LENGTH = 1024
     HEADING_DEMOTION = 2
     NAME_RULE = "'name' must be lowercase letters, digits and hyphens (used as the install directory)"
 
@@ -84,6 +85,9 @@ module Jekyll
       name = required_string(data, 'name', relative)
       description = required_string(data, 'description', relative)
       fail_skill(relative, NAME_RULE) unless name.match?(NAME_PATTERN) && name.length <= NAME_MAX_LENGTH
+      if description.length > DESCRIPTION_MAX_LENGTH
+        fail_skill(relative, "'description' must be at most #{DESCRIPTION_MAX_LENGTH} characters")
+      end
 
       { 'name' => name, 'description' => description, 'body' => match.post_match }
     end

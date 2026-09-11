@@ -100,6 +100,17 @@ class SkillProcessorTest < Minitest::Test
     assert_equal name, skill['name']
   end
 
+  def test_parse_fails_on_description_longer_than_1024_characters
+    assert_skill_error("---\nname: demo-skill\ndescription: #{'x' * 1025}\n---\n",
+                       "'description' must be at most 1024 characters")
+  end
+
+  def test_parse_accepts_description_of_exactly_1024_characters
+    skill = @processor.send(:parse_skill, "---\nname: demo-skill\ndescription: #{'x' * 1024}\n---\n", REL)
+
+    assert_equal 1024, skill['description'].length
+  end
+
   def test_validation_failures_are_jekyll_fatal_exceptions
     error = assert_raises(Jekyll::Errors::FatalException) do
       @processor.send(:parse_skill, "no front matter", REL)

@@ -110,13 +110,18 @@ class RealSiteSkillSectionTest < Minitest::Test
     assert_equal expected_description, section.css('.talk-skill__description').text.strip
   end
 
-  def test_install_command_targets_personal_skills_folder_and_raw_url
-    command = section.css('#talk-skill-command').text
+  def test_install_command_uses_the_skills_cli_with_the_raw_url_in_personal_scope
+    command = section.css('#talk-skill-command').text.strip
 
-    assert_includes command, "mkdir -p ~/.claude/skills/#{expected_name}"
-    assert_includes command, 'curl -fsSL'
-    assert_includes command, "#{site.config['url']}#{baseurl}#{raw_path}"
-    assert_includes command, "-o ~/.claude/skills/#{expected_name}/SKILL.md"
+    assert_equal "npx skills add #{site.config['url']}#{baseurl}#{raw_path} -g", command
+  end
+
+  def test_fallback_names_the_file_layout_and_the_claude_code_folder
+    generic = section.css('.talk-skill__generic').first
+
+    refute_nil generic
+    assert_includes generic.text, "#{expected_name}/SKILL.md"
+    assert_includes generic.text, "~/.claude/skills/#{expected_name}/SKILL.md"
   end
 
   def test_download_link_points_at_raw_file
@@ -154,6 +159,46 @@ class RealSiteSkillSectionTest < Minitest::Test
       assert_empty html.css('.talk-skill, .skill-available, script[src*="skill-install"]'),
                    "#{stem} must carry no skill section, badge, or script (FR-004)"
     end
+  end
+
+  # --- US3: copy control, script, and mobile CSS contract -----------------
+
+  def test_copy_button_is_wired_for_progressive_enhancement
+    button = section.css('button.talk-skill__copy').first
+
+    refute_nil button, 'section needs a copy button'
+    assert_equal 'button', button['type']
+    assert_equal 'talk-skill-command', button['data-copy-target']
+    assert_equal 'talk-skill-copy-status', button['aria-describedby']
+    refute_empty button['aria-label'].to_s, 'copy button needs an accessible name'
+
+    status = section.css('#talk-skill-copy-status').first
+    refute_nil status, 'section needs a copy status element'
+    assert_equal 'polite', status['aria-live']
+  end
+
+  def test_copy_script_is_served_and_referenced_only_on_skill_pages
+    scripts = skill_page.css('script[src$="/assets/js/skill-install.js"]')
+
+    assert_equal 1, scripts.size, 'skill page references skill-install.js exactly once'
+    assert scripts.first.has_attribute?('defer'), 'script must be deferred'
+    assert File.exist?(File.join(REPO_ROOT, '_test_site', 'assets', 'js', 'skill-install.js')),
+           'skill-install.js must be part of the built site'
+  end
+
+  def test_css_declares_scrolling_command_block_and_touch_targets
+    css = File.read(File.join(REPO_ROOT, 'assets', 'css', 'main.css'))
+
+    assert_match(/\.talk-skill__command pre \{[^}]*overflow-x:\s*auto/m, css,
+                 'the command block must scroll horizontally within itself (FR-010)')
+    assert_match(/\.talk-skill__content table \{[^}]*overflow-x:\s*auto/m, css,
+                 'tables inside the body must scroll within themselves, not widen the page (FR-010)')
+    assert_match(/\.talk-skill__content pre \{[^}]*overflow-x:\s*auto/m, css,
+                 'code blocks inside the body must scroll within themselves (FR-010)')
+    assert_match(/\.talk-skill__copy \{[^}]*min-height:\s*44px/m, css)
+    assert_match(/\.talk-skill__copy \{[^}]*min-width:\s*44px/m, css)
+    assert_match(/@media \(max-width: 768px\) \{[^@]*\.talk-skill/m, css,
+                 'the section needs rules inside the 768px mobile block')
   end
 
   def test_raw_file_is_served_byte_identical
@@ -215,7 +260,7 @@ class TempSiteSkillSectionTest < Minitest::Test
     assert_empty section.css('details.talk-skill__body'), 'no disclosure for an empty body'
     assert_equal 'temp-skill', section.css('.talk-skill__name').text.strip
     assert_equal 'Temp description.', section.css('.talk-skill__description').text.strip
-    assert_includes section.css('#talk-skill-command').text, 'temp-skill'
+    assert_includes section.css('.talk-skill__generic').text, 'temp-skill/SKILL.md'
   end
 
   def test_description_markup_is_escaped

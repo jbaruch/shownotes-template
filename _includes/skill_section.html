@@ -17,18 +17,18 @@ DOM contract: specs/002-talk-skill-section/contracts/rendered-html.md
 
     <div class="talk-skill__install">
         <h3 class="talk-skill__install-heading">Install</h3>
-        <p class="talk-skill__install-label">Claude Code, personal skills folder:</p>
+        <p class="talk-skill__install-label">Works with any agent that supports Agent Skills (Claude Code, Codex, Cursor, Gemini CLI and more):</p>
         <div class="talk-skill__command">
-            <pre><code id="talk-skill-command">mkdir -p {{ skill.install_dir | escape }} &amp;&amp; curl -fsSL {{ raw_absolute }} -o {{ skill.install_dir | escape }}/SKILL.md</code></pre>
+            <pre><code id="talk-skill-command">npx skills add {{ raw_absolute }} -g</code></pre>
             <button type="button" class="talk-skill__copy" data-copy-target="talk-skill-command" aria-label="Copy install command" aria-describedby="talk-skill-copy-status">Copy</button>
         </div>
         <p id="talk-skill-copy-status" class="talk-skill__copy-status" aria-live="polite"></p>
-        <p class="talk-skill__generic">Other assistants: <a class="talk-skill__raw" href="{{ raw_relative }}" download>download SKILL.md</a> and place it where your assistant looks for skills.</p>
+        <p class="talk-skill__generic">No Node.js? <a class="talk-skill__raw" href="{{ raw_relative }}" download>Download SKILL.md</a> and save it as <code>{{ skill.name | escape }}/SKILL.md</code> inside your agent's skills folder (Claude Code: <code>{{ skill.install_dir | escape }}/SKILL.md</code>).</p>
     </div>
 
     {% if skill.html != "" %}
     <details class="talk-skill__body">
-        <summary class="talk-skill__summary">Show skill instructions</summary>
+        <summary class="talk-skill__summary">Show skill content</summary>
         <div class="talk-skill__content">
 {{ skill.html }}
         </div>

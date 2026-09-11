@@ -19,17 +19,17 @@ Rendered only when `page.skill` is truthy. Position: the first child of `<articl
 
   <div class="talk-skill__install">
     <h3 class="talk-skill__install-heading">Install</h3>
-    <p class="talk-skill__install-label">Claude Code, personal skills folder:</p>
+    <p class="talk-skill__install-label">Works with any agent that supports Agent Skills (Claude Code, Codex, Cursor, Gemini CLI and more):</p>
     <div class="talk-skill__command">
-      <pre><code id="talk-skill-command">mkdir -p ~/.claude/skills/{name} &amp;&amp; curl -fsSL {absolute raw url} -o ~/.claude/skills/{name}/SKILL.md</code></pre>
-      <button type="button" class="talk-skill__copy" data-copy-target="talk-skill-command" aria-describedby="talk-skill-copy-status">Copy</button>
+      <pre><code id="talk-skill-command">npx skills add {absolute raw url} -g</code></pre>
+      <button type="button" class="talk-skill__copy" data-copy-target="talk-skill-command" aria-label="Copy install command" aria-describedby="talk-skill-copy-status">Copy</button>
     </div>
     <p id="talk-skill-copy-status" class="talk-skill__copy-status" aria-live="polite"></p>
-    <p class="talk-skill__generic">Other assistants: <a class="talk-skill__raw" href="{relative raw url}" download>download SKILL.md</a> and place it where your assistant looks for skills.</p>
+    <p class="talk-skill__generic">No Node.js? <a class="talk-skill__raw" href="{relative raw url}" download>Download SKILL.md</a> and save it as <code>{name}/SKILL.md</code> inside your agent's skills folder (Claude Code: <code>~/.claude/skills/{name}/SKILL.md</code>).</p>
   </div>
 
   <details class="talk-skill__body">
-    <summary class="talk-skill__summary">Show skill instructions</summary>
+    <summary class="talk-skill__summary">Show skill content</summary>
     <div class="talk-skill__content">{html}</div>
   </details>
 </section>
@@ -38,7 +38,8 @@ Rendered only when `page.skill` is truthy. Position: the first child of `<articl
 
 Invariants:
 - `{name}` and `{description}` are Liquid-`escape`d. `{html}` is inserted as-is (already sanitized by the plugin).
-- `{absolute raw url}` = `skill.url | absolute_url`; `{relative raw url}` = `skill.url | relative_url`; `~/.claude/skills/{name}` in the command is `skill.install_dir` from the plugin, not recomputed in Liquid.
+- `{absolute raw url}` = `skill.url | absolute_url`; `{relative raw url}` = `skill.url | relative_url`; the Claude Code example path in the fallback sentence is `skill.install_dir` from the plugin, not recomputed in Liquid.
+- The command is the open Agent Skills CLI (`npx skills add <url> -g`): it downloads the served SKILL.md and installs it, personal scope, into every supported agent it detects on the visitor's machine (verified 2026-09-11 against a local build with a throwaway HOME). The command never contains the skill name; the CLI takes it from the file's `name` field.
 - Headings: exactly one `h2` in the section; `h3` for Install; body headings start at `h3`.
 - `<details>` has no `open` attribute in the build output. When the rendered body is empty (whitespace only), the whole `<details class="talk-skill__body">` element is omitted.
 - No CSS transitions or animations are used in the section, so there is nothing to gate on `prefers-reduced-motion`.

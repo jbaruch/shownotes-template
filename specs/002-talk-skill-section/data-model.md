@@ -17,7 +17,7 @@ One markdown file per talk, located by convention.
 | `stem` | `File.basename(File.dirname(source_path))` | Must equal a talk document's stem (`File.basename(doc.path, '.md')`) to be attached; otherwise the file is an **orphan** |
 | `front_matter` | Leading `---` block, parsed with `SafeYAML.load` | Must be a YAML mapping |
 | `name` | `front_matter['name']` | Required, non-empty string, matches `^[a-z0-9]+(-[a-z0-9]+)*$`, at most 64 characters |
-| `description` | `front_matter['description']` | Required, non-empty string; leading/trailing whitespace trimmed |
+| `description` | `front_matter['description']` | Required, non-empty string, at most 1024 characters (Agent Skills spec); leading/trailing whitespace trimmed |
 | `body` | Everything after the closing `---` | Markdown; may be empty (a metadata-only skill is legal but pointless) |
 | `raw_bytes` | The whole file | Served unchanged; the build never rewrites the source |
 
@@ -54,9 +54,9 @@ Composed in the include from `Skill` and site config.
 
 | Field | Value |
 |---|---|
-| `label` | `Claude Code (personal skills folder)` |
-| `command` | `mkdir -p ~/.claude/skills/{name} && curl -fsSL {skill.url \| absolute_url} -o ~/.claude/skills/{name}/SKILL.md` |
-| `generic` | Link to `{skill.url \| relative_url}` with the `download` attribute, plus one sentence for other assistants |
+| `label` | `Works with any agent that supports Agent Skills (Claude Code, Codex, Cursor, Gemini CLI and more)` |
+| `command` | `npx skills add {skill.url \| absolute_url} -g` |
+| `generic` | Link to `{skill.url \| relative_url}` with the `download` attribute, the `{name}/SKILL.md` layout, and `install_dir` as the Claude Code example |
 
 ### Talk header / listing indicator
 
@@ -93,7 +93,7 @@ Cardinality is enforced by the filesystem: one directory per stem, one `SKILL.md
 2. Front matter parses to a Hash.
 3. `name` present, String, non-empty after trim.
 4. `name` matches `^[a-z0-9]+(-[a-z0-9]+)*$` and length ≤ 64.
-5. `description` present, String, non-empty after trim.
+5. `description` present, String, non-empty after trim, at most 1024 characters.
 6. Body renders through the site converter without raising.
 
 Rules 1–5 fail the build. Rule 6 surfaces the converter's own exception unchanged.
