@@ -115,10 +115,10 @@
 
 ## Phase 7: Polish & Cross-Cutting
 
-- [ ] T022 [P] Update `README.md`: new optional Quick Start step "Add a Skill" (file location, required fields, what renders) between "Add a Thumbnail" and "Deploy", and change the clean-up command to `rm _talks/DEMO-*.md && rm -rf _skills/DEMO-*` (FR-013, FR-017)
-- [ ] T023 [P] Add a "Skills" section to `docs/USAGE.md` covering location, required metadata and the `name` slug rule, what the page shows, install alternatives including project-level `.claude/skills/{name}/SKILL.md`, the exact build failure messages, orphan behaviour, and local preview with `jekyll serve` (FR-013)
-- [ ] T024 [P] Update `docs/TESTING.md` (list `skill_processor_test.rb` and `skill_section_test.rb` under their categories) and `docs/DEVELOPMENT.md` (add the skill processor to the talk-processing pipeline description)
-- [ ] T025 [P] Create `docs/templates/sample-skill.md` as a copy-and-edit starter next to `sample-talk.md`
+- [X] T022 [P] Update `README.md`: new optional Quick Start step "Add a Skill" (file location, required fields, what renders) between "Add a Thumbnail" and "Deploy", and change the clean-up command to `rm _talks/DEMO-*.md && rm -rf _skills/DEMO-*` (FR-013, FR-017)
+- [X] T023 [P] Add a "Skills" section to `docs/USAGE.md` covering location, required metadata and the `name` slug rule, what the page shows, install alternatives including project-level `.claude/skills/{name}/SKILL.md`, the exact build failure messages, orphan behaviour, and local preview with `jekyll serve` (FR-013)
+- [X] T024 [P] Update `docs/TESTING.md` (list `skill_processor_test.rb` and `skill_section_test.rb` under their categories) and `docs/DEVELOPMENT.md` (add the skill processor to the talk-processing pipeline description)
+- [X] T025 [P] Create `docs/templates/sample-skill.md` as a copy-and-edit starter next to `sample-talk.md`
 - [ ] T026 Run `bundle exec rake test:unit` and `bundle exec rake test:integration` and `bundle exec rake quick`; all green with no modified pre-existing test files (SC-003)
 - [ ] T027 Run the quickstart.md "Verify locally" block end to end (test-config build, `grep` counts, `cmp` on the raw file, failure-mode build exits non-zero naming the file, clean-up) and confirm `bundle exec jekyll build` prints no warnings
 

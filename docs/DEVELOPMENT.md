@@ -48,6 +48,18 @@ Jekyll Static Site Generator
    - Provides fallback placeholders
    - No external dependencies
 
+#### Skill Processing
+
+`_plugins/skill_processor.rb` runs as a Jekyll generator after the talk processor:
+
+1. Globs `_skills/*/SKILL.md` (an underscore directory, so Jekyll's reader never sees the files)
+2. Validates the front matter fail-loud: missing header, invalid YAML, missing `name`/`description`, `name` not a slug, `description` over 1024 characters all raise `Jekyll::Errors::FatalException` naming the file
+3. Renders the body through the site's markdown converter, then `HtmlSanitizer#sanitize_html`, then demotes headings by two levels
+4. Attaches `doc.data['skill']` (`name`, `description`, `html`, `url`, `source_path`, `install_dir`) to the talk whose filename stem matches the folder name
+5. Registers a `StaticFile` subclass so the source file is copied byte-for-byte to `/skills/{stem}/SKILL.md`
+
+`_includes/skill_section.html` renders `page.skill`; `assets/js/skill-install.js` adds the copy button behaviour. Templates only ever test `page.skill` / `talk.skill` for truthiness, the same way they test `extracted_video`.
+
 #### Content Structure
 
 ```yaml

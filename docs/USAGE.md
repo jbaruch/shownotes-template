@@ -248,6 +248,91 @@ Benefits:
 - **Thumbnail missing**: Placeholder SVG used
 - **Thumbnail fails to load**: Browser shows placeholder
 
+## Skills
+
+A talk can ship an [Agent Skill](https://agentskills.io): a `SKILL.md` file that packages the talk's know-how for coding agents (Claude Code, Codex, Cursor, Gemini CLI, and 30+ others support the format). Visitors install it from the talk page with one command.
+
+### Location
+
+```
+_skills/{talk-stem}/SKILL.md
+```
+
+`{talk-stem}` is the talk's filename without `.md`, exactly as thumbnails use it:
+
+```
+_talks/2024-06-12-conference-talk-title.md
+_skills/2024-06-12-conference-talk-title/SKILL.md
+```
+
+Drop the file, rebuild, done. No frontmatter or `_config.yml` changes. The `_skills/` directory is invisible to Jekyll's normal processing; the site's plugin picks the file up and serves it verbatim at `/skills/{talk-stem}/SKILL.md`.
+
+### Format
+
+```markdown
+---
+name: evaluate-ai-assistant-claims
+description: Evaluate a vendor's productivity claim about an AI coding assistant. Use when someone quotes a percentage gain and asks whether to adopt the tool.
+---
+
+# Evaluate AI Coding Assistant Claims
+
+Step-by-step instructions, examples, edge cases. Headings, lists, tables, and code blocks all render.
+```
+
+| Field | Rule |
+|---|---|
+| `name` | Required. Lowercase letters, digits, and single hyphens; 1–64 characters. Becomes the install folder and, in most agents, the slash command. |
+| `description` | Required. 1–1024 characters. Say what the skill does *and* when to use it; agents pick skills by this text. |
+| body | Optional markdown. Rendered on the page inside a collapsed "Show skill content" disclosure. `<script>` blocks are neutralised. Headings are shown two levels down so the page outline stays valid. |
+
+Extra frontmatter fields (`license`, `metadata`, …) are allowed and preserved in the served file. A starter file is at [docs/templates/sample-skill.md](templates/sample-skill.md).
+
+### What the page shows
+
+When the file exists, the talk page renders a **Skill** section directly under the slides/video row, and a **Skill Available** badge appears next to the video status in the header and on the homepage cards. The section shows the name, the description, an install block, a download link, and the collapsed content. When the file is absent, nothing is rendered: no section, no badge, no placeholder.
+
+### Installing (what visitors see)
+
+The install block offers one command that works for every agent supporting Agent Skills:
+
+```bash
+npx skills add https://your-site/skills/{talk-stem}/SKILL.md -g
+```
+
+`-g` installs into the visitor's personal skills folders (all detected agents); without `-g` the CLI installs into the current project instead. Visitors without Node.js get a download link and the layout to place the file in: `{name}/SKILL.md` inside their agent's skills folder, for example `~/.claude/skills/{name}/SKILL.md` for Claude Code (personal) or `.claude/skills/{name}/SKILL.md` inside a repository (project).
+
+### When the build fails
+
+A broken skill file fails the build on purpose. The message always starts with the file path:
+
+| Message | Fix |
+|---|---|
+| `Skill _skills/x/SKILL.md: missing front matter (file must start with ---)` | Add the `---` block at the very top |
+| `…: front matter is not valid YAML: …` | Fix the YAML (quote values containing `:`) |
+| `…: missing required field 'name'` / `'description'` | Add the field with a non-empty value |
+| `…: 'name' must be lowercase letters, digits and hyphens (used as the install directory)` | Rename, e.g. `my-skill` |
+| `…: 'description' must be at most 1024 characters` | Shorten the description |
+
+A skill folder whose stem has no matching talk is ignored (logged at info level) and not served. A site with no `_skills/` directory at all builds normally.
+
+### Local preview
+
+```bash
+bundle exec jekyll serve
+open http://localhost:4000/talks/{talk-stem}/
+```
+
+Edits under `_skills/` trigger a rebuild like any other content. Copy-to-clipboard needs a secure context; `localhost` counts, so the Copy button works locally.
+
+### Removing the demo skill
+
+The template ships one demo skill for the DEMO talk of the same name. Remove it with the demo talks:
+
+```bash
+rm _talks/DEMO-*.md && rm -rf _skills/DEMO-*
+```
+
 ## Testing Your Talks
 
 ### Single Talk Testing

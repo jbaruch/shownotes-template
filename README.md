@@ -12,8 +12,8 @@ Perfect for speakers who want a simple, mobile-friendly page for their talks.
 git clone https://github.com/YOUR-USERNAME/shownotes.git
 cd shownotes
 
-# Remove example talks
-rm _talks/*.md
+# Remove example talks and the example skill
+rm _talks/DEMO-*.md && rm -rf _skills/DEMO-*
 ```
 
 ### 2. Configure Your Speaker Profile
@@ -77,7 +77,21 @@ assets/images/thumbnails/2024-06-12-conference-talk-title-thumbnail.png
 ```
 *The platform automatically resizes images to 400x300 while maintaining aspect ratio.*
 
-### 5. Deploy
+### 5. Add a Skill (Optional)
+Ship the talk's know-how as an [Agent Skill](https://agentskills.io) that visitors can install into Claude Code, Codex, Cursor, Gemini CLI, and any other agent that supports the format. Create `_skills/2024-06-12-conference-talk-title/SKILL.md` (the folder name is the talk's filename without `.md`):
+```markdown
+---
+name: my-talk-skill
+description: What the skill does and when an agent should use it.
+---
+
+# My Talk Skill
+
+Instructions for the agent, in markdown.
+```
+The talk page gains a Skill section directly under the slides and video: the description, a one-line install command, a download link, and the skill content. No skill file, no section. `name` must be lowercase letters, digits, and hyphens (it becomes the install folder); `description` is required. A malformed file fails the build and names the file and the problem. See the [Usage Guide](docs/USAGE.md#skills) for details.
+
+### 6. Deploy
 - Push to GitHub
 - Enable GitHub Pages in repository Settings
 - Your site will be live at `https://YOUR-USERNAME.github.io/shownotes`
@@ -156,6 +170,7 @@ TEST_SINGLE_TALK=your-talk-name bundle exec ruby test/migration/migration_test.r
 - **⚡ Zero Dependencies** - Works with GitHub Pages out of the box
 - **🖼️ Automatic Thumbnails** - From your first slide or custom images
 - **📋 Resource Management** - Organized links to slides, videos, code, docs
+- **🧠 Agent Skills** - Ship a SKILL.md per talk; visitors install it into their coding agent with one command
 - **🎯 SEO Optimized** - Proper meta tags and structured data
 - **⚡ Fast Loading** - Minimal, optimized static site
 - **🔒 Secure & Accessible** - XSS protection and WCAG-compliant
