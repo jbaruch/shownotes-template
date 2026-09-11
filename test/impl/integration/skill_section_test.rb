@@ -145,6 +145,17 @@ class RealSiteSkillSectionTest < Minitest::Test
     refute_empty section.css('.talk-skill__content h3'), 'the demo body h1 renders as h3'
   end
 
+  # --- US2: talks without a skill are untouched ---------------------------
+
+  def test_other_demo_talks_have_no_skill_markup_or_script
+    OTHER_DEMO_STEMS.each do |stem|
+      html = talk_html(site, stem)
+
+      assert_empty html.css('.talk-skill, .skill-available, script[src*="skill-install"]'),
+                   "#{stem} must carry no skill section, badge, or script (FR-004)"
+    end
+  end
+
   def test_raw_file_is_served_byte_identical
     source = File.binread(File.join(REPO_ROOT, '_skills', SKILL_STEM, 'SKILL.md'))
     served = File.join(REPO_ROOT, '_test_site', 'skills', SKILL_STEM, 'SKILL.md')
@@ -217,6 +228,39 @@ class TempSiteSkillSectionTest < Minitest::Test
     assert_empty description.css('b'), 'markup in the description must not become elements'
     assert_includes description.inner_html, '&lt;b&gt;'
     assert_equal 'Uses <b>bold</b> text', description.text.strip
+  end
+
+  # --- US2: build-time failure modes --------------------------------------
+
+  def test_malformed_skill_fails_the_build_naming_the_file
+    write_talk('bad-talk')
+    write_skill('bad-talk', front_matter: 'description: no name here')
+
+    error = assert_raises(Jekyll::Errors::FatalException) { build }
+
+    assert_includes error.message, '_skills/bad-talk/SKILL.md'
+    assert_includes error.message, "'name'"
+    refute File.exist?(File.join(@dir, '_site', 'talks', 'bad-talk', 'index.html')),
+           'nothing may be published when a skill file is malformed (FR-009)'
+  end
+
+  def test_orphan_skill_is_ignored_and_not_served
+    write_talk('real-talk')
+    write_skill('ghost-talk')
+
+    site = build
+
+    assert_empty talk_html(site, 'real-talk').css('.talk-skill')
+    refute File.exist?(File.join(@dir, '_site', 'skills')), 'orphan skills are not served (FR-012)'
+  end
+
+  def test_site_without_skills_directory_builds_cleanly
+    write_talk('lonely-talk')
+
+    site = build
+
+    assert File.exist?(File.join(@dir, '_site', 'talks', 'lonely-talk', 'index.html'))
+    assert_empty talk_html(site, 'lonely-talk').css('.talk-skill, .skill-available')
   end
 
   private
