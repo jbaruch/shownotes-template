@@ -61,6 +61,12 @@ layout: default
                 Video Coming Soon
             </span>
             {% endif %}
+            {% comment %} Agent skill availability (feature 002); nothing rendered when no skill file exists {% endcomment %}
+            {% if page.skill %}
+            <span class="meta-item status-badge skill-available">
+                Skill Available
+            </span>
+            {% endif %}
         </div>
 
     </header>
@@ -87,6 +93,11 @@ layout: default
             {% endif %}
         </div>
     </section>
+    {% endif %}
+
+    <!-- Agent skill distilled from the talk (feature 002); omitted entirely when no skill file exists -->
+    {% if page.skill %}
+    {% include skill_section.html skill=page.skill %}
     {% endif %}
 
     <!-- Talk content -->

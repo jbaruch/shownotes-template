@@ -824,6 +824,20 @@ a:hover {
     border: none;
 }
 
+/* Skill availability (feature 002): same weight and tracking as the video badge, accent underline as the tell */
+.meta-item.status-badge.skill-available {
+    color: var(--color-text-primary);
+    background: none;
+    border: none;
+    border-bottom: 2px solid var(--color-accent);
+    font-weight: 500;
+}
+
+[data-theme="dark"] .meta-item.status-badge.skill-available {
+    color: var(--color-text-secondary);
+    border-bottom-color: var(--color-accent-light);
+}
+
 .talk-summary {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
@@ -1118,6 +1132,223 @@ a:hover {
 }
 
 /* ===========================================
+   Talk Page - Skill Section (feature 002)
+   =========================================== */
+.talk-skill {
+    margin-bottom: var(--space-12);
+    padding: var(--space-8);
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+}
+
+.talk-skill__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    margin: 0 0 var(--space-4) 0;
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.talk-skill__label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.talk-skill__name {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+}
+
+.talk-skill__description {
+    margin: 0 0 var(--space-6) 0;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.talk-skill__install-heading {
+    font-family: var(--font-display);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 0 0 var(--space-2) 0;
+}
+
+.talk-skill__install-label {
+    margin: 0 0 var(--space-2) 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+/* The one call-to-action on the page: hard accent shadow, everything else stays quiet */
+.talk-skill__command {
+    display: flex;
+    align-items: stretch;
+    margin: 0 0 var(--space-3) 0;
+    background: var(--color-surface-elevated);
+    border: 2px solid var(--color-border-strong);
+    box-shadow: 4px 4px 0 var(--color-accent);
+}
+
+.talk-skill__command pre {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    padding: var(--space-4);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+    color: var(--color-text-primary);
+}
+
+.talk-skill__command code {
+    white-space: pre;
+}
+
+.talk-skill__copy {
+    flex: 0 0 auto;
+    align-self: center;
+    margin: 0 var(--space-2);
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+    background: var(--color-background);
+    border: 2px solid var(--color-border-strong);
+    cursor: pointer;
+}
+
+.talk-skill__copy:hover,
+.talk-skill__copy:focus-visible {
+    color: var(--color-background);
+    background: var(--color-border-strong);
+}
+
+.talk-skill__copy-status {
+    min-height: 1.5em;
+    margin: 0 0 var(--space-3) 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.talk-skill__generic {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.talk-skill__body {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 2px solid var(--color-border);
+}
+
+.talk-skill__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-bold);
+}
+
+.talk-skill__summary::-webkit-details-marker {
+    display: none;
+}
+
+.talk-skill__summary::before {
+    content: "+";
+    display: inline-block;
+    width: 1.5rem;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-lg);
+    color: var(--color-accent);
+}
+
+.talk-skill__body[open] .talk-skill__summary::before {
+    content: "\2212";
+}
+
+.talk-skill__content {
+    margin-top: var(--space-4);
+    line-height: 1.7;
+}
+
+.talk-skill__content h3,
+.talk-skill__content h4,
+.talk-skill__content h5,
+.talk-skill__content h6 {
+    font-family: var(--font-display);
+    margin: var(--space-6) 0 var(--space-2) 0;
+}
+
+.talk-skill__content h3 {
+    font-size: var(--font-size-lg);
+}
+
+.talk-skill__content h4 {
+    font-size: var(--font-size-base);
+}
+
+.talk-skill__content pre {
+    overflow-x: auto;
+    padding: var(--space-4);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
+    font-size: var(--font-size-sm);
+}
+
+.talk-skill__content code {
+    font-family: var(--font-mono);
+}
+
+.talk-skill__content ul,
+.talk-skill__content ol {
+    padding-left: var(--space-6);
+}
+
+.talk-skill__content table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: var(--space-4) 0;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+}
+
+.talk-skill__content th,
+.talk-skill__content td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.talk-skill__content th {
+    font-family: var(--font-display);
+    border-bottom: 2px solid var(--color-border-strong);
+}
+
+/* ===========================================
    Responsive - Mobile First
    =========================================== */
 @media (max-width: 768px) {
@@ -1186,6 +1417,21 @@ a:hover {
     .talk-title {
         font-size: var(--font-size-3xl);
     }
+
+    /* Skill section: stack the copy button under the command on phones */
+    .talk-skill {
+        padding: var(--space-4);
+    }
+
+    .talk-skill__command {
+        flex-direction: column;
+    }
+
+    .talk-skill__copy {
+        align-self: stretch;
+        margin: 0 var(--space-4) var(--space-4);
+    }
+
 }
 
 @media (max-width: 480px) {
@@ -1209,6 +1455,15 @@ a:hover {
     .talk-list-item {
         padding: var(--space-4);
     }
+
+    .talk-skill__heading {
+        font-size: var(--font-size-lg);
+    }
+
+    .talk-skill__name {
+        font-size: var(--font-size-base);
+    }
+
 }
 
 /* 280px extreme viewport */

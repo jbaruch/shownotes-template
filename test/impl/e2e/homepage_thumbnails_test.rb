@@ -30,7 +30,7 @@ class HomepageThumbnailsTest < Minitest::Test
       sleep 2
       
       puts "Building Jekyll site for homepage thumbnails test..."
-      build_result = system('bundle exec jekyll build --config _config_test.yml --quiet')
+      build_result = system({'JEKYLL_ENV' => 'production'}, 'bundle exec jekyll build --config _config_test.yml --quiet')
       raise "Failed to build Jekyll site" unless build_result
       
       puts "Starting Jekyll server for homepage thumbnails test..."
