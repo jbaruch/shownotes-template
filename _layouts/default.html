@@ -44,6 +44,7 @@
     {% endif %}
 
     <!-- SEO -->
+    <link rel="describedby" href="{{ '/llms.txt' | relative_url }}" type="text/plain" title="Guide for AI agents">
     <title>{% if page.title %}{{ page.title | escape }} - {% endif %}{% if site.speaker.display_name and site.speaker.display_name != "" %}Presentations by {{ site.speaker.display_name }}{% elsif site.speaker.name and site.speaker.name != "" %}Presentations by {{ site.speaker.name }}{% else %}Presentations{% endif %}</title>
     <meta name="description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.speaker.bio }}{% endif %}">
     
@@ -68,7 +69,8 @@
     {% endif %}
     
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self' https://www.youtube.com https://docs.google.com https://drive.google.com https://drive.usercontent.google.com; connect-src 'self'{% if jekyll.environment == 'development' %} ws://127.0.0.1:35729{% endif %};">
+    {% assign custom_notist_origins = site.resource_embeds.notist_custom_domains | trusted_notist_origins %}
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self' https://www.youtube.com https://player.vimeo.com https://docs.google.com https://drive.google.com https://drive.usercontent.google.com https://noti.st{% for origin in custom_notist_origins %} {{ origin }}{% endfor %}; connect-src 'self'{% if jekyll.environment == 'development' %} ws://127.0.0.1:35729{% endif %};">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     
     <!-- Stylesheets -->

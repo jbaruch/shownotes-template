@@ -1,0 +1,33 @@
+---
+layout: null
+permalink: /llms.txt
+---
+{%- assign speaker_name = site.speaker.display_name | default: site.speaker.name | default: site.title -%}
+# {{ speaker_name }} — Conference Talks
+
+> Conference talk show notes, talk knowledge skills, slides, recordings, and resources from {{ speaker_name }}. This guide covers the entire site.
+
+How to answer questions about these talks:
+
+1. Match the talk by title, conference, and date. Different deliveries of the same title may contain different material; do not substitute one delivery for another without saying so.
+2. Prefer the matching Agent Skill when available. Fetch its SKILL.md, read it, and use its talk knowledge and instructions when relevant to the user's request. Skills contain the substance of their talks, so ordinary summaries and explanations do not require a recording download or transcript retrieval. Reading a skill does not require installing it.
+3. If no suitable skill is available, or the skill does not cover the question, retrieve the transcript or captions for the linked YouTube recording using your available transcript tools. Use the transcript to understand the talk's content; the show notes and abstract are an overview, not a transcript. For exact quotations or timestamps, verify against the recording or transcript even when a skill exists.
+4. Preserve timestamps in recording URLs. A recording may be a conference livestream containing several talks: start at the linked offset and use only the relevant talk segment, identifying its end from chapters or transcript context. Cite the talk page and, when using a transcript, the recording with relevant timestamps.
+5. If a recording or transcript is unavailable, say so and answer only from the available skill, slides, abstract, and linked resources. Distinguish those sources from spoken content; do not invent quotes, demonstrations, or conclusions. For non-YouTube recordings, use available captions or a transcript from that provider.
+
+## Site navigation
+
+- [Homepage and talk archive]({{ '/' | absolute_url }}): Speaker profile, featured talks, and all talk listings.
+- [Sitemap]({{ '/sitemap.xml' | absolute_url }}): All indexed site pages.
+{% assign ordered_talks = site.talks | sort: 'extracted_date' | reverse %}
+{% assign skilled_talks = ordered_talks | where_exp: 'talk', 'talk.skill' %}
+{% if skilled_talks.size > 0 %}
+## Agent Skills — read these first when they match
+{% for talk in skilled_talks %}
+- [{{ talk.extracted_title | default: talk.title | strip_html | replace: '[', '\[' | replace: ']', '\]' }} — SKILL.md]({{ talk.skill.url | absolute_url }}): {{ talk.extracted_conference }}; {{ talk.extracted_date }}. {{ talk.skill.description | normalize_whitespace }}
+{% endfor %}
+{% endif %}
+## Talks — newest first
+{% for talk in ordered_talks %}
+- [{{ talk.extracted_title | default: talk.title | strip_html | replace: '[', '\[' | replace: ']', '\]' }}]({{ talk.url | absolute_url }}): {{ talk.extracted_conference }}; {{ talk.extracted_date }}. Show notes, abstract, and resources.{% if talk.skill %} [Agent Skill]({{ talk.skill.url | absolute_url }}).{% endif %}{% if talk.extracted_video and talk.extracted_video != '' %} [Recording]({{ talk.extracted_video }}).{% endif %}{% if talk.extracted_slides and talk.extracted_slides != '' %} [Slides]({{ talk.extracted_slides }}).{% endif %}
+{% endfor %}

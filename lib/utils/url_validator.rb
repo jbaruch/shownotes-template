@@ -84,6 +84,10 @@ module UrlValidator
   # Check if URL is from Notist
   def notist_url?(url)
     return false if url.nil? || url.to_s.strip.empty?
-    url.include?('notist.cloud') || url.include?('speaking.jbaru.ch') || url.include?('notist.ninja')
+
+    host = URI.parse(url).host&.downcase
+    host == 'noti.st' || host == 'www.noti.st' || host&.end_with?('.notist.cloud') || host == 'notist.ninja'
+  rescue URI::InvalidURIError
+    false
   end
 end

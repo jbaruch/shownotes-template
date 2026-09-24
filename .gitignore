@@ -39,6 +39,7 @@ pdfs/
 # Development helper scripts (use proper test suite instead)
 debug_*.rb
 test_*.rb
+!test/test_helper.rb
 compare_*.rb
 analyze_*.rb
 migrate_talk_*.rb
