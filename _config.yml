@@ -10,6 +10,12 @@ encoding: utf-8
 timezone: UTC
 future: true
 
+# Embedded resources
+# Canonical YouTube, Vimeo, Google, and Notist URLs work automatically.
+# To embed a Notist custom domain, add only its hostname (no scheme or path).
+resource_embeds:
+  notist_custom_domains: []
+
 # Kramdown configuration
 kramdown:
   auto_ids: true

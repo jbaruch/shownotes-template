@@ -1,5 +1,5 @@
 {% comment %}
-Embedded resource include for Google Slides and YouTube v                            <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" data-fallback="{{ placeholder_url }}" onerror="this.onerror=null;this.src=this.dataset.fallback;">                           <img src="{{ thum                        <img src="{{ placeholder_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" data-fallback="{{ placeholder_url }}" onerror="this.onerror=null;this.src=this.dataset.fallback;">_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" data-fallback="{{ placeholder_url }}" onerror="this.onerror=null;this.src=this.dataset.fallback;">deos
+Embedded resources for Google Slides, Drive PDFs, Notist, YouTube, and Vimeo.
 Usage: {% include embedded_resource.html url=page.slides type="slides" %}
        {% include embedded_resource.html url=page.video type="video" %}
 {% endcomment %}
@@ -9,6 +9,7 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
 {% assign preview_mode = include.preview_mode | default: false %}
 {% assign size = include.size | default: 'normal' %}
 {% assign title = include.title | default: "Presentation slides" %}
+{% assign placeholder_url = "/assets/images/placeholder-thumbnail.svg" | relative_url %}
 
 {% comment %} Set thumbnail height based on size {% endcomment %}
 
@@ -25,11 +26,10 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
   {% assign is_google_drive_pdf = true %}
 {% endif %}
 
-{% comment %} Check if URL is YouTube {% endcomment %}
-{% assign is_youtube = false %}
-{% if url contains "youtube.com/watch?v=" or url contains "youtu.be/" or url contains "m.youtube.com/watch?v=" %}
-  {% assign is_youtube = true %}
-{% endif %}
+{% assign youtube = url | youtube_resource %}
+{% assign vimeo = url | vimeo_resource %}
+{% assign custom_notist_domains = site.resource_embeds.notist_custom_domains | default: empty %}
+{% assign notist_url = url | notist_embed_url: custom_notist_domains %}
 
 {% if is_google_slides %}
   {% comment %} Extract presentation ID from Google Slides URL {% endcomment %}
@@ -129,16 +129,34 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
     {% if not preview_mode %}<div class="resource-fallback"><a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">{{ title }}</a></div>{% endif %}
   {% endif %}
 
-{% elsif is_youtube %}
-  {% assign video_id = "" %}
-  {% if url contains "youtube.com/watch?v=" or url contains "m.youtube.com/watch?v=" %}
-    {% assign video_id = url | split: "v=" | last | split: "&" | first %}
-  {% elsif url contains "youtu.be/" %}
-    {% assign video_id = url | split: "youtu.be/" | last | split: "?" | first %}
+{% elsif notist_url %}
+  {% if preview_mode %}
+    {% assign thumb_url = placeholder_url %}
+    {% if include.talk %}
+      {% assign talk_slug = include.talk.path | split: "/" | last | remove: ".md" %}
+      {% assign local_thumbnail_path = "/assets/images/thumbnails/" | append: talk_slug | append: "-thumbnail.png" %}
+      {% assign thumb_url = local_thumbnail_path | relative_url %}
+    {% endif %}
+    <div class="preview-thumbnail-wrapper">
+      <div class="talk-preview-{{ size }}">
+        {% if include.talk_url %}<a href="{{ include.talk_url }}" class="preview-link">{% endif %}
+          <div class="slides-thumbnail-preview thumbnail-container">
+            <img src="{{ thumb_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy" data-fallback="{{ placeholder_url }}" onerror="this.onerror=null;this.src=this.dataset.fallback;">
+          </div>
+        {% if include.talk_url %}</a>{% endif %}
+      </div>
+    </div>
+  {% else %}
+    <div class="embed-container slides-embed">
+      <iframe src="{{ notist_url }}" frameborder="0" allowfullscreen loading="lazy" title="{{ title | escape }}" class="responsive-iframe" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox"></iframe>
+    </div>
   {% endif %}
 
+{% elsif youtube %}
+  {% assign video_id = youtube.video_id %}
+
   {% if video_id != "" %}
-    {% assign embed_url = "https://www.youtube.com/embed/" | append: video_id %}
+    {% assign embed_url = youtube.embed_url %}
     {% if preview_mode %}
       <div class="preview-thumbnail-wrapper">
                 <div class="talk-preview-{{ size }}">
@@ -162,6 +180,22 @@ Usage: {% include embedded_resource.html url=page.slides type="slides" %}
     {% endif %}
   {% else %}
     {% if not preview_mode %}<div class="resource-fallback"><a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="resource-link">{{ title }}</a></div>{% endif %}
+  {% endif %}
+
+{% elsif vimeo %}
+  {% if preview_mode %}
+    <div class="preview-thumbnail-wrapper">
+      <div class="talk-preview-{{ size }}">
+        {% if include.talk_url %}<a href="{{ include.talk_url }}" class="preview-link">{% endif %}
+          <div class="video-thumbnail-preview thumbnail-container">
+            <img src="{{ placeholder_url }}" alt="{{ title | escape }}" class="thumbnail-image preview-image" loading="lazy">
+            <div class="play-overlay"><svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        {% if include.talk_url %}</a>{% endif %}
+      </div>
+    </div>
+  {% else %}
+    <div class="embed-container video-embed"><iframe src="{{ vimeo.embed_url }}" frameborder="0" allowfullscreen loading="lazy" title="{{ title | escape }}" class="responsive-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox"></iframe></div>
   {% endif %}
 
 {% else %}

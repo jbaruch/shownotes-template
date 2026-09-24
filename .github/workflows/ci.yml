@@ -10,6 +10,7 @@ on:
       - 'test/**'
       - '_plugins/**'
       - '_skills/**'
+      - 'llms.txt'
       - '_config.yml'
       - 'Gemfile*'
       - '_layouts/**'

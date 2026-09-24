@@ -230,8 +230,8 @@ class UrlValidatorTest < Minitest::Test
     assert notist_url?('https://on.notist.cloud/slides/abc123')
   end
   
-  def test_notist_url_with_speaking_domain
-    assert notist_url?('https://example.com/abc123')
+  def test_notist_url_with_canonical_domain
+    assert notist_url?('https://noti.st/example/abc123')
   end
   
   def test_notist_url_with_notist_ninja

@@ -11,6 +11,7 @@ on:
       - '_includes/**'
       - 'assets/**'
       - 'index.md'
+      - 'llms.txt'
       - '_data/**'
       - 'pdfs/**'
       - '*.html'

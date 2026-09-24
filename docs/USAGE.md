@@ -333,6 +333,39 @@ The template ships one demo skill for the DEMO talk of the same name. Remove it 
 rm _talks/DEMO-*.md && rm -rf _skills/DEMO-*
 ```
 
+## Embedded recordings and slides
+
+The `Video` and `Slides` fields accept these embedded providers:
+
+| Provider | Supported URLs | Notes |
+|---|---|---|
+| YouTube | `youtube.com/watch`, `youtube.com/live`, `youtube.com/shorts`, `youtube.com/embed`, and `youtu.be` | `t` and `start` timestamps are preserved, including values such as `1h2m3s`. |
+| Vimeo | Public, channel, unlisted, and `player.vimeo.com/video` URLs | Tracking parameters are removed; an unlisted video's privacy hash is preserved. |
+| Google | Slides presentations and Drive-hosted PDFs | Existing local-thumbnail and fallback behavior is unchanged. |
+| Notist | `noti.st/{user}/{id}/...` | Share parameters and slide fragments are removed from the embed URL. |
+
+Unknown, malformed, and host-lookalike URLs remain ordinary resource links instead of becoming iframes. Archive previews use the local talk thumbnail when one is available and never load a player iframe.
+
+### Custom Notist domains
+
+Custom Notist domains are opt-in so the template does not trust a speaker-specific hostname by default. Add hostnames without a scheme or path:
+
+```yaml
+resource_embeds:
+  notist_custom_domains:
+    - slides.example.com
+```
+
+Configured hosts are added to the page's `frame-src` policy and are expected to serve the presentation at `/{presentation-id}/embed` over HTTPS. Restart the Jekyll server after changing `_config.yml`.
+
+## Guide for AI agents
+
+The site publishes `/llms.txt`, generated from `llms.txt` during each Jekyll build. The shared page layout links to it through a `rel="describedby"` discovery link, including on the homepage and talk pages. It lists every talk newest first with its available Agent Skill, recording, and slides, so adding or updating talk metadata automatically updates the guide.
+
+The guide tells agents to read a matching `SKILL.md` first for ordinary summaries and questions. When no suitable skill covers the question, agents should retrieve the linked YouTube transcript. Exact quotations and timestamps still require checking the recording or transcript. Livestream links retain their start times so agents can isolate the correct talk segment.
+
+Edit the prose in `llms.txt` to change this behavior. The file provides navigation and source guidance; it does not fetch or host captions.
+
 ## Testing Your Talks
 
 ### Single Talk Testing
