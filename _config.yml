@@ -53,17 +53,17 @@ plugins:
 
 # Speaker configuration (single source of truth)
 speaker:
-  name: "Baruch Sadogursky"
+  name: "Your Name"
   display_name: ""                 # Optional: Override for display (if empty, uses name)
-  bio: "Developer advocate and expert in DevOps, software development practices, and technology trends. Regular speaker at major conferences about improving developer productivity and software quality."
+  bio: "Add your professional bio here."
   avatar_url: ""                   # Optional: Custom avatar URL (fallback if no social media avatars available)
   # Social media handles (all optional - leave empty to hide)
   social:
-    linkedin: "jbaruch"           # Optional: LinkedIn username (generates https://linkedin.com/in/jbaruch)
-    x: "jbaruch"                 # Optional: X.com username (generates https://x.com/jbaruch)  
-    github: "jbaruch"            # Optional: GitHub username (generates https://github.com/jbaruch + avatar from GitHub)
+    linkedin: ""                # Optional: LinkedIn username
+    x: ""                       # Optional: X.com username
+    github: ""                  # Optional: GitHub username (also provides the avatar)
     mastodon: ""                 # Optional: Full Mastodon URL (e.g., "https://mastodon.social/@username")
-    bluesky: "jbaru.ch"                  # Optional: BlueSky username (generates https://bsky.app/profile/jbaruch)
+    bluesky: ""                 # Optional: BlueSky username
 
 # Site metadata (templates will use speaker config)
 title: "Speaker Presentations"

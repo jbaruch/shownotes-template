@@ -23,7 +23,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     
     strategy:
       matrix:
@@ -49,7 +49,7 @@ jobs:
       run: bundle exec rake test:migration
 
   performance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     
     steps:
     - uses: actions/checkout@v4
@@ -64,7 +64,7 @@ jobs:
       run: bundle exec rake test:performance
 
   security:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     
     steps:
     - uses: actions/checkout@v4
@@ -79,7 +79,7 @@ jobs:
       run: bundle exec bundle-audit
 
   e2e:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     
     steps:
     - uses: actions/checkout@v4
@@ -94,7 +94,7 @@ jobs:
       run: bundle exec rake test:e2e
 
   tools:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     
     steps:
     - uses: actions/checkout@v4
@@ -109,7 +109,7 @@ jobs:
       run: bundle exec rake test:tools
 
   external:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     continue-on-error: true  # External tests may fail due to network/API issues
     
     steps:
@@ -128,7 +128,7 @@ jobs:
         GOOGLE_API_CREDENTIALS_JSON: ${{ secrets.GOOGLE_API_CREDENTIALS }}
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [test, security, performance, e2e, tools]  # Note: external tests not required for build
     
     steps:
